@@ -1,0 +1,13 @@
+[data-theme="cobalt"] {
+  --c-bg: #e4e8f2;
+  --c-surface: #f4f6fb;
+  --c-ink: #0f1630;
+  --c-ink-soft: #4a536e;
+  --c-line: #0f1630;
+  --c-shadow: #0f1630;
+  --c-accent: #2b4fd8;
+  --c-accent-ink: #f4f6fb;
+  --c-highlight: #ffd84d;
+  --grain-opacity: 0.25;
+  --grain-blend: multiply;
+}

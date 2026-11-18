@@ -1,9 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  cacheComponents: true,
-  partialPrefetching: true,
+  experimental: {
+    // Gallery uploads: up to 6 images of 2 MB each travel in one request.
+    serverActions: { bodySizeLimit: "14mb" },
+  },
   turbopack: {
     rules: {
       "*.css": {

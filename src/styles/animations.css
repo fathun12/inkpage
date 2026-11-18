@@ -1,0 +1,37 @@
+/* animations.css: every keyframe and animation utility (animate-rise, animate-stamp). */
+
+@theme inline {
+  --animate-rise: rise var(--dur-slow) var(--ease-out) both;
+  --animate-stamp: stamp var(--dur-base) var(--ease-press) both;
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes stamp {
+    from {
+      opacity: 0;
+      transform: scale(1.18) rotate(-4deg);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) rotate(0);
+    }
+  }
+}
+
+/* Respect "reduce motion": one switch turns all motion off */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0.01ms;
+    --dur-base: 0.01ms;
+    --dur-slow: 0.01ms;
+  }
+}

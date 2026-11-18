@@ -1,26 +1,30 @@
 @import "tailwindcss";
+@import "../styles/tokens.css";
+@import "../styles/animations.css";
+@import "../styles/themes/paper.css";
+@import "../styles/themes/midnight.css";
+@import "../styles/themes/sage.css";
+@import "../styles/themes/cobalt.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@layer base {
+  body {
+    @apply bg-bg font-body text-ink;
+  }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  ::selection {
+    background: var(--c-highlight);
+    color: var(--c-ink);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  .grain-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    pointer-events: none;
+    background-image: var(--grain);
+    opacity: var(--grain-opacity);
+    mix-blend-mode: var(--grain-blend);
+  }
 }
