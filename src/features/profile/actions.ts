@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { requireUser } from "@/features/auth/queries";
 import { filesFrom, removeImages, uploadImage } from "@/features/media/upload";
 import { routes, siteConfig } from "@/config/site";
-import { redirectWithError } from "@/lib/flash";
+import { redirectWithError, redirectWithSaved } from "@/lib/flash";
 import { field } from "@/lib/form";
 import { createClient } from "@/lib/supabase/server";
 import { firstError } from "@/lib/validation";
@@ -106,12 +106,22 @@ export async function updateProfileAction(formData: FormData): Promise<void> {
     .eq("id", user.id);
   if (error) {
     await removeImages(user.id, fresh);
-    return redirectWithError(routes.appearance, "Could not save. Try again.");
+    const missing = error.code === "PGRST204" || error.code === "42703";
+    return redirectWithError(
+      routes.appearance,
+      missing
+        ? "The database is missing the background columns. Run the migration 20261119040000_profile_background.sql in Supabase, then save again."
+        : `Could not save: ${error.message}`,
+    );
   }
 
   await removeImages(user.id, [
     avatarUrl !== oldAvatar ? oldAvatar : null,
     bgUrl !== oldBg ? oldBg : null,
   ]);
-  redirect(`${routes.appearance}?saved=1`);
+  const switched = Boolean(bgFile) && parsed.data.bg_mode === "color" && mode === "full";
+  redirectWithSaved(
+    routes.appearance,
+    switched ? "Saved. Your photo is now used as the Full page background." : "Saved.",
+  );
 }

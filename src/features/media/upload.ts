@@ -27,7 +27,7 @@ export async function uploadImage(userId: string, file: File): Promise<UploadRes
   const { error } = await supabase.storage
     .from(mediaConfig.bucket)
     .upload(path, file, { contentType: file.type, upsert: false });
-  if (error) return { error: "Could not upload the image. Try again." };
+  if (error) return { error: `Could not upload the image: ${error.message}` };
 
   return { url: supabase.storage.from(mediaConfig.bucket).getPublicUrl(path).data.publicUrl };
 }
