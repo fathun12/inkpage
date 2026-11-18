@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/Button";
 import { Field, Input } from "@/components/ui/Field";
 import { Grain } from "@/components/ui/Grain";
 import { Notice } from "@/components/ui/Notice";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import type { FormAction } from "@/types/form";
 
 type Props = { action: FormAction; error?: string };
@@ -22,7 +22,7 @@ export function LoginForm({ action, error }: Props) {
         <Field label="Password" htmlFor="password">
           <Input id="password" name="password" type="password" autoComplete="current-password" required />
         </Field>
-        <Button type="submit" variant="accent">Sign in</Button>
+        <SubmitButton variant="accent" pendingLabel="Signing in...">Sign in</SubmitButton>
       </form>
     </main>
   );

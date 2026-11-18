@@ -1,6 +1,7 @@
-import { Button } from "@/components/ui/Button";
 import { Field, Input, Textarea } from "@/components/ui/Field";
 import { Img } from "@/components/ui/Img";
+import { ImageInput } from "@/components/ui/ImageInput";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { mediaConfig } from "@/config/media";
 import type { FormAction } from "@/types/form";
 import type { Profile } from "@/types/profile";
@@ -33,7 +34,7 @@ export function ProfileForm({ action, profile, themes }: Props) {
           htmlFor="avatar"
           hint={`JPG, PNG or WebP, up to ${mediaConfig.maxMb} MB. Leave empty to keep the current one or use your initial.`}
         >
-          <Input id="avatar" name="avatar" type="file" accept={mediaConfig.accept} />
+          <ImageInput id="avatar" name="avatar" kind="avatar" accept={mediaConfig.accept} />
         </Field>
         {profile.avatar_url && (
           <label className="flex items-center gap-2 text-sm">
@@ -44,7 +45,7 @@ export function ProfileForm({ action, profile, themes }: Props) {
       </div>
       <ThemePicker current={profile.theme} options={themes} />
       <div>
-        <Button type="submit" variant="accent">Save changes</Button>
+        <SubmitButton variant="accent">Save changes</SubmitButton>
       </div>
     </form>
   );

@@ -1,7 +1,7 @@
-import { Button } from "@/components/ui/Button";
 import { Field, Input } from "@/components/ui/Field";
 import { Grain } from "@/components/ui/Grain";
 import { Notice } from "@/components/ui/Notice";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import type { FormAction } from "@/types/form";
 
 type Props = { action: FormAction; error?: string };
@@ -22,7 +22,7 @@ export function SetupForm({ action, error }: Props) {
         <Field label="Display name" htmlFor="display_name">
           <Input id="display_name" name="display_name" required maxLength={60} />
         </Field>
-        <Button type="submit" variant="accent">Create page</Button>
+        <SubmitButton variant="accent" pendingLabel="Creating...">Create page</SubmitButton>
       </form>
     </main>
   );

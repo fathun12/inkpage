@@ -1,6 +1,7 @@
-import { Button } from "@/components/ui/Button";
 import { Field, Input, Textarea } from "@/components/ui/Field";
 import { Img } from "@/components/ui/Img";
+import { ImageInput } from "@/components/ui/ImageInput";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { mediaConfig } from "@/config/media";
 import { isoToLocalInput } from "@/lib/datetime";
 import { cn } from "@/lib/utils";
@@ -40,9 +41,9 @@ function MiniForm({ action, id, fields = {}, label, ariaLabel, disabled }: MiniP
       {Object.entries(fields).map(([name, value]) => (
         <input key={name} type="hidden" name={name} value={value} />
       ))}
-      <Button type="submit" size="sm" aria-label={ariaLabel} disabled={disabled}>
+      <SubmitButton size="sm" pendingLabel="..." aria-label={ariaLabel} disabled={disabled}>
         {label}
-      </Button>
+      </SubmitButton>
     </form>
   );
 }
@@ -147,7 +148,12 @@ function BlockCard({ block, index, total, actions }: CardProps) {
                   htmlFor={`image-${block.id}`}
                   hint={`${block.image_url ? "Choose a file to replace it. " : "Optional. "}${imageHint}`}
                 >
-                  <Input id={`image-${block.id}`} name="image" type="file" accept={mediaConfig.accept} />
+                  <ImageInput
+                    id={`image-${block.id}`}
+                    name="image"
+                    kind={type === "project" ? "cover" : "photo"}
+                    accept={mediaConfig.accept}
+                  />
                 </Field>
                 {block.image_url && <RemoveBox name="remove_image" label="Remove the current image" />}
               </div>
@@ -170,7 +176,13 @@ function BlockCard({ block, index, total, actions }: CardProps) {
                   htmlFor={`images-${block.id}`}
                   hint={`${images.length} of ${mediaConfig.maxGallery} used. ${imageHint}`}
                 >
-                  <Input id={`images-${block.id}`} name="images" type="file" accept={mediaConfig.accept} multiple />
+                  <ImageInput
+                    id={`images-${block.id}`}
+                    name="images"
+                    kind="gallery"
+                    accept={mediaConfig.accept}
+                    multiple
+                  />
                 </Field>
               </div>
             )}
@@ -204,7 +216,7 @@ function BlockCard({ block, index, total, actions }: CardProps) {
               <Input id={`exp-${block.id}`} name="expire_at" type="datetime-local" defaultValue={isoToLocalInput(block.expire_at)} />
             </Field>
             <div className="sm:col-span-2">
-              <Button type="submit" variant="accent" size="sm">Save changes</Button>
+              <SubmitButton variant="accent" size="sm">Save changes</SubmitButton>
             </div>
           </form>
 
@@ -214,7 +226,7 @@ function BlockCard({ block, index, total, actions }: CardProps) {
             </summary>
             <form action={actions.remove} className="mt-2">
               <input type="hidden" name="id" value={block.id} />
-              <Button type="submit" size="sm" variant="danger">Confirm delete</Button>
+              <SubmitButton size="sm" variant="danger">Confirm delete</SubmitButton>
             </form>
           </details>
         </div>

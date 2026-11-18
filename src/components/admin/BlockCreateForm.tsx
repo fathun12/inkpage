@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
-import { Button } from "@/components/ui/Button";
 import { Field, Input, Textarea } from "@/components/ui/Field";
+import { ImageInput } from "@/components/ui/ImageInput";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 import { mediaConfig } from "@/config/media";
 import { siteConfig } from "@/config/site";
 import type { BlockType } from "@/types/block";
@@ -50,7 +51,7 @@ function TypeCard({ type, label, hint, action, open, children }: CardProps) {
         {children}
         <Schedule id={id} />
         <Wide>
-          <Button type="submit" variant="accent">Add {label.toLowerCase()}</Button>
+          <SubmitButton variant="accent">Add {label.toLowerCase()}</SubmitButton>
         </Wide>
       </form>
     </details>
@@ -79,7 +80,7 @@ export function BlockCreateForm({ action }: { action: FormAction }) {
         </Wide>
         <Wide>
           <Field label="Photo" htmlFor="new-link-image" hint={`Optional. ${imageHint}`}>
-            <Input id="new-link-image" name="image" type="file" accept={mediaConfig.accept} />
+            <ImageInput id="new-link-image" name="image" kind="photo" accept={mediaConfig.accept} />
           </Field>
         </Wide>
       </TypeCard>
@@ -87,7 +88,7 @@ export function BlockCreateForm({ action }: { action: FormAction }) {
       <TypeCard type="project" label="Project card" hint="A large cover image with text." action={action}>
         <Wide>
           <Field label="Cover image" htmlFor="new-project-image" hint={`Optional. ${imageHint}`}>
-            <Input id="new-project-image" name="image" type="file" accept={mediaConfig.accept} />
+            <ImageInput id="new-project-image" name="image" kind="cover" accept={mediaConfig.accept} />
           </Field>
         </Wide>
         <Wide>
@@ -117,7 +118,14 @@ export function BlockCreateForm({ action }: { action: FormAction }) {
             htmlFor="new-gallery-images"
             hint={`Up to ${mediaConfig.maxGallery} images. ${imageHint}`}
           >
-            <Input id="new-gallery-images" name="images" type="file" accept={mediaConfig.accept} multiple required />
+            <ImageInput
+              id="new-gallery-images"
+              name="images"
+              kind="gallery"
+              accept={mediaConfig.accept}
+              multiple
+              required
+            />
           </Field>
         </Wide>
       </TypeCard>

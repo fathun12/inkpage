@@ -5,6 +5,7 @@ import type { Stats } from "@/types/analytics";
 type EventRow = {
   kind: "view" | "click";
   block_id: string | null;
+  label: string | null;
   device: string | null;
   created_at: string;
 };
@@ -18,7 +19,7 @@ async function fetchEvents(userId: string, since: string): Promise<EventRow[]> {
   for (let page = 0; page < 20; page++) {
     const { data, error } = await supabase
       .from("events")
-      .select("kind, block_id, device, created_at")
+      .select("kind, block_id, label, device, created_at")
       .eq("user_id", userId)
       .gte("created_at", since)
       .order("created_at", { ascending: false })
@@ -48,7 +49,7 @@ export async function getStats(userId: string, days: number): Promise<Stats> {
     daily.set(new Date(end - i * DAY).toISOString().slice(0, 10), { views: 0, clicks: 0 });
   }
 
-  const clicksPerBlock = new Map<string, number>();
+  const clicksPerTarget = new Map<string, { blockId: string; label: string | null; count: number }>();
   const devices = new Map<string, number>();
   let views = 0;
   let clicks = 0;
@@ -62,7 +63,12 @@ export async function getStats(userId: string, days: number): Promise<Stats> {
     } else {
       clicks++;
       if (bucket) bucket.clicks++;
-      if (e.block_id) clicksPerBlock.set(e.block_id, (clicksPerBlock.get(e.block_id) ?? 0) + 1);
+      if (e.block_id) {
+        const key = `${e.block_id}|${e.label ?? ""}`;
+        const entry = clicksPerTarget.get(key) ?? { blockId: e.block_id, label: e.label, count: 0 };
+        entry.count++;
+        clicksPerTarget.set(key, entry);
+      }
     }
   }
 
@@ -72,8 +78,11 @@ export async function getStats(userId: string, days: number): Promise<Stats> {
     clicks,
     ctr: views > 0 ? clicks / views : 0,
     daily: [...daily.entries()].map(([label, v]) => ({ label, ...v })),
-    topBlocks: [...clicksPerBlock.entries()]
-      .map(([id, count]) => ({ id, title: titles.get(id) ?? "Deleted block", clicks: count }))
+    topBlocks: [...clicksPerTarget.entries()]
+      .map(([key, t]) => {
+        const title = titles.get(t.blockId) ?? "Deleted block";
+        return { id: key, title: t.label ? `${title}: ${t.label}` : title, clicks: t.count };
+      })
       .sort((a, b) => b.clicks - a.clicks)
       .slice(0, 5),
     devices: [...devices.entries()]
