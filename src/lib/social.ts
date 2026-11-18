@@ -24,6 +24,21 @@ const known: Record<string, string> = {
   "pinterest.com": "Pinterest",
   "behance.net": "Behance",
   "dribbble.com": "Dribbble",
+  "gitlab.com": "GitLab",
+  "snapchat.com": "Snapchat",
+  "bsky.app": "Bluesky",
+  "patreon.com": "Patreon",
+  "ko-fi.com": "Ko-fi",
+  "substack.com": "Substack",
+  "soundcloud.com": "SoundCloud",
+  "music.apple.com": "Apple Music",
+  "vimeo.com": "Vimeo",
+  "tumblr.com": "Tumblr",
+  "buymeacoffee.com": "Buy Me a Coffee",
+  "steamcommunity.com": "Steam",
+  "steampowered.com": "Steam",
+  "whatsapp.com": "WhatsApp",
+  "line.me": "LINE",
 };
 
 export function splitLines(text: string | undefined): string[] {

@@ -135,7 +135,7 @@ export function BlockCreateForm({ action }: { action: FormAction }) {
           <Field
             label="Links"
             htmlFor="new-socials-links"
-            hint={`One link per line, up to ${mediaConfig.maxSocials}. The name is detected from the address.`}
+            hint={`One link per line, up to ${mediaConfig.maxSocials}. The logo is picked from the address; unknown sites show their name.`}
           >
             <Textarea
               id="new-socials-links"
