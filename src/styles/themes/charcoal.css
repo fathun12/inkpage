@@ -1,0 +1,11 @@
+/* charcoal: dark, sand text, burnt orange. */
+[data-theme="charcoal"] {
+  --c-bg: #1e1e1c;
+  --c-surface: #2a2a27;
+  --c-ink: #d8cbb3;
+  --c-ink-soft: #a39b89;
+  --c-line: #3a3935;
+  --c-accent: #d9541e;
+  --c-accent-ink: #ffffff;
+  --c-highlight: #3a3935;
+}

@@ -1,0 +1,11 @@
+/* ember: burnt orange background, ink black text, cream cards. */
+[data-theme="ember"] {
+  --c-bg: #d9541e;
+  --c-surface: #f3eee3;
+  --c-ink: #111111;
+  --c-ink-soft: #3b1e10;
+  --c-line: #b8430f;
+  --c-accent: #111111;
+  --c-accent-ink: #f3eee3;
+  --c-highlight: #f3eee3;
+}

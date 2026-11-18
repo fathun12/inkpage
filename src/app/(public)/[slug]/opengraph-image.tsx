@@ -10,8 +10,8 @@ export const alt = "Profile preview";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-const display = "Fraunces";
-const body = "Schibsted Grotesk";
+const sans = "Instrument Sans";
+const voice = "Instrument Serif";
 
 function toArrayBuffer(buf: Buffer): ArrayBuffer {
   return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer;
@@ -20,13 +20,13 @@ function toArrayBuffer(buf: Buffer): ArrayBuffer {
 // Fonts are copied into src/assets/fonts. If they cannot be read, the default font is used.
 async function loadFonts() {
   try {
-    const [fraunces, schibsted] = await Promise.all([
-      readFile(join(process.cwd(), "src/assets/fonts/fraunces-900.woff")),
-      readFile(join(process.cwd(), "src/assets/fonts/schibsted-grotesk-400.woff")),
+    const [sansFile, voiceFile] = await Promise.all([
+      readFile(join(process.cwd(), "src/assets/fonts/instrument-sans-500.woff")),
+      readFile(join(process.cwd(), "src/assets/fonts/instrument-serif-italic.woff")),
     ]);
     return [
-      { name: display, data: toArrayBuffer(fraunces), weight: 900 as const, style: "normal" as const },
-      { name: body, data: toArrayBuffer(schibsted), weight: 400 as const, style: "normal" as const },
+      { name: sans, data: toArrayBuffer(sansFile), weight: 500 as const, style: "normal" as const },
+      { name: voice, data: toArrayBuffer(voiceFile), weight: 400 as const, style: "italic" as const },
     ];
   } catch {
     return undefined;
@@ -71,7 +71,7 @@ export default async function OpengraphImage({ params }: { params: Promise<{ slu
           background: p.bg,
           color: p.ink,
           padding: 80,
-          fontFamily: body,
+          fontFamily: sans,
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
@@ -82,25 +82,27 @@ export default async function OpengraphImage({ params }: { params: Promise<{ slu
               justifyContent: "center",
               width: 120,
               height: 120,
+              borderRadius: 60,
               background: p.accent,
-              border: `4px solid ${p.ink}`,
+              color: p.bg,
               overflow: "hidden",
-              fontFamily: display,
-              fontSize: 72,
-              fontWeight: 900,
+              fontSize: 64,
+              fontWeight: 500,
             }}
           >
             {avatar ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={avatar} alt="" width={112} height={112} style={{ width: 112, height: 112, objectFit: "cover" }} />
+              <img src={avatar} alt="" width={120} height={120} style={{ width: 120, height: 120, objectFit: "cover" }} />
             ) : (
               initial
             )}
           </div>
-          <div style={{ display: "flex", fontSize: 34, color: p.soft }}>{handle}</div>
+          <div style={{ display: "flex", fontFamily: voice, fontStyle: "italic", fontSize: 42, color: p.soft }}>
+            {handle}
+          </div>
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          <div style={{ display: "flex", fontFamily: display, fontSize: 104, fontWeight: 900, lineHeight: 1.05 }}>
+          <div style={{ display: "flex", fontSize: 112, fontWeight: 500, letterSpacing: -3, lineHeight: 1.02 }}>
             {name}
           </div>
           {bio ? <div style={{ display: "flex", fontSize: 38, color: p.soft }}>{bio}</div> : null}

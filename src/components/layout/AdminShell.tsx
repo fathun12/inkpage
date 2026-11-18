@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import { routes, siteConfig } from "@/config/site";
 import { Button } from "@/components/ui/Button";
-import { Grain } from "@/components/ui/Grain";
 import type { FormAction } from "@/types/form";
 import { NavLink } from "./NavLink";
 
@@ -9,11 +8,10 @@ type Props = { username: string; logoutAction: FormAction; children: ReactNode }
 
 export function AdminShell({ username, logoutAction, children }: Props) {
   return (
-    <div className="relative min-h-screen">
-      <Grain />
-      <header className="border-b-2 border-line">
+    <div className="min-h-screen">
+      <header className="border-b border-line">
         <div className="mx-auto flex max-w-4xl flex-wrap items-center gap-x-6 gap-y-3 px-5 py-4">
-          <span className="font-display text-2xl font-black">{siteConfig.name}</span>
+          <span className="font-display text-xl font-medium tracking-tight">{siteConfig.name}</span>
           <nav className="flex flex-wrap gap-1" aria-label="Admin">
             <NavLink href={routes.admin} exact>Overview</NavLink>
             <NavLink href={routes.links}>Links</NavLink>

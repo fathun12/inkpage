@@ -6,13 +6,13 @@ type Variant = "solid" | "accent" | "ghost" | "danger";
 type Size = "md" | "sm";
 
 const base =
-  "ink-border press inline-flex cursor-pointer items-center justify-center gap-2 rounded-md font-body font-semibold disabled:pointer-events-none disabled:opacity-40";
+  "ink-border press inline-flex cursor-pointer items-center justify-center gap-2 rounded-md font-body font-medium disabled:pointer-events-none disabled:opacity-40";
 
 const variants: Record<Variant, string> = {
   solid: "bg-surface text-ink",
-  accent: "bg-accent text-accent-ink",
-  ghost: "bg-bg text-ink",
-  danger: "bg-ink text-bg",
+  accent: "bg-ink text-bg",
+  ghost: "bg-transparent text-ink",
+  danger: "bg-accent text-accent-ink",
 };
 
 const sizes: Record<Size, string> = {

@@ -7,14 +7,14 @@ import type {
 import { cn } from "@/lib/utils";
 
 const control =
-  "ink-border w-full rounded-md bg-surface px-3 py-2 font-body text-ink placeholder:text-ink-soft focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-accent";
+  "ink-border w-full rounded-md bg-surface px-3 py-2.5 font-body text-ink placeholder:text-ink-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink";
 
 type FieldProps = { label: string; hint?: string; htmlFor?: string; children: ReactNode };
 
 export function Field({ label, hint, htmlFor, children }: FieldProps) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={htmlFor} className="font-mono text-xs uppercase tracking-widest text-ink-soft">
+      <label htmlFor={htmlFor} className="text-sm font-medium text-ink-soft">
         {label}
       </label>
       {children}

@@ -1,0 +1,11 @@
+/* sand: sand background, charcoal text, burnt orange. */
+[data-theme="sand"] {
+  --c-bg: #d8cbb3;
+  --c-surface: #e6dcc8;
+  --c-ink: #1e1e1c;
+  --c-ink-soft: #5e5645;
+  --c-line: #bfb299;
+  --c-accent: #d9541e;
+  --c-accent-ink: #ffffff;
+  --c-highlight: #c9bb9f;
+}

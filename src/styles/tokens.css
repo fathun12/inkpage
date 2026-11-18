@@ -1,28 +1,24 @@
-/* tokens.css: the ONE place for shape, shadow, motion and Tailwind mapping.
+/* tokens.css: the ONE place for shape, motion and Tailwind mapping.
    Colors live in themes/*.css. Keyframes live in animations.css. */
 
 :root {
   /* shape */
-  --r-sm: 2px;
-  --r-md: 4px;
-  --r-lg: 10px;
-  --bw: 2px;
+  --r-sm: 8px;
+  --r-md: 12px;
+  --r-lg: 20px;
+  --bw: 1px;
 
-  /* hard-shadow distance (the "pressed ink" feel) */
-  --press: 4px;
+  /* hover lift (px) */
+  --lift: 1px;
 
   /* motion */
   --dur-fast: 120ms;
   --dur-base: 220ms;
   --dur-slow: 520ms;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
-  --ease-press: cubic-bezier(0.2, 0.9, 0.3, 1.25);
-
-  /* paper grain (SVG noise, no image file needed) */
-  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
 }
 
-/* Maps tokens to Tailwind utilities: bg-bg, text-ink, font-display, rounded-md, shadow-hard ... */
+/* Maps tokens to Tailwind utilities: bg-bg, text-ink, font-display, rounded-md ... */
 @theme inline {
   --color-*: initial;
   --color-bg: var(--c-bg);
@@ -34,39 +30,39 @@
   --color-accent-ink: var(--c-accent-ink);
   --color-highlight: var(--c-highlight);
 
-  --font-display: var(--nf-display), Georgia, serif;
+  --font-display: var(--nf-body), system-ui, sans-serif;
   --font-body: var(--nf-body), system-ui, sans-serif;
+  --font-voice: var(--nf-voice), Georgia, serif;
   --font-mono: var(--nf-mono), ui-monospace, monospace;
 
   --radius-sm: var(--r-sm);
   --radius-md: var(--r-md);
   --radius-lg: var(--r-lg);
 
-  --shadow-hard: var(--press) var(--press) 0 0 var(--c-shadow);
-  --shadow-hard-lg: calc(var(--press) * 1.75) calc(var(--press) * 1.75) 0 0 var(--c-shadow);
+  /* Names kept so old components still build. There are no hard shadows now. */
+  --shadow-hard: 0 0 0 0 transparent;
+  --shadow-hard-lg: 0 0 0 0 transparent;
 }
 
-/* Standard outline used by every card and button */
+/* Thin outline used by every card and button */
 @utility ink-border {
   border-width: var(--bw);
   border-style: solid;
   border-color: var(--c-line);
 }
 
-/* Physical "press" interaction: lifts on hover, sinks on click */
+/* Soft hover: rises 1px and the outline darkens. No shadow. */
 @utility press {
-  box-shadow: var(--press) var(--press) 0 0 var(--c-shadow);
   transition:
-    transform var(--dur-fast) var(--ease-press),
-    box-shadow var(--dur-fast) var(--ease-press);
+    transform var(--dur-fast) var(--ease-out),
+    border-color var(--dur-fast) var(--ease-out);
 
   &:hover {
-    transform: translate(calc(var(--press) * -0.5), calc(var(--press) * -0.5));
-    box-shadow: calc(var(--press) * 1.5) calc(var(--press) * 1.5) 0 0 var(--c-shadow);
+    transform: translateY(calc(var(--lift) * -1));
+    border-color: var(--c-ink);
   }
 
   &:active {
-    transform: translate(var(--press), var(--press));
-    box-shadow: 0 0 0 0 var(--c-shadow);
+    transform: translateY(0) scale(0.99);
   }
 }

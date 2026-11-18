@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { backgroundModes, tintRange } from "@/config/background";
 import { themeNames } from "@/config/site";
 
 export const reservedUsernames = [
@@ -26,4 +27,11 @@ export const profileSchema = z.object({
   display_name: displayName,
   bio: z.string().trim().max(240, "Bio can be at most 240 characters.").optional(),
   theme: z.enum(themeNames, { error: "Pick a theme." }),
+  bg_mode: z.enum(backgroundModes, { error: "Pick a background style." }),
+  bg_tint: z.coerce
+    .number({ error: "Photo overlay must be a number." })
+    .int()
+    .min(tintRange.min, "Photo overlay is out of range.")
+    .max(tintRange.max, "Photo overlay is out of range."),
+  bg_gray: z.boolean(),
 });

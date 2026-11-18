@@ -4,6 +4,7 @@ export const cropPresets = {
   photo: { aspect: 1, maxPx: 640 },
   cover: { aspect: 16 / 9, maxPx: 1280 },
   gallery: { aspect: 1, maxPx: 1080 },
+  background: { aspect: 4 / 5, maxPx: 1600 },
 } as const;
 
 export type CropKind = keyof typeof cropPresets;

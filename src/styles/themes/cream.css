@@ -1,0 +1,12 @@
+/* cream: warm cream, ink black, burnt orange. Default theme. */
+:root,
+[data-theme="cream"] {
+  --c-bg: #f3eee3;
+  --c-surface: #fbf8f1;
+  --c-ink: #111111;
+  --c-ink-soft: #5c574d;
+  --c-line: #d9d1be;
+  --c-accent: #d9541e;
+  --c-accent-ink: #ffffff;
+  --c-highlight: #e9dfc9;
+}

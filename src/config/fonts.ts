@@ -1,16 +1,18 @@
-import { Fraunces, Schibsted_Grotesk, DM_Mono } from "next/font/google";
+import { Instrument_Sans, Instrument_Serif, DM_Mono } from "next/font/google";
 
 // Change a font here and the whole site follows.
-export const fontDisplay = Fraunces({
+// Sans is used for body AND headings. The serif is the italic accent ("font-voice").
+export const fontBody = Instrument_Sans({
   subsets: ["latin"],
-  variable: "--nf-display",
-  axes: ["opsz"],
+  variable: "--nf-body",
   display: "swap",
 });
 
-export const fontBody = Schibsted_Grotesk({
+export const fontVoice = Instrument_Serif({
   subsets: ["latin"],
-  variable: "--nf-body",
+  variable: "--nf-voice",
+  weight: "400",
+  style: ["normal", "italic"],
   display: "swap",
 });
 
@@ -21,8 +23,4 @@ export const fontMono = DM_Mono({
   display: "swap",
 });
 
-export const fontVariables = [
-  fontDisplay.variable,
-  fontBody.variable,
-  fontMono.variable,
-].join(" ");
+export const fontVariables = [fontBody.variable, fontVoice.variable, fontMono.variable].join(" ");

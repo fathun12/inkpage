@@ -1,17 +1,17 @@
-export const themeNames = ["paper", "midnight", "sage", "cobalt"] as const;
+export const themeNames = ["cream", "charcoal", "sand", "ember"] as const;
 export type ThemeName = (typeof themeNames)[number];
 
 export const themeLabels: Record<ThemeName, string> = {
-  paper: "Paper",
-  midnight: "Midnight",
-  sage: "Sage",
-  cobalt: "Cobalt",
+  cream: "Cream",
+  charcoal: "Charcoal",
+  sand: "Sand",
+  ember: "Ember",
 };
 
 export const siteConfig = {
   name: "inkpage",
-  description: "A link-in-bio page, printed in ink.",
-  defaultTheme: "paper" as ThemeName,
+  description: "All your links in one simple page.",
+  defaultTheme: "cream" as ThemeName,
   utcOffsetMinutes: 420,
   timezoneLabel: "WIB (UTC+7)",
 } as const;
