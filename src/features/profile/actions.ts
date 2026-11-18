@@ -52,8 +52,13 @@ export async function updateProfileAction(formData: FormData): Promise<void> {
   const bgFile = filesFrom(formData, "bg_image")[0];
   const removeBg = formData.get("remove_bg_image") === "on" && !bgFile;
 
-  // Removing the photo always goes back to the plain color.
-  const mode = removeBg ? "color" : parsed.data.bg_mode;
+  // Removing the photo goes back to the plain color.
+  // Uploading a new photo while the style is still Plain color switches to Full page.
+  const mode = removeBg
+    ? "color"
+    : bgFile && parsed.data.bg_mode === "color"
+      ? "full"
+      : parsed.data.bg_mode;
   const hasBg = Boolean(bgFile) || (Boolean(oldBg) && !removeBg);
   if (mode !== "color" && !hasBg) {
     return redirectWithError(
