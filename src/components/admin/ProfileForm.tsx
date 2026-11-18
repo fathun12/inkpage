@@ -4,6 +4,7 @@ import { ImageInput } from "@/components/ui/ImageInput";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { backgroundLabels, backgroundModes, readBackground, tintRange } from "@/config/background";
 import { mediaConfig } from "@/config/media";
+import { resolveTheme } from "@/config/site";
 import type { FormAction } from "@/types/form";
 import type { Profile } from "@/types/profile";
 import { ThemePicker } from "./ThemePicker";
@@ -48,7 +49,7 @@ export function ProfileForm({ action, profile, themes }: Props) {
         </div>
       </section>
 
-      <ThemePicker current={profile.theme} options={themes} />
+      <ThemePicker current={resolveTheme(profile.theme)} options={themes} />
 
       <section className="flex flex-col gap-5">
         <h2 className="text-xl font-medium">Background</h2>
