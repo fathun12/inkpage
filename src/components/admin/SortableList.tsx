@@ -32,7 +32,7 @@ function Row({ id, children }: { id: string; children: ReactNode }) {
     <li
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={cn("ink-border relative rounded-md bg-surface p-4", isDragging && "z-10 opacity-80")}
+      className={cn("ink-border relative flex rounded-md bg-surface", isDragging && "z-10 opacity-80")}
     >
       <button
         type="button"
@@ -40,11 +40,11 @@ function Row({ id, children }: { id: string; children: ReactNode }) {
         {...attributes}
         {...listeners}
         aria-label="Drag to reorder"
-        className="mb-3 cursor-grab touch-none font-mono text-xs uppercase tracking-widest text-ink-soft active:cursor-grabbing"
+        className="flex w-8 shrink-0 cursor-grab touch-none items-center justify-center border-r border-line font-mono text-sm text-ink-soft active:cursor-grabbing"
       >
-        Drag to reorder
+        ::
       </button>
-      {children}
+      <div className="min-w-0 flex-1">{children}</div>
     </li>
   );
 }
@@ -76,7 +76,7 @@ export function SortableList({ items, onReorder }: Props) {
       </p>
       <DndContext id="blocks-dnd" sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={order} strategy={verticalListSortingStrategy}>
-          <ul className="flex flex-col gap-5">
+          <ul className="flex flex-col gap-3">
             {order.map((id) => (
               <Row key={id} id={id}>
                 {byId.get(id)}

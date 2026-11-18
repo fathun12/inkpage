@@ -61,10 +61,12 @@ const imageHint = `JPG, PNG or WebP, up to ${mediaConfig.maxMb} MB.`;
 
 export function BlockCreateForm({ action }: { action: FormAction }) {
   return (
-    <section className="flex flex-col gap-3">
-      <h2 className="font-display text-2xl font-black">Add a block</h2>
-
-      <TypeCard type="link" label="Link" hint="A button with an optional photo." action={action} open>
+    <details>
+      <summary className="ink-border press inline-flex cursor-pointer list-none items-center rounded-md bg-accent px-5 py-3 font-body font-semibold text-accent-ink">
+        + Add block
+      </summary>
+      <div className="mt-3 flex flex-col gap-3">
+      <TypeCard type="link" label="Link" hint="A button with an optional photo." action={action}>
         <Wide>
           <Field label="URL" htmlFor="new-link-url">
             <Input id="new-link-url" name="url" type="url" placeholder="https://" required />
@@ -155,6 +157,7 @@ export function BlockCreateForm({ action }: { action: FormAction }) {
           </Field>
         </Wide>
       </TypeCard>
-    </section>
+      </div>
+    </details>
   );
 }
