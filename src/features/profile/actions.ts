@@ -39,6 +39,7 @@ export async function updateProfileAction(formData: FormData): Promise<void> {
     bio: field(formData, "bio"),
     theme: field(formData, "theme"),
     bg_mode: field(formData, "bg_mode"),
+    bg_fade: field(formData, "bg_fade"),
     bg_tint: field(formData, "bg_tint"),
     bg_gray: formData.get("bg_gray") === "on",
   });
@@ -99,6 +100,7 @@ export async function updateProfileAction(formData: FormData): Promise<void> {
       avatar_url: avatarUrl,
       theme: parsed.data.theme,
       bg_mode: mode,
+      bg_fade: parsed.data.bg_fade,
       bg_image_url: bgUrl,
       bg_tint: parsed.data.bg_tint,
       bg_gray: parsed.data.bg_gray,
@@ -110,7 +112,7 @@ export async function updateProfileAction(formData: FormData): Promise<void> {
     return redirectWithError(
       routes.appearance,
       missing
-        ? "The database is missing the background columns. Run the migration 20261119040000_profile_background.sql in Supabase, then save again."
+        ? "The database is missing a background column. Run the migrations 20261119040000_profile_background.sql and 20261119050000_profile_bg_fade.sql in Supabase, then save again."
         : `Could not save: ${error.message}`,
     );
   }

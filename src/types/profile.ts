@@ -9,5 +9,6 @@ export type Profile = {
   bg_image_url: string | null;
   bg_tint: number;
   bg_gray: boolean;
+  bg_fade: string;
   created_at: string;
 };

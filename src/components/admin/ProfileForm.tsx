@@ -2,7 +2,14 @@ import { Field, Input, Textarea } from "@/components/ui/Field";
 import { Img } from "@/components/ui/Img";
 import { ImageInput } from "@/components/ui/ImageInput";
 import { SubmitButton } from "@/components/ui/SubmitButton";
-import { backgroundLabels, backgroundModes, readBackground, tintRange } from "@/config/background";
+import {
+  backgroundFades,
+  backgroundLabels,
+  backgroundModes,
+  fadeLabels,
+  readBackground,
+  tintRange,
+} from "@/config/background";
 import { mediaConfig } from "@/config/media";
 import { resolveTheme } from "@/config/site";
 import type { FormAction } from "@/types/form";
@@ -75,6 +82,30 @@ export function ProfileForm({ action, profile, themes }: Props) {
           </div>
           <p className="text-xs text-ink-soft">
             Plain color uses your theme. Full page, Banner and Frame use the photo below.
+          </p>
+        </fieldset>
+
+        <fieldset className="flex flex-col gap-2">
+          <legend className="mb-1.5 text-sm font-medium text-ink-soft">Full page fade</legend>
+          <div className="flex flex-wrap gap-2">
+            {backgroundFades.map((f) => (
+              <label
+                key={f}
+                className="ink-border cursor-pointer rounded-full px-4 py-2 text-sm has-checked:bg-ink has-checked:text-bg has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink"
+              >
+                <input
+                  type="radio"
+                  name="bg_fade"
+                  value={f}
+                  defaultChecked={f === bg.fade}
+                  className="sr-only"
+                />
+                {fadeLabels[f]}
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-ink-soft">
+            Which end of the photo melts into your theme color. Used by Full page.
           </p>
         </fieldset>
 

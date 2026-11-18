@@ -11,16 +11,18 @@ function mix(percent: number) {
   return `color-mix(in srgb, var(--c-bg) ${p}%, transparent)`;
 }
 
-// Full page: the photo fills the screen. The theme color is solid on the left and fades
-// toward the right, with a soft vignette at the top and bottom. "Photo overlay" sets how strong it is.
-function fullFade(tint: number) {
-  const side = `linear-gradient(to right, ${mix(tint + 40)} 0%, ${mix(tint * 0.5)} 55%, ${mix(tint * 0.15)} 100%)`;
-  const edges = `linear-gradient(to bottom, ${mix(tint + 30)} 0%, transparent 35%, transparent 65%, ${mix(tint + 30)} 100%)`;
-  return `${edges}, ${side}`;
+// Full page: the photo fills the screen and melts into the theme color at the top or the
+// bottom. "Photo overlay" sets how strong the fade is.
+function fullFade(tint: number, fade: "top" | "bottom") {
+  const clear = mix(tint * 0.15);
+  const mid = mix(tint * 0.9);
+  const end = mix(Math.min(100, 70 + tint * 0.5));
+  const dir = fade === "bottom" ? "to bottom" : "to top";
+  return `linear-gradient(${dir}, ${clear} 0%, ${mid} 40%, ${end} 88%)`;
 }
 
 export function PublicFrame({ theme, background = plainBackground, children }: Props) {
-  const { mode, imageUrl, tint, gray } = background;
+  const { mode, fade, imageUrl, tint, gray } = background;
   const photo = gray ? "grayscale" : "";
   const full = mode === "full" && imageUrl;
   const banner = mode === "banner" && imageUrl;
@@ -31,7 +33,7 @@ export function PublicFrame({ theme, background = plainBackground, children }: P
       {full && (
         <>
           <Img src={imageUrl} loading="eager" className={`fixed inset-0 size-full object-cover ${photo}`} />
-          <div aria-hidden className="fixed inset-0" style={{ backgroundImage: fullFade(tint) }} />
+          <div aria-hidden className="fixed inset-0" style={{ backgroundImage: fullFade(tint, fade) }} />
         </>
       )}
       {banner && (
