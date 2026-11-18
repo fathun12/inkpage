@@ -5,6 +5,20 @@ import { siteConfig, type ThemeName } from "@/config/site";
 
 type Props = { theme: ThemeName; background?: BackgroundView; children: ReactNode };
 
+// Theme color at a given strength (0 to 100), so the fade follows the chosen theme.
+function mix(percent: number) {
+  const p = Math.max(0, Math.min(100, Math.round(percent)));
+  return `color-mix(in srgb, var(--c-bg) ${p}%, transparent)`;
+}
+
+// Full page: the photo fills the screen. The theme color is solid on the left and fades
+// toward the right, with a soft vignette at the top and bottom. "Photo overlay" sets how strong it is.
+function fullFade(tint: number) {
+  const side = `linear-gradient(to right, ${mix(tint + 40)} 0%, ${mix(tint * 0.5)} 55%, ${mix(tint * 0.15)} 100%)`;
+  const edges = `linear-gradient(to bottom, ${mix(tint + 30)} 0%, transparent 35%, transparent 65%, ${mix(tint + 30)} 100%)`;
+  return `${edges}, ${side}`;
+}
+
 export function PublicFrame({ theme, background = plainBackground, children }: Props) {
   const { mode, imageUrl, tint, gray } = background;
   const photo = gray ? "grayscale" : "";
@@ -17,11 +31,7 @@ export function PublicFrame({ theme, background = plainBackground, children }: P
       {full && (
         <>
           <Img src={imageUrl} loading="eager" className={`fixed inset-0 size-full object-cover ${photo}`} />
-          <div
-            aria-hidden
-            className="fixed inset-0"
-            style={{ backgroundColor: `color-mix(in srgb, var(--c-bg) ${tint}%, transparent)` }}
-          />
+          <div aria-hidden className="fixed inset-0" style={{ backgroundImage: fullFade(tint) }} />
         </>
       )}
       {banner && (
