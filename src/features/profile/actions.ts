@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { requireUser } from "@/features/auth/queries";
 import { filesFrom, removeImages, uploadImage } from "@/features/media/upload";
+import { photoModes, type BackgroundMode } from "@/config/background";
 import { routes, siteConfig } from "@/config/site";
 import { redirectWithError, redirectWithSaved } from "@/lib/flash";
 import { field } from "@/lib/form";
@@ -40,6 +41,9 @@ export async function updateProfileAction(formData: FormData): Promise<void> {
     theme: field(formData, "theme"),
     bg_mode: field(formData, "bg_mode"),
     bg_fade: field(formData, "bg_fade"),
+    bg_color: field(formData, "bg_color"),
+    bg_color2: field(formData, "bg_color2"),
+    bg_angle: field(formData, "bg_angle"),
     bg_tint: field(formData, "bg_tint"),
     bg_gray: formData.get("bg_gray") === "on",
   });
@@ -53,18 +57,18 @@ export async function updateProfileAction(formData: FormData): Promise<void> {
   const bgFile = filesFrom(formData, "bg_image")[0];
   const removeBg = formData.get("remove_bg_image") === "on" && !bgFile;
 
-  // Removing the photo goes back to the plain color.
-  // Uploading a new photo while the style is still Plain color switches to Full page.
-  const mode = removeBg
-    ? "color"
-    : bgFile && parsed.data.bg_mode === "color"
-      ? "full"
-      : parsed.data.bg_mode;
+  // Removing the photo drops a photo style back to the theme color. Uploading a photo while the
+  // style is still "Theme color" switches to Full page photo. Solid and Gradient are never changed.
+  let mode: BackgroundMode = parsed.data.bg_mode;
+  if (removeBg && photoModes.includes(mode)) mode = "color";
+  const switched = Boolean(bgFile) && mode === "color";
+  if (switched) mode = "full";
+
   const hasBg = Boolean(bgFile) || (Boolean(oldBg) && !removeBg);
-  if (mode !== "color" && !hasBg) {
+  if (photoModes.includes(mode) && !hasBg) {
     return redirectWithError(
       routes.appearance,
-      "Upload a photo to use this background style, or pick Plain color.",
+      "Upload a photo to use this background style, or pick another style.",
     );
   }
 
@@ -102,17 +106,20 @@ export async function updateProfileAction(formData: FormData): Promise<void> {
       bg_mode: mode,
       bg_fade: parsed.data.bg_fade,
       bg_image_url: bgUrl,
+      bg_color: parsed.data.bg_color,
+      bg_color2: parsed.data.bg_color2,
+      bg_angle: parsed.data.bg_angle,
       bg_tint: parsed.data.bg_tint,
       bg_gray: parsed.data.bg_gray,
     })
     .eq("id", user.id);
   if (error) {
     await removeImages(user.id, fresh);
-    const missing = error.code === "PGRST204" || error.code === "42703";
+    const missing = error.code === "PGRST204" || error.code === "42703" || error.code === "23514";
     return redirectWithError(
       routes.appearance,
       missing
-        ? "The database is missing a background column. Run the migrations 20261119040000_profile_background.sql and 20261119050000_profile_bg_fade.sql in Supabase, then save again."
+        ? "The database does not know the new background settings yet. Run the migration 20261119060000_profile_background_modes.sql in Supabase, then save again."
         : `Could not save: ${error.message}`,
     );
   }
@@ -121,7 +128,6 @@ export async function updateProfileAction(formData: FormData): Promise<void> {
     avatarUrl !== oldAvatar ? oldAvatar : null,
     bgUrl !== oldBg ? oldBg : null,
   ]);
-  const switched = Boolean(bgFile) && parsed.data.bg_mode === "color" && mode === "full";
   redirectWithSaved(
     routes.appearance,
     switched ? "Saved. Your photo is now used as the Full page background." : "Saved.",

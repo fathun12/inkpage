@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { backgroundFades, backgroundModes, tintRange } from "@/config/background";
+import {
+  backgroundFades,
+  backgroundModes,
+  gradientDirections,
+  hexColor,
+  tintRange,
+} from "@/config/background";
 import { themeNames } from "@/config/site";
 
 export const reservedUsernames = [
@@ -21,6 +27,14 @@ const displayName = z
   .min(1, "Name is required.")
   .max(60, "Name can be at most 60 characters.");
 
+const angles: number[] = gradientDirections.map((d) => d.value);
+
+const color = z
+  .string({ error: "Pick a color." })
+  .trim()
+  .regex(hexColor, "Pick a valid color.")
+  .transform((v) => v.toLowerCase());
+
 export const setupSchema = z.object({ username, display_name: displayName });
 
 export const profileSchema = z.object({
@@ -29,6 +43,11 @@ export const profileSchema = z.object({
   theme: z.enum(themeNames, { error: "Pick a theme." }),
   bg_mode: z.enum(backgroundModes, { error: "Pick a background style." }),
   bg_fade: z.enum(backgroundFades, { error: "Pick where the photo fades." }),
+  bg_color: color,
+  bg_color2: color,
+  bg_angle: z.coerce
+    .number({ error: "Pick a gradient direction." })
+    .refine((v) => angles.includes(v), "Pick a gradient direction."),
   bg_tint: z.coerce
     .number({ error: "Photo overlay must be a number." })
     .int()

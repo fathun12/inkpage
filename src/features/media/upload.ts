@@ -50,7 +50,14 @@ export async function removeImages(
     .filter((p): p is string => p !== null);
   if (paths.length === 0) return;
   const supabase = await createClient();
-  await supabase.storage.from(mediaConfig.bucket).remove(paths);
+  const { data, error } = await supabase.storage.from(mediaConfig.bucket).remove(paths);
+  if (error || (data?.length ?? 0) < paths.length) {
+    console.error("removeImages: some files were not deleted", {
+      wanted: paths.length,
+      removed: data?.length ?? 0,
+      error: error?.message,
+    });
+  }
 }
 
 // All or nothing: if one upload fails, the ones already uploaded are removed again.

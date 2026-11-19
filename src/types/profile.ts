@@ -6,9 +6,13 @@ export type Profile = {
   avatar_url: string | null;
   theme: string;
   bg_mode: string;
+  bg_fade: string;
   bg_image_url: string | null;
   bg_tint: number;
   bg_gray: boolean;
-  bg_fade: string;
+  bg_color: string | null;
+  bg_color2: string | null;
+  bg_angle: number | null;
+  bg_video_url: string | null;
   created_at: string;
 };

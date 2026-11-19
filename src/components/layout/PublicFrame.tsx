@@ -1,6 +1,6 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { Img } from "@/components/ui/Img";
-import { plainBackground, type BackgroundView } from "@/config/background";
+import { customPalette, plainBackground, type BackgroundView } from "@/config/background";
 import { siteConfig, type ThemeName } from "@/config/site";
 
 type Props = { theme: ThemeName; background?: BackgroundView; children: ReactNode };
@@ -11,8 +11,8 @@ function mix(percent: number) {
   return `color-mix(in srgb, var(--c-bg) ${p}%, transparent)`;
 }
 
-// Full page: the photo fills the screen and melts into the theme color at the top or the
-// bottom. "Photo overlay" sets how strong the fade is.
+// Full page photo: it melts into the theme color at the top or the bottom.
+// "Photo overlay" sets how strong the fade is.
 function fullFade(tint: number, fade: "top" | "bottom") {
   const clear = mix(tint * 0.15);
   const mid = mix(tint * 0.9);
@@ -22,14 +22,23 @@ function fullFade(tint: number, fade: "top" | "bottom") {
 }
 
 export function PublicFrame({ theme, background = plainBackground, children }: Props) {
-  const { mode, fade, imageUrl, tint, gray } = background;
+  const { mode, fade, imageUrl, tint, gray, color, color2, angle } = background;
   const photo = gray ? "grayscale" : "";
   const full = mode === "full" && imageUrl;
   const banner = mode === "banner" && imageUrl;
   const frame = mode === "frame" && imageUrl;
 
+  let style: CSSProperties | undefined;
+  if (mode === "solid") style = customPalette([color]);
+  if (mode === "gradient") {
+    style = {
+      ...customPalette([color, color2]),
+      backgroundImage: `linear-gradient(${angle}deg, ${color}, ${color2})`,
+    };
+  }
+
   return (
-    <div data-theme={theme} className="relative min-h-screen bg-bg text-ink">
+    <div data-theme={theme} style={style} className="relative min-h-screen bg-bg text-ink">
       {full && (
         <>
           <Img src={imageUrl} loading="eager" className={`fixed inset-0 size-full object-cover ${photo}`} />

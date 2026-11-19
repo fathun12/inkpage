@@ -7,6 +7,7 @@ import {
   backgroundLabels,
   backgroundModes,
   fadeLabels,
+  gradientDirections,
   readBackground,
   tintRange,
 } from "@/config/background";
@@ -22,8 +23,38 @@ type Props = {
   themes: { name: string; label: string }[];
 };
 
+const pill =
+  "ink-border cursor-pointer rounded-full px-4 py-2 text-sm has-checked:bg-ink has-checked:text-bg has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink";
+
+const colorInput = "ink-border h-10 w-20 cursor-pointer rounded-md bg-surface p-1";
+
+type Option = { value: string; label: string };
+
+function Pills({ name, options, current }: { name: string; options: Option[]; current: string }) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {options.map((o) => (
+        <label key={o.value} className={pill}>
+          <input
+            type="radio"
+            name={name}
+            value={o.value}
+            defaultChecked={o.value === current}
+            className="sr-only"
+          />
+          {o.label}
+        </label>
+      ))}
+    </div>
+  );
+}
+
 export function ProfileForm({ action, profile, themes }: Props) {
   const bg = readBackground(profile);
+  const modeOptions = backgroundModes.map((m) => ({ value: m, label: backgroundLabels[m] }));
+  const angleOptions = gradientDirections.map((d) => ({ value: String(d.value), label: d.label }));
+  const fadeOptions = backgroundFades.map((f) => ({ value: f, label: fadeLabels[f] }));
+
   return (
     <form action={action} className="flex flex-col gap-8">
       <section className="flex flex-col gap-6">
@@ -58,55 +89,33 @@ export function ProfileForm({ action, profile, themes }: Props) {
 
       <ThemePicker current={resolveTheme(profile.theme)} options={themes} />
 
-      <section className="flex flex-col gap-5">
+      <section className="flex flex-col gap-6">
         <h2 className="text-xl font-medium">Background</h2>
 
         <fieldset className="flex flex-col gap-2">
           <legend className="mb-1.5 text-sm font-medium text-ink-soft">Style</legend>
-          <div className="flex flex-wrap gap-2">
-            {backgroundModes.map((m) => (
-              <label
-                key={m}
-                className="ink-border cursor-pointer rounded-full px-4 py-2 text-sm has-checked:bg-ink has-checked:text-bg has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink"
-              >
-                <input
-                  type="radio"
-                  name="bg_mode"
-                  value={m}
-                  defaultChecked={m === bg.mode}
-                  className="sr-only"
-                />
-                {backgroundLabels[m]}
-              </label>
-            ))}
-          </div>
+          <Pills name="bg_mode" options={modeOptions} current={bg.mode} />
           <p className="text-xs text-ink-soft">
-            Plain color uses your theme. Full page, Banner and Frame use the photo below.
+            Theme color uses your theme. Solid color and Gradient use the colors below. The photo styles use the photo below.
           </p>
         </fieldset>
 
+        <div className="grid gap-4 sm:grid-cols-2">
+          <Field
+            label="Color"
+            htmlFor="bg_color"
+            hint="Used by Solid color and Gradient. Text turns light or dark by itself so it stays readable."
+          >
+            <input id="bg_color" name="bg_color" type="color" defaultValue={bg.color} className={colorInput} />
+          </Field>
+          <Field label="Second color" htmlFor="bg_color2" hint="Gradient only.">
+            <input id="bg_color2" name="bg_color2" type="color" defaultValue={bg.color2} className={colorInput} />
+          </Field>
+        </div>
+
         <fieldset className="flex flex-col gap-2">
-          <legend className="mb-1.5 text-sm font-medium text-ink-soft">Full page fade</legend>
-          <div className="flex flex-wrap gap-2">
-            {backgroundFades.map((f) => (
-              <label
-                key={f}
-                className="ink-border cursor-pointer rounded-full px-4 py-2 text-sm has-checked:bg-ink has-checked:text-bg has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink"
-              >
-                <input
-                  type="radio"
-                  name="bg_fade"
-                  value={f}
-                  defaultChecked={f === bg.fade}
-                  className="sr-only"
-                />
-                {fadeLabels[f]}
-              </label>
-            ))}
-          </div>
-          <p className="text-xs text-ink-soft">
-            Which end of the photo melts into your theme color. Used by Full page.
-          </p>
+          <legend className="mb-1.5 text-sm font-medium text-ink-soft">Gradient direction</legend>
+          <Pills name="bg_angle" options={angleOptions} current={String(bg.angle)} />
         </fieldset>
 
         <div className="flex flex-col gap-2">
@@ -126,10 +135,18 @@ export function ProfileForm({ action, profile, themes }: Props) {
           )}
         </div>
 
+        <fieldset className="flex flex-col gap-2">
+          <legend className="mb-1.5 text-sm font-medium text-ink-soft">Full page photo fade</legend>
+          <Pills name="bg_fade" options={fadeOptions} current={bg.fade} />
+          <p className="text-xs text-ink-soft">
+            Which end of the photo melts into your theme color. Used by Full page photo.
+          </p>
+        </fieldset>
+
         <Field
           label="Photo overlay"
           htmlFor="bg_tint"
-          hint="Higher covers the photo with your theme color so text stays readable. Used by Full page."
+          hint="Higher makes the fade stronger so text stays readable. Used by Full page photo."
         >
           <input
             id="bg_tint"
