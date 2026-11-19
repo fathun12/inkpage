@@ -2,6 +2,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { Img } from "@/components/ui/Img";
 import { customPalette, plainBackground, type BackgroundView } from "@/config/background";
 import { siteConfig, type ThemeName } from "@/config/site";
+import { isGifUrl } from "@/config/video";
 
 type Props = { theme: ThemeName; background?: BackgroundView; children: ReactNode };
 
@@ -11,7 +12,7 @@ function mix(percent: number) {
   return `color-mix(in srgb, var(--c-bg) ${p}%, transparent)`;
 }
 
-// Full page photo: it melts into the theme color at the top or the bottom.
+// Full page photo and video: it melts into the theme color at the top or the bottom.
 // "Photo overlay" sets how strong the fade is.
 function fullFade(tint: number, fade: "top" | "bottom") {
   const clear = mix(tint * 0.15);
@@ -22,11 +23,12 @@ function fullFade(tint: number, fade: "top" | "bottom") {
 }
 
 export function PublicFrame({ theme, background = plainBackground, children }: Props) {
-  const { mode, fade, imageUrl, tint, gray, color, color2, angle } = background;
+  const { mode, fade, imageUrl, videoUrl, tint, gray, color, color2, angle } = background;
   const photo = gray ? "grayscale" : "";
   const full = mode === "full" && imageUrl;
   const banner = mode === "banner" && imageUrl;
   const frame = mode === "frame" && imageUrl;
+  const video = mode === "video" && videoUrl;
 
   let style: CSSProperties | undefined;
   if (mode === "solid") style = customPalette([color]);
@@ -42,6 +44,29 @@ export function PublicFrame({ theme, background = plainBackground, children }: P
       {full && (
         <>
           <Img src={imageUrl} loading="eager" className={`fixed inset-0 size-full object-cover ${photo}`} />
+          <div aria-hidden className="fixed inset-0" style={{ backgroundImage: fullFade(tint, fade) }} />
+        </>
+      )}
+      {video && (
+        <>
+          {isGifUrl(videoUrl) ? (
+            <Img
+              src={videoUrl}
+              loading="eager"
+              className={`fixed inset-0 size-full object-cover motion-reduce:hidden ${photo}`}
+            />
+          ) : (
+            <video
+              src={videoUrl}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              aria-hidden
+              className={`fixed inset-0 size-full object-cover motion-reduce:hidden ${photo}`}
+            />
+          )}
           <div aria-hidden className="fixed inset-0" style={{ backgroundImage: fullFade(tint, fade) }} />
         </>
       )}

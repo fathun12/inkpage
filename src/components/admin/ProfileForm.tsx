@@ -2,6 +2,7 @@ import { Field, Input, Textarea } from "@/components/ui/Field";
 import { Img } from "@/components/ui/Img";
 import { ImageInput } from "@/components/ui/ImageInput";
 import { SubmitButton } from "@/components/ui/SubmitButton";
+import { VideoInput } from "@/components/ui/VideoInput";
 import {
   backgroundFades,
   backgroundLabels,
@@ -13,12 +14,15 @@ import {
 } from "@/config/background";
 import { mediaConfig } from "@/config/media";
 import { resolveTheme } from "@/config/site";
+import { isGifUrl, videoConfig } from "@/config/video";
 import type { FormAction } from "@/types/form";
+import type { VideoSignAction } from "@/types/media";
 import type { Profile } from "@/types/profile";
 import { ThemePicker } from "./ThemePicker";
 
 type Props = {
   action: FormAction;
+  signVideo: VideoSignAction;
   profile: Profile;
   themes: { name: string; label: string }[];
 };
@@ -49,7 +53,7 @@ function Pills({ name, options, current }: { name: string; options: Option[]; cu
   );
 }
 
-export function ProfileForm({ action, profile, themes }: Props) {
+export function ProfileForm({ action, profile, themes, signVideo }: Props) {
   const bg = readBackground(profile);
   const modeOptions = backgroundModes.map((m) => ({ value: m, label: backgroundLabels[m] }));
   const angleOptions = gradientDirections.map((d) => ({ value: String(d.value), label: d.label }));
@@ -96,7 +100,7 @@ export function ProfileForm({ action, profile, themes }: Props) {
           <legend className="mb-1.5 text-sm font-medium text-ink-soft">Style</legend>
           <Pills name="bg_mode" options={modeOptions} current={bg.mode} />
           <p className="text-xs text-ink-soft">
-            Theme color uses your theme. Solid color and Gradient use the colors below. The photo styles use the photo below.
+            Theme color uses your theme. Solid color and Gradient use the colors below. The photo styles use the photo below. Video or GIF uses the video below.
           </p>
         </fieldset>
 
@@ -135,18 +139,46 @@ export function ProfileForm({ action, profile, themes }: Props) {
           )}
         </div>
 
+        <div className="flex flex-col gap-2">
+          {bg.videoUrl &&
+            (isGifUrl(bg.videoUrl) ? (
+              <Img src={bg.videoUrl} className="ink-border h-32 w-24 rounded-md object-cover" />
+            ) : (
+              <video
+                src={bg.videoUrl}
+                muted
+                playsInline
+                preload="metadata"
+                className="ink-border h-32 w-24 rounded-md object-cover"
+              />
+            ))}
+          <Field
+            label="Background video or GIF"
+            htmlFor="bg_video"
+            hint={`MP4, WebM or GIF. Videos: up to ${videoConfig.maxSeconds} seconds and ${videoConfig.videoMaxMb} MB. GIFs: up to ${videoConfig.gifMaxMb} MB. It uploads as soon as you pick it, then press Save changes. Only one is kept: a new one replaces the old one and the old file is deleted.`}
+          >
+            <VideoInput id="bg_video" name="bg_video_path" sign={signVideo} />
+          </Field>
+          {bg.videoUrl && (
+            <label className="flex items-center gap-2 text-sm">
+              <input type="checkbox" name="remove_bg_video" className="accent-accent" />
+              Remove the current video
+            </label>
+          )}
+        </div>
+
         <fieldset className="flex flex-col gap-2">
-          <legend className="mb-1.5 text-sm font-medium text-ink-soft">Full page photo fade</legend>
+          <legend className="mb-1.5 text-sm font-medium text-ink-soft">Fade (Full page photo and Video)</legend>
           <Pills name="bg_fade" options={fadeOptions} current={bg.fade} />
           <p className="text-xs text-ink-soft">
-            Which end of the photo melts into your theme color. Used by Full page photo.
+            Which end of the photo or video melts into your theme color.
           </p>
         </fieldset>
 
         <Field
           label="Photo overlay"
           htmlFor="bg_tint"
-          hint="Higher makes the fade stronger so text stays readable. Used by Full page photo."
+          hint="Higher makes the fade stronger so text stays readable. Used by Full page photo and Video."
         >
           <input
             id="bg_tint"
@@ -162,7 +194,7 @@ export function ProfileForm({ action, profile, themes }: Props) {
 
         <label className="flex items-center gap-2 text-sm">
           <input type="checkbox" name="bg_gray" defaultChecked={bg.gray} className="accent-accent" />
-          Show the photo in black and white
+          Show the photo or video in black and white
         </label>
       </section>
 

@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 
 // Page background settings. Change labels and defaults here, not in components.
-export const backgroundModes = ["color", "solid", "gradient", "full", "banner", "frame"] as const;
+export const backgroundModes = ["color", "solid", "gradient", "full", "banner", "frame", "video"] as const;
 export type BackgroundMode = (typeof backgroundModes)[number];
 
 export const backgroundLabels: Record<BackgroundMode, string> = {
@@ -11,12 +11,13 @@ export const backgroundLabels: Record<BackgroundMode, string> = {
   full: "Full page photo",
   banner: "Banner photo",
   frame: "Framed photo",
+  video: "Video or GIF",
 };
 
 // Styles that need the background photo.
 export const photoModes: readonly BackgroundMode[] = ["full", "banner", "frame"];
 
-// Which end of the Full page photo melts into the theme color.
+// Which end of the Full page photo or video melts into the theme color.
 export const backgroundFades = ["bottom", "top"] as const;
 export type BackgroundFade = (typeof backgroundFades)[number];
 
@@ -54,6 +55,7 @@ export type BackgroundView = {
   mode: BackgroundMode;
   fade: BackgroundFade;
   imageUrl: string | null;
+  videoUrl: string | null;
   tint: number;
   gray: boolean;
   color: string;
@@ -65,6 +67,7 @@ export const plainBackground: BackgroundView = {
   mode: "color",
   fade: backgroundDefaults.fade,
   imageUrl: null,
+  videoUrl: null,
   tint: backgroundDefaults.tint,
   gray: backgroundDefaults.gray,
   color: backgroundDefaults.color,
@@ -77,6 +80,7 @@ export function readBackground(p: {
   bg_mode?: string | null;
   bg_fade?: string | null;
   bg_image_url?: string | null;
+  bg_video_url?: string | null;
   bg_tint?: number | null;
   bg_gray?: boolean | null;
   bg_color?: string | null;
@@ -95,6 +99,7 @@ export function readBackground(p: {
     mode,
     fade,
     imageUrl: p.bg_image_url ?? null,
+    videoUrl: p.bg_video_url ?? null,
     tint: p.bg_tint ?? backgroundDefaults.tint,
     gray: p.bg_gray ?? backgroundDefaults.gray,
     color: pick(p.bg_color, backgroundDefaults.color),

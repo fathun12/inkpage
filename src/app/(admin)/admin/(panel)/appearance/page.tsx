@@ -5,7 +5,7 @@ import { FlashNotice } from "@/components/ui/FlashNotice";
 import { savedText } from "@/lib/flash";
 import { routes, themeLabels, themeNames } from "@/config/site";
 import { requireUser } from "@/features/auth/queries";
-import { updateProfileAction } from "@/features/profile/actions";
+import { createVideoUploadAction, updateProfileAction } from "@/features/profile/actions";
 import { getProfileById } from "@/features/profile/queries";
 
 export const metadata: Metadata = { title: "Appearance" };
@@ -25,7 +25,12 @@ export default async function AppearancePage({ searchParams }: Props) {
       <h1 className="font-display text-4xl font-black">Appearance</h1>
       {error && <FlashNotice key={t} tone="error">{error}</FlashNotice>}
       {saved && <FlashNotice key={t} tone="ok">{savedText(saved)}</FlashNotice>}
-      <ProfileForm action={updateProfileAction} profile={profile} themes={themes} />
+      <ProfileForm
+        action={updateProfileAction}
+        signVideo={createVideoUploadAction}
+        profile={profile}
+        themes={themes}
+      />
     </div>
   );
 }

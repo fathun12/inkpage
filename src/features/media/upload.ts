@@ -1,6 +1,8 @@
 import { randomUUID } from "node:crypto";
 import { mediaConfig } from "@/config/media";
+import { videoConfig, videoTypes } from "@/config/video";
 import { createClient } from "@/lib/supabase/server";
+import type { VideoSignInput, VideoSignResult } from "@/types/media";
 
 const extensions: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -75,4 +77,82 @@ export async function uploadImages(
     urls.push(result.url);
   }
   return { urls };
+}
+
+// Background video: the browser uploads the file straight to Storage (Vercel refuses request
+// bodies over 4.5 MB). The server only checks the claim and makes a one-time upload token.
+export async function signVideoUpload(userId: string, input: VideoSignInput): Promise<VideoSignResult> {
+  const type = typeof input?.type === "string" ? input.type : "";
+  const size = typeof input?.size === "number" ? input.size : 0;
+  const kind = videoTypes.find((t) => t.mime === type);
+  if (!kind) return { error: "Use an MP4, WebM or GIF file." };
+
+  const maxMb = kind.ext === "gif" ? videoConfig.gifMaxMb : videoConfig.videoMaxMb;
+  if (!Number.isFinite(size) || size <= 0 || size > maxMb * 1024 * 1024) {
+    return { error: `This file is too large. The limit is ${maxMb} MB.` };
+  }
+
+  const supabase = await createClient();
+  const path = `${userId}/${videoConfig.folder}/${randomUUID()}.${kind.ext}`;
+  const { data, error } = await supabase.storage.from(mediaConfig.bucket).createSignedUploadUrl(path);
+  if (error || !data) {
+    return { error: `Could not prepare the upload: ${error?.message ?? "unknown error"}` };
+  }
+  return { path, token: data.token };
+}
+
+// Checks that a video uploaded by the browser really exists, belongs to this user and is small enough.
+export async function findPendingVideo(
+  userId: string,
+  path: string,
+): Promise<{ url: string } | { error: string }> {
+  const prefix = `${userId}/${videoConfig.folder}/`;
+  const name = path.startsWith(prefix) ? path.slice(prefix.length) : "";
+  if (!/^[0-9a-f-]{36}\.(mp4|webm|gif)$/.test(name)) {
+    return { error: "The uploaded video is not valid. Pick it again." };
+  }
+
+  const supabase = await createClient();
+  const bucket = supabase.storage.from(mediaConfig.bucket);
+  const { data, error } = await bucket.list(prefix.slice(0, -1), { limit: 100 });
+  const file = error ? undefined : data?.find((f) => f.name === name);
+  if (!file) {
+    return { error: "The uploaded video was not found. Pick it again and wait until it says Uploaded." };
+  }
+
+  const maxMb = name.endsWith(".gif") ? videoConfig.gifMaxMb : videoConfig.videoMaxMb;
+  if (Number(file.metadata?.size ?? 0) > maxMb * 1024 * 1024) {
+    await bucket.remove([path]);
+    return { error: `The uploaded file is larger than ${maxMb} MB.` };
+  }
+  return { url: bucket.getPublicUrl(path).data.publicUrl };
+}
+
+// Keeps ONE background video: deletes every file in the user's video folder except the one in use.
+// Also cleans up videos that were uploaded but never saved.
+export async function sweepBackgroundVideos(userId: string, keepUrl: string | null): Promise<void> {
+  const supabase = await createClient();
+  const bucket = supabase.storage.from(mediaConfig.bucket);
+  const folder = `${userId}/${videoConfig.folder}`;
+  const { data, error } = await bucket.list(folder, { limit: 100 });
+  if (error || !data) {
+    console.error("sweepBackgroundVideos: could not list the folder", error?.message);
+    return;
+  }
+
+  const keep = keepUrl ? pathFromUrl(keepUrl, userId) : null;
+  const stale = data
+    .filter((f) => !f.name.startsWith("."))
+    .map((f) => `${folder}/${f.name}`)
+    .filter((p) => p !== keep);
+  if (stale.length === 0) return;
+
+  const { data: removed, error: removeError } = await bucket.remove(stale);
+  if (removeError || (removed?.length ?? 0) < stale.length) {
+    console.error("sweepBackgroundVideos: some files were not deleted", {
+      wanted: stale.length,
+      removed: removed?.length ?? 0,
+      error: removeError?.message,
+    });
+  }
 }
