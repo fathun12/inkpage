@@ -2,6 +2,8 @@
 
 @theme inline {
   --animate-rise: rise var(--dur-slow) var(--ease-out) both;
+  /* Glass cards: transform only. An animated opacity would make the glass see nothing behind it. */
+  --animate-rise-glass: rise-glass var(--dur-slow) var(--ease-out) both;
 
   @keyframes rise {
     from {
@@ -10,6 +12,15 @@
     }
     to {
       opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes rise-glass {
+    from {
+      transform: translateY(14px);
+    }
+    to {
       transform: translateY(0);
     }
   }

@@ -31,14 +31,18 @@ function renderBlock(block: Block) {
   }
 }
 
-export function BlockRenderer({ blocks }: { blocks: Block[] }) {
+export function BlockRenderer({ blocks, glass = false }: { blocks: Block[]; glass?: boolean }) {
   if (blocks.length === 0) {
     return <p className="text-center font-mono text-sm text-ink-soft">Nothing here yet.</p>;
   }
   return (
     <ul className="flex flex-col gap-4">
       {blocks.map((block, index) => (
-        <li key={block.id} className="animate-rise" style={{ animationDelay: `${index * 60}ms` }}>
+        <li
+          key={block.id}
+          className={glass ? "animate-rise-glass" : "animate-rise"}
+          style={{ animationDelay: `${index * 60}ms` }}
+        >
           {renderBlock(block)}
         </li>
       ))}

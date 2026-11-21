@@ -16,5 +16,6 @@ export type Profile = {
   bg_video_url: string | null;
   font_heading: string | null;
   font_body: string | null;
+  card: unknown;
   created_at: string;
 };

@@ -31,6 +31,7 @@ import {
   type FontId,
   type FontPair,
 } from "@/config/font-choices";
+import { cardDefaults, type CardStyle } from "@/config/card";
 import { mediaConfig } from "@/config/media";
 import { resolveTheme, routes, siteConfig, type ThemeName } from "@/config/site";
 import { videoConfig } from "@/config/video";
@@ -38,6 +39,7 @@ import { cn } from "@/lib/utils";
 import type { Block } from "@/types/block";
 import type { FormAction } from "@/types/form";
 import type { VideoSignAction } from "@/types/media";
+import { CardControls } from "./studio/CardControls";
 import { ThemePicker } from "./ThemePicker";
 
 type Props = {
@@ -47,6 +49,7 @@ type Props = {
   theme: ThemeName;
   background: BackgroundView;
   fonts: FontPair;
+  card: CardStyle;
   blocks: Block[];
   themes: { name: string; label: string }[];
   notice?: ReactNode;
@@ -64,6 +67,7 @@ type Draft = {
   gray: boolean;
   fontHeading: FontId;
   fontBody: FontId;
+  card: CardStyle;
 };
 
 const modeOptions = backgroundModes.map((m) => ({ value: m, label: backgroundLabels[m] }));
@@ -225,7 +229,18 @@ function FontPicker({
   );
 }
 
-export function CustomizeStudio({ action, signVideo, profile, theme, background, fonts, blocks, themes, notice }: Props) {
+export function CustomizeStudio({
+  action,
+  signVideo,
+  profile,
+  theme,
+  background,
+  fonts,
+  card,
+  blocks,
+  themes,
+  notice,
+}: Props) {
   const [initial] = useState<Draft>(() => ({
     theme,
     mode: background.mode,
@@ -237,6 +252,7 @@ export function CustomizeStudio({ action, signVideo, profile, theme, background,
     gray: background.gray,
     fontHeading: fonts.heading,
     fontBody: fonts.body,
+    card,
   }));
   const [draft, setDraft] = useState<Draft>(initial);
   const [device, setDevice] = useState<"phone" | "desktop">("phone");
@@ -279,6 +295,7 @@ export function CustomizeStudio({ action, signVideo, profile, theme, background,
   const needsPhoto = photoModes.includes(draft.mode) && !photoSrc;
   const needsVideo = draft.mode === "video" && !videoSrc;
   const previewBlocks = blocks.length > 0 ? blocks : sampleBlocks();
+  const plainBg = view.mode === "color" || view.mode === "solid";
 
   // Links in the preview must not leave the studio.
   function stopLinks(event: MouseEvent<HTMLDivElement>) {
@@ -297,6 +314,7 @@ export function CustomizeStudio({ action, signVideo, profile, theme, background,
       <input type="hidden" name="bg_tint" value={draft.tint} />
       <input type="hidden" name="font_heading" value={draft.fontHeading} />
       <input type="hidden" name="font_body" value={draft.fontBody} />
+      <input type="hidden" name="card" value={JSON.stringify(draft.card)} />
       {draft.gray && <input type="hidden" name="bg_gray" value="on" />}
       {removePhoto && <input type="hidden" name="remove_bg_image" value="on" />}
       {removeVideo && <input type="hidden" name="remove_bg_video" value="on" />}
@@ -508,6 +526,10 @@ export function CustomizeStudio({ action, signVideo, profile, theme, background,
             />
             <FontPicker legend="Body font" value={draft.fontBody} onChange={(id) => set("fontBody", id)} />
           </Section>
+
+          <Section title="Card" onReset={() => set("card", cardDefaults)}>
+            <CardControls card={draft.card} onChange={(next) => set("card", next)} plainBackground={plainBg} />
+          </Section>
         </aside>
 
         <section
@@ -524,6 +546,7 @@ export function CustomizeStudio({ action, signVideo, profile, theme, background,
                 theme={draft.theme}
                 background={view}
                 fonts={{ heading: draft.fontHeading, body: draft.fontBody }}
+                card={draft.card}
               >
                 <ProfileHeader
                   displayName={profile.displayName}
@@ -531,7 +554,7 @@ export function CustomizeStudio({ action, signVideo, profile, theme, background,
                   bio={profile.bio}
                   avatarUrl={profile.avatarUrl}
                 />
-                <BlockRenderer blocks={previewBlocks} />
+                <BlockRenderer blocks={previewBlocks} glass={draft.card.kind === "glass"} />
               </PublicFrame>
             </div>
           </div>

@@ -9,6 +9,7 @@ import { createVideoUploadAction, updateAppearanceAction } from "@/features/appe
 import { requireUser } from "@/features/auth/queries";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileById } from "@/features/profile/queries";
+import { readCard } from "@/lib/card-style";
 import { savedText } from "@/lib/flash";
 
 export const metadata: Metadata = { title: "Customize" };
@@ -47,6 +48,7 @@ export default async function CustomizePage({ searchParams }: Props) {
       theme={resolveTheme(profile.theme)}
       background={readBackground(profile)}
       fonts={readFonts(profile)}
+      card={readCard(profile.card)}
       blocks={blocks}
       themes={themes}
       notice={notice}

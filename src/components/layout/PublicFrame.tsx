@@ -1,11 +1,20 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Img } from "@/components/ui/Img";
 import { customPalette, plainBackground, type BackgroundView } from "@/config/background";
+import { cardDefaults, type CardStyle } from "@/config/card";
 import { defaultFonts, fontStyle, type FontPair } from "@/config/font-choices";
 import { siteConfig, type ThemeName } from "@/config/site";
 import { isGifUrl } from "@/config/video";
+import { cardVars } from "@/lib/card-style";
+import { GlassDefs } from "./GlassDefs";
 
-type Props = { theme: ThemeName; background?: BackgroundView; fonts?: FontPair; children: ReactNode };
+type Props = {
+  theme: ThemeName;
+  background?: BackgroundView;
+  fonts?: FontPair;
+  card?: CardStyle;
+  children: ReactNode;
+};
 
 // Theme color at a given strength (0 to 100), so the fade follows the chosen theme.
 function mix(percent: number) {
@@ -23,7 +32,13 @@ function fullFade(tint: number, fade: "top" | "bottom") {
   return `linear-gradient(${dir}, ${clear} 0%, ${mid} 40%, ${end} 88%)`;
 }
 
-export function PublicFrame({ theme, background = plainBackground, fonts = defaultFonts, children }: Props) {
+export function PublicFrame({
+  theme,
+  background = plainBackground,
+  fonts = defaultFonts,
+  card = cardDefaults,
+  children,
+}: Props) {
   const { mode, fade, imageUrl, videoUrl, tint, gray, color, color2, angle } = background;
   const photo = gray ? "grayscale" : "";
   const full = mode === "full" && imageUrl;
@@ -43,9 +58,11 @@ export function PublicFrame({ theme, background = plainBackground, fonts = defau
   return (
     <div
       data-theme={theme}
-      style={{ ...fontStyle(fonts), ...style }}
+      data-card={card.kind}
+      style={{ ...fontStyle(fonts), ...cardVars(card), ...style }}
       className="relative min-h-screen bg-bg font-body text-ink [font-synthesis-weight:none]"
     >
+      <GlassDefs card={card} />
       {full && (
         <>
           <Img src={imageUrl} loading="eager" className={`fixed inset-0 size-full object-cover ${photo}`} />

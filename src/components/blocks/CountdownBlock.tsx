@@ -26,12 +26,12 @@ export function CountdownBlock({ title, target }: Props) {
   ];
 
   return (
-    <div className="ink-border rounded-md bg-surface p-5 text-center">
-      <p className="font-mono text-xs uppercase tracking-widest text-ink-soft">{title}</p>
+    <div className="card p-5 text-center">
+      <p className="relative z-10 font-mono text-xs uppercase tracking-widest text-ink-soft">{title}</p>
       {ready && left === 0 ? (
-        <p className="mt-3 font-display text-3xl font-black">It has started.</p>
+        <p className="relative z-10 mt-3 font-display text-3xl font-black">It has started.</p>
       ) : (
-        <div className="mt-3 grid grid-cols-4 gap-2">
+        <div className="relative z-10 mt-3 grid grid-cols-4 gap-2">
           {parts.map(([label, value]) => (
             <div key={label}>
               <p className="font-display text-4xl font-black">

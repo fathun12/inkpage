@@ -9,6 +9,7 @@ import { readFonts } from "@/config/font-choices";
 import { resolveTheme, routes, siteConfig } from "@/config/site";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
+import { readCard } from "@/lib/card-style";
 import { getSiteUrl } from "@/lib/site-url";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -33,12 +34,14 @@ export default async function PublicPage({ params }: Props) {
   if (!profile) notFound();
 
   const blocks = await getPublicBlocks(profile.id);
+  const card = readCard(profile.card);
 
   return (
     <PublicFrame
       theme={resolveTheme(profile.theme)}
       background={readBackground(profile)}
       fonts={readFonts(profile)}
+      card={card}
     >
       <ProfileHeader
         displayName={profile.display_name}
@@ -46,7 +49,7 @@ export default async function PublicPage({ params }: Props) {
         bio={profile.bio}
         avatarUrl={profile.avatar_url}
       />
-      <BlockRenderer blocks={blocks} />
+      <BlockRenderer blocks={blocks} glass={card.kind === "glass"} />
       <ViewBeacon endpoint={routes.track} username={profile.username} />
     </PublicFrame>
   );

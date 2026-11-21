@@ -1,0 +1,64 @@
+/* card.css: the "card" utility, used by link, project, countdown and embed blocks.
+   Every value reads a --card-* variable that PublicFrame sets (lib/card-style.ts, cardVars).
+   Without those variables a card looks exactly like the card before Phase 10c.
+   Layers, bottom to top: shadow, fill, media (Phase 10d), overlays (::before, ::after), text (z-10). */
+
+@utility card {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  --card-ri: max(0px, calc(var(--card-r, var(--r-md)) - var(--card-sw, var(--bw))));
+  border-radius: var(--card-r, var(--r-md));
+  border: var(--card-sw, var(--bw)) solid
+    color-mix(in srgb, var(--card-stroke-c, var(--c-line)) var(--card-stroke-o, 100%), transparent);
+  background-color: color-mix(in srgb, var(--card-fill-c, var(--c-surface)) var(--card-fill-o, 100%), transparent);
+  color: var(--card-ink, var(--c-ink));
+  box-shadow: var(--card-drop, none);
+
+  /* Pinned: a plain card keeps the accent fill. A custom or glass card keeps its fill
+     and gets an accent outline instead (--card-pin-ow is only set then). */
+  &[data-pinned] {
+    background-color: color-mix(in srgb, var(--card-fill-c, var(--c-accent)) var(--card-fill-o, 100%), transparent);
+    color: var(--card-ink, var(--c-accent-ink));
+    outline: var(--card-pin-ow, 0px) solid var(--c-accent);
+    outline-offset: 2px;
+  }
+
+  /* Specular highlight: a thin bright edge, brightest on the side the light comes from. */
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    box-sizing: border-box;
+    border-radius: var(--card-ri);
+    padding: var(--card-ring, 0px);
+    background: linear-gradient(
+      var(--card-light, 135deg),
+      color-mix(in srgb, white var(--card-spec, 0%), transparent),
+      color-mix(in srgb, white calc(var(--card-spec, 0%) * 0.12), transparent) 40%,
+      color-mix(in srgb, white calc(var(--card-spec, 0%) * 0.12), transparent) 60%,
+      color-mix(in srgb, white calc(var(--card-spec, 0%) * 0.45), transparent)
+    );
+    -webkit-mask:
+      linear-gradient(#000, #000) content-box,
+      linear-gradient(#000, #000);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000, #000) content-box,
+      linear-gradient(#000, #000);
+    mask-composite: exclude;
+  }
+
+  /* Inner shadow */
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    border-radius: var(--card-ri);
+    box-shadow: var(--card-inner, none);
+  }
+}

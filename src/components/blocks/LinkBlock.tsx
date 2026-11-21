@@ -1,6 +1,5 @@
 import { Img } from "@/components/ui/Img";
 import { routes } from "@/config/site";
-import { cn } from "@/lib/utils";
 import type { Block } from "@/types/block";
 
 function hostOf(url: string | null): string {
@@ -16,15 +15,13 @@ export function LinkBlock({ block }: { block: Block }) {
   return (
     <a
       href={routes.go(block.id)}
-      className={cn(
-        "ink-border press group flex items-center gap-4 rounded-md px-5 py-4",
-        pinned ? "bg-accent text-accent-ink" : "bg-surface text-ink",
-      )}
+      data-pinned={pinned ? "" : undefined}
+      className="card press group flex items-center gap-4 px-5 py-4"
     >
       {block.image_url && (
         <Img src={block.image_url} className="ink-border size-16 shrink-0 rounded-sm object-cover" />
       )}
-      <span className="min-w-0 flex-1">
+      <span className="relative z-10 min-w-0 flex-1">
         {pinned && (
           <span className="mb-1 block font-mono text-[11px] uppercase tracking-widest opacity-80">
             Pinned
@@ -36,7 +33,7 @@ export function LinkBlock({ block }: { block: Block }) {
       </span>
       <span
         aria-hidden
-        className="font-display text-2xl transition-transform duration-(--dur-base) group-hover:translate-x-1"
+        className="relative z-10 font-display text-2xl transition-transform duration-(--dur-base) group-hover:translate-x-1"
       >
         →
       </span>

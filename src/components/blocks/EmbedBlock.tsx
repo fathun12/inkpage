@@ -7,7 +7,7 @@ export function EmbedBlock({ block }: { block: Block }) {
   if (!embed) return null;
 
   return (
-    <div className="ink-border overflow-hidden rounded-md bg-surface">
+    <div className="card">
       <iframe
         src={embed.src}
         title={block.title}
