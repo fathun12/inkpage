@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { BlockCreateForm } from "@/components/admin/BlockCreateForm";
 import { BlockEditorList } from "@/components/admin/BlockEditorList";
+import { ButtonLink } from "@/components/ui/Button";
 import { FlashNotice } from "@/components/ui/FlashNotice";
 import { mediaConfig } from "@/config/media";
+import { routes } from "@/config/site";
 import { savedText } from "@/lib/flash";
 import { requireUser } from "@/features/auth/queries";
 import {
@@ -28,7 +30,10 @@ export default async function LinksPage({ searchParams }: Props) {
 
   return (
     <div className="flex flex-col gap-8">
-      <h1 className="font-display text-4xl font-black">Links</h1>
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <h1 className="font-display text-4xl font-black">Links</h1>
+        <ButtonLink href={routes.customize} variant="studio">Customize</ButtonLink>
+      </div>
       {error && <FlashNotice key={t} tone="error">{error}</FlashNotice>}
       {saved && <FlashNotice key={t} tone="ok">{savedText(saved)}</FlashNotice>}
       <BlockCreateForm action={createBlockAction} allowGif={allowGif} />

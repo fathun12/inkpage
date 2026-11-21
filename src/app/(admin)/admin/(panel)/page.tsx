@@ -25,14 +25,17 @@ export default async function OverviewPage() {
 
   return (
     <div className="flex flex-col gap-10">
-      <div>
-        <h1 className="font-display text-4xl font-black">Overview</h1>
-        <p className="mt-2 text-ink-soft">
-          Your page is live at{" "}
-          <a href={routes.profile(profile.username)} target="_blank" rel="noopener noreferrer" className="font-mono underline underline-offset-4">
-            /{profile.username}
-          </a>
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="font-display text-4xl font-black">Overview</h1>
+          <p className="mt-2 text-ink-soft">
+            Your page is live at{" "}
+            <a href={routes.profile(profile.username)} target="_blank" rel="noopener noreferrer" className="font-mono underline underline-offset-4">
+              /{profile.username}
+            </a>
+          </p>
+        </div>
+        <ButtonLink href={routes.customize} variant="studio">Customize</ButtonLink>
       </div>
 
       <section className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -60,7 +63,6 @@ export default async function OverviewPage() {
 
       <div className="flex flex-wrap gap-4">
         <ButtonLink href={routes.links} variant="accent">Edit links</ButtonLink>
-        <ButtonLink href={routes.customize}>Customize page</ButtonLink>
       </div>
 
       <QrCard svg={qr} url={pageUrl} />

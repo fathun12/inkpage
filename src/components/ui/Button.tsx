@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { ButtonHTMLAttributes, ComponentProps } from "react";
 import { cn } from "@/lib/utils";
 
-type Variant = "solid" | "accent" | "ghost" | "danger";
+type Variant = "solid" | "accent" | "ghost" | "danger" | "studio";
 type Size = "md" | "sm";
 
 const base =
@@ -13,6 +13,7 @@ const variants: Record<Variant, string> = {
   accent: "bg-ink text-bg",
   ghost: "bg-transparent text-ink",
   danger: "bg-accent text-accent-ink",
+  studio: "bg-ink text-accent uppercase tracking-wider",
 };
 
 const sizes: Record<Size, string> = {

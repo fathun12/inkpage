@@ -303,7 +303,7 @@ export function CustomizeStudio({
   }
 
   return (
-    <form action={action} className="flex h-dvh flex-col">
+    <form action={action} className="flex h-dvh flex-col overflow-hidden">
       {/* The sidebar controls have no name. These hidden inputs are what the server receives. */}
       <input type="hidden" name="theme" value={draft.theme} />
       <input type="hidden" name="bg_mode" value={draft.mode} />
@@ -362,7 +362,7 @@ export function CustomizeStudio({
       {notice && <div className="px-5 pt-3">{notice}</div>}
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-        <aside className="order-2 min-h-0 flex-1 overflow-y-auto border-t border-line lg:order-1 lg:w-[360px] lg:flex-none lg:border-r lg:border-t-0">
+        <aside className="relative order-2 min-h-0 flex-1 overflow-y-auto border-t border-line lg:order-1 lg:w-[360px] lg:flex-none lg:border-r lg:border-t-0">
           <Section title="Theme" open onReset={() => set("theme", siteConfig.defaultTheme)}>
             <ThemePicker value={draft.theme} options={themes} onChange={(v) => set("theme", resolveTheme(v))} />
           </Section>
