@@ -1,10 +1,17 @@
 import { z } from "zod";
+import { cardRanges, mediaDefaults } from "@/config/card";
 import { mediaConfig } from "@/config/media";
 import { parseEmbed } from "@/lib/embed";
 import { field } from "@/lib/form";
 import { splitLines } from "@/lib/social";
 import { isHttpUrl } from "@/lib/validation";
-import { blockTypes } from "@/types/block";
+import {
+  blockTypes,
+  mediaFits,
+  mediaHeights,
+  mediaPlacements,
+  mediaPositions,
+} from "@/types/block";
 
 export const blockSchema = z
   .object({
@@ -92,5 +99,28 @@ export function parseBlockForm(formData: FormData) {
     target: field(formData, "target"),
     publish_at: field(formData, "publish_at"),
     expire_at: field(formData, "expire_at"),
+  });
+}
+
+// Settings of the image or GIF inside a link or project card (blocks.data.media, without url and kind).
+export const mediaSettingsSchema = z.object({
+  opacity: z.coerce
+    .number({ error: "Media opacity must be a number." })
+    .int("Media opacity must be a whole number.")
+    .min(cardRanges.opacity.min, "Media opacity is out of range.")
+    .max(cardRanges.opacity.max, "Media opacity is out of range."),
+  fit: z.enum(mediaFits, { error: "Pick how the media fits." }),
+  position: z.enum(mediaPositions, { error: "Pick where the media sits." }),
+  placement: z.enum(mediaPlacements, { error: "Pick where the media goes." }),
+  height: z.enum(mediaHeights, { error: "Pick a media height." }),
+});
+
+export function parseMediaSettings(formData: FormData) {
+  return mediaSettingsSchema.safeParse({
+    opacity: field(formData, "media_opacity") ?? mediaDefaults.opacity,
+    fit: field(formData, "media_fit") ?? mediaDefaults.fit,
+    position: field(formData, "media_position") ?? mediaDefaults.position,
+    placement: field(formData, "media_placement") ?? mediaDefaults.placement,
+    height: field(formData, "media_height") ?? mediaDefaults.height,
   });
 }

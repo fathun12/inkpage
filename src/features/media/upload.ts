@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { mediaConfig } from "@/config/media";
 import { videoConfig, videoTypes } from "@/config/video";
 import { createClient } from "@/lib/supabase/server";
+import type { CardMedia } from "@/types/block";
 import type { VideoSignInput, VideoSignResult } from "@/types/media";
 
 const extensions: Record<string, string> = {
@@ -32,6 +33,36 @@ export async function uploadImage(userId: string, file: File): Promise<UploadRes
   if (error) return { error: `Could not upload the image: ${error.message}` };
 
   return { url: supabase.storage.from(mediaConfig.bucket).getPublicUrl(path).data.publicUrl };
+}
+
+const cardExtensions: Record<string, string> = { ...extensions, "image/gif": "gif" };
+
+// Image or GIF inside a card. Small files only (the browser already shrank still images), so this goes
+// through the normal server action, not a signed upload.
+export async function uploadCardMedia(
+  userId: string,
+  file: File,
+): Promise<{ url: string; kind: CardMedia["kind"] } | { error: string }> {
+  const ext = cardExtensions[file.type];
+  if (!ext) return { error: "Card media must be a JPG, PNG, WebP or GIF file." };
+
+  const gif = file.type === "image/gif";
+  const limit = gif ? mediaConfig.cardMedia.maxGifMb : mediaConfig.cardMedia.maxImageMb;
+  if (file.size > limit * 1024 * 1024) {
+    return { error: `${gif ? "A GIF" : "An image"} in a card must be ${limit} MB or smaller.` };
+  }
+
+  const supabase = await createClient();
+  const path = `${userId}/cards/${randomUUID()}.${ext}`;
+  const { error } = await supabase.storage
+    .from(mediaConfig.bucket)
+    .upload(path, file, { contentType: file.type, upsert: false });
+  if (error) return { error: `Could not upload the card media: ${error.message}` };
+
+  return {
+    url: supabase.storage.from(mediaConfig.bucket).getPublicUrl(path).data.publicUrl,
+    kind: gif ? "gif" : "image",
+  };
 }
 
 function pathFromUrl(url: string, userId: string): string | null {

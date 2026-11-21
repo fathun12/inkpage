@@ -1,6 +1,8 @@
 // card.ts: the ONE source for the card style (types, ranges, defaults, presets).
 // The Customize studio (sliders), the server (Zod) and readCard() all read this file.
 
+import type { MediaFit, MediaHeight, MediaPlacement, MediaPosition } from "@/types/block";
+
 export type Range = { min: number; max: number; step: number };
 
 export const cardKinds = ["solid", "glass"] as const;
@@ -141,3 +143,27 @@ export const lensTuning = {
   edgeX: 0.08, // depth 100 = left and right bevel is 8% of the card width
   edgeY: 0.3, // depth 100 = top and bottom bevel is 30% of the card height
 } as const;
+
+// Image or GIF inside a card (Phase 10d). The ids are in types/block.ts.
+export const mediaDefaults = {
+  opacity: 100,
+  fit: "cover" as MediaFit,
+  position: "center" as MediaPosition,
+  placement: "behind" as MediaPlacement,
+  height: "md" as MediaHeight,
+};
+
+// Height (px) of the strip when the media is below the text.
+export const mediaHeightPx: Record<MediaHeight, number> = { sm: 80, md: 120, lg: 180 };
+
+export const mediaLabels: {
+  fit: Record<MediaFit, string>;
+  position: Record<MediaPosition, string>;
+  placement: Record<MediaPlacement, string>;
+  height: Record<MediaHeight, string>;
+} = {
+  fit: { cover: "Fill (may cut the edges)", contain: "Fit (show everything)" },
+  position: { center: "Center", top: "Top", bottom: "Bottom" },
+  placement: { behind: "Behind the text", below: "Below the text" },
+  height: { sm: "Small", md: "Medium", lg: "Large" },
+};

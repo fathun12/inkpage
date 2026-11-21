@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireUser } from "@/features/auth/queries";
-import { filesFrom, removeImages, uploadImages } from "@/features/media/upload";
+import { filesFrom, removeImages, uploadCardMedia, uploadImages } from "@/features/media/upload";
 import { mediaConfig } from "@/config/media";
 import { routes } from "@/config/site";
 import { localInputToIso } from "@/lib/datetime";
@@ -13,14 +13,65 @@ import { field } from "@/lib/form";
 import { splitLines, toSocialItems } from "@/lib/social";
 import { createClient } from "@/lib/supabase/server";
 import { firstError } from "@/lib/validation";
-import type { Block, BlockData } from "@/types/block";
-import { parseBlockForm, type BlockInput } from "./schema";
+import type { Block, BlockData, CardMedia } from "@/types/block";
+import { parseBlockForm, parseMediaSettings, type BlockInput } from "./schema";
 
 const back = routes.links;
 const galleryEmpty = "A gallery needs at least one image.";
 const galleryFull = `A gallery can hold up to ${mediaConfig.maxGallery} images.`;
 
-function toRow(v: BlockInput, imageUrl: string | null, images: string[]) {
+type Db = Awaited<ReturnType<typeof createClient>>;
+
+// How many of the user's blocks hold a GIF (the block being edited can be left out).
+async function countAnimated(supabase: Db, userId: string, exceptId: string | null): Promise<number> {
+  const { data } = await supabase.from("blocks").select("id, data").eq("user_id", userId);
+  const rows = (data ?? []) as { id: string; data: BlockData | null }[];
+  return rows.filter((r) => r.id !== exceptId && r.data?.media?.kind === "gif").length;
+}
+
+type MediaPlan = { media: CardMedia | null; fresh: string[]; removed: string[] } | { error: string };
+
+// Decides what happens to the card media of a link or project block:
+//   new file picked  -> upload it; the old file is deleted after saving
+//   "Remove" ticked  -> no media; the old file is deleted after saving
+//   nothing picked   -> keep the file, only update the settings (opacity, fit ...)
+// fresh = files uploaded now (delete them again if saving fails). removed = old files to delete after saving.
+async function planMedia(
+  supabase: Db,
+  userId: string,
+  formData: FormData,
+  type: BlockInput["type"],
+  current: CardMedia | null,
+  blockId: string | null,
+): Promise<MediaPlan> {
+  if (type !== "link" && type !== "project") return { media: null, fresh: [], removed: [] };
+
+  const settings = parseMediaSettings(formData);
+  if (!settings.success) return { error: firstError(settings.error) };
+
+  const file = filesFrom(formData, "media")[0];
+  const oldUrl = current ? [current.url] : [];
+
+  if (file) {
+    if (file.type === "image/gif") {
+      const used = await countAnimated(supabase, userId, blockId);
+      if (used >= mediaConfig.cardMedia.maxAnimatedPerPage) {
+        return {
+          error: `A page can have up to ${mediaConfig.cardMedia.maxAnimatedPerPage} GIFs in its cards. Remove a GIF from another card first.`,
+        };
+      }
+    }
+    const up = await uploadCardMedia(userId, file);
+    if ("error" in up) return { error: up.error };
+    return { media: { url: up.url, kind: up.kind, ...settings.data }, fresh: [up.url], removed: oldUrl };
+  }
+
+  if (formData.get("remove_media") === "on") return { media: null, fresh: [], removed: oldUrl };
+  if (current) return { media: { ...current, ...settings.data }, fresh: [], removed: [] };
+  return { media: null, fresh: [], removed: [] };
+}
+
+function toRow(v: BlockInput, imageUrl: string | null, images: string[], media: CardMedia | null) {
   const hasUrl = v.type === "link" || v.type === "project" || v.type === "embed";
   const hasBody = v.type === "link" || v.type === "project" || v.type === "text";
   const hasImage = v.type === "link" || v.type === "project";
@@ -29,6 +80,8 @@ function toRow(v: BlockInput, imageUrl: string | null, images: string[]) {
   if (v.type === "gallery") data.images = images;
   if (v.type === "socials") data.items = toSocialItems(splitLines(v.links));
   if (v.type === "countdown") data.target = localInputToIso(v.target) ?? undefined;
+  // The media comes from planMedia, so saving a block never drops it.
+  if (hasImage && media) data.media = media;
 
   return {
     type: v.type,
@@ -61,6 +114,11 @@ export async function createBlockAction(formData: FormData): Promise<void> {
   const images = v.type === "gallery" ? uploaded.urls : [];
 
   const supabase = await createClient();
+  const plan = await planMedia(supabase, user.id, formData, v.type, null, null);
+  if ("error" in plan) {
+    await removeImages(user.id, uploaded.urls);
+    return redirectWithError(back, plan.error);
+  }
   const { data: last } = await supabase
     .from("blocks")
     .select("position")
@@ -72,9 +130,9 @@ export async function createBlockAction(formData: FormData): Promise<void> {
   const position = ((last?.position as number | undefined) ?? -1) + 1;
   const { error } = await supabase
     .from("blocks")
-    .insert({ user_id: user.id, position, ...toRow(v, imageUrl, images) });
+    .insert({ user_id: user.id, position, ...toRow(v, imageUrl, images, plan.media) });
   if (error) {
-    await removeImages(user.id, uploaded.urls);
+    await removeImages(user.id, [...uploaded.urls, ...plan.fresh]);
     return redirectWithError(back, `Could not add the block: ${error.message}`);
   }
 
@@ -130,17 +188,23 @@ export async function updateBlockAction(formData: FormData): Promise<void> {
   if (single.length > 0) imageUrl = uploaded.urls[0] ?? null;
   if (v.type === "gallery") images = [...images, ...uploaded.urls];
 
+  const plan = await planMedia(supabase, user.id, formData, v.type, current.data.media ?? null, id);
+  if ("error" in plan) {
+    await removeImages(user.id, uploaded.urls);
+    return redirectWithError(back, plan.error);
+  }
+
   const { error } = await supabase
     .from("blocks")
-    .update(toRow(v, imageUrl, images))
+    .update(toRow(v, imageUrl, images, plan.media))
     .eq("id", id)
     .eq("user_id", user.id);
   if (error) {
-    await removeImages(user.id, uploaded.urls);
+    await removeImages(user.id, [...uploaded.urls, ...plan.fresh]);
     return redirectWithError(back, `Could not save the block: ${error.message}`);
   }
 
-  await removeImages(user.id, removed);
+  await removeImages(user.id, [...removed, ...plan.removed]);
   redirectWithSaved(back, "Block saved.");
 }
 
@@ -162,7 +226,11 @@ export async function deleteBlockAction(formData: FormData): Promise<void> {
 
   if (found) {
     const data = (found.data ?? {}) as BlockData;
-    await removeImages(user.id, [found.image_url as string | null, ...(data.images ?? [])]);
+    await removeImages(user.id, [
+      found.image_url as string | null,
+      ...(data.images ?? []),
+      data.media?.url,
+    ]);
   }
   redirectWithSaved(back, "Block deleted.");
 }

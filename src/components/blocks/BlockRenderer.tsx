@@ -8,16 +8,16 @@ import { ProjectBlock } from "./ProjectBlock";
 import { SocialsBlock } from "./SocialsBlock";
 import { TextBlock } from "./TextBlock";
 
-function renderBlock(block: Block) {
+function renderBlock(block: Block, first: boolean) {
   switch (block.type) {
     case "link":
-      return <LinkBlock block={block} />;
+      return <LinkBlock block={block} eager={first} />;
     case "header":
       return <HeaderBlock block={block} />;
     case "text":
       return <TextBlock block={block} />;
     case "project":
-      return <ProjectBlock block={block} />;
+      return <ProjectBlock block={block} eager={first} />;
     case "embed":
       return <EmbedBlock block={block} />;
     case "gallery":
@@ -43,7 +43,7 @@ export function BlockRenderer({ blocks, glass = false }: { blocks: Block[]; glas
           className={glass ? "animate-rise-glass" : "animate-rise"}
           style={{ animationDelay: `${index * 60}ms` }}
         >
-          {renderBlock(block)}
+          {renderBlock(block, index === 0)}
         </li>
       ))}
     </ul>

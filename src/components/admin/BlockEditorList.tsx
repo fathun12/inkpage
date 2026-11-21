@@ -3,10 +3,12 @@ import { Img } from "@/components/ui/Img";
 import { ImageInput } from "@/components/ui/ImageInput";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { mediaConfig } from "@/config/media";
+import { readMedia } from "@/lib/card-media";
 import { isoToLocalInput } from "@/lib/datetime";
 import { cn } from "@/lib/utils";
 import type { BlockStatus, BlockView } from "@/types/block";
 import type { FormAction } from "@/types/form";
+import { CardMediaFields } from "./CardMediaFields";
 import { SortableList } from "./SortableList";
 
 type Actions = {
@@ -16,7 +18,7 @@ type Actions = {
   setFlag: FormAction;
   reorder: FormAction;
 };
-type Props = { blocks: BlockView[]; actions: Actions };
+type Props = { blocks: BlockView[]; actions: Actions; gifCount: number };
 
 const statusLabel: Record<BlockStatus, string> = {
   live: "Live",
@@ -57,9 +59,9 @@ function RemoveBox({ name, value, label }: { name: string; value?: string; label
   );
 }
 
-type CardProps = { block: BlockView; index: number; total: number; actions: Actions };
+type CardProps = { block: BlockView; index: number; total: number; actions: Actions; gifCount: number };
 
-function BlockCard({ block, index, total, actions }: CardProps) {
+function BlockCard({ block, index, total, actions, gifCount }: CardProps) {
   const type = block.type;
   const hasUrl = type === "link" || type === "project" || type === "embed";
   const hasBody = type === "link" || type === "project" || type === "text";
@@ -68,6 +70,9 @@ function BlockCard({ block, index, total, actions }: CardProps) {
   const socialLines = (block.data.items ?? []).map((item) => item.url).join("\n");
   const imageHint = `JPG, PNG or WebP, up to ${mediaConfig.maxMb} MB.`;
   const thumb = block.image_url ?? images[0] ?? null;
+  const media = hasImage ? readMedia(block.data.media) : null;
+  // Replacing this card's own GIF is always fine; a new GIF needs a free slot on the page.
+  const allowGif = media?.kind === "gif" || gifCount < mediaConfig.cardMedia.maxAnimatedPerPage;
 
   return (
     <>
@@ -159,6 +164,12 @@ function BlockCard({ block, index, total, actions }: CardProps) {
               </div>
             )}
 
+            {hasImage && (
+              <div className="sm:col-span-2">
+                <CardMediaFields id={`media-${block.id}`} media={media} allowGif={allowGif} />
+              </div>
+            )}
+
             {type === "gallery" && (
               <div className="flex flex-col gap-3 sm:col-span-2">
                 {images.length > 0 && (
@@ -235,14 +246,14 @@ function BlockCard({ block, index, total, actions }: CardProps) {
   );
 }
 
-export function BlockEditorList({ blocks, actions }: Props) {
+export function BlockEditorList({ blocks, actions, gifCount }: Props) {
   if (blocks.length === 0) {
     return <p className="font-mono text-sm text-ink-soft">No blocks yet. Add your first one above.</p>;
   }
 
   const items = blocks.map((block, index) => ({
     id: block.id,
-    node: <BlockCard block={block} index={index} total={blocks.length} actions={actions} />,
+    node: <BlockCard block={block} index={index} total={blocks.length} actions={actions} gifCount={gifCount} />,
   }));
 
   // The key resets the list whenever the saved order changes.

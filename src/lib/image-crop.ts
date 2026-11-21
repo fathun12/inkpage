@@ -43,3 +43,38 @@ export async function cropToFile(
   if (!blob) throw new Error("Could not prepare this image.");
   return new File([blob], fileName, { type: "image/jpeg" });
 }
+
+// Shrinks an image so its longest side is at most maxPx (it is never enlarged). NO crop: the whole
+// picture stays. The result is WebP, which keeps PNG transparency. A browser that cannot write
+// WebP (older Safari) gets JPEG on a white background instead.
+export async function resizeToFile(
+  img: HTMLImageElement,
+  maxPx: number,
+  quality: number,
+  fileName: string,
+): Promise<File> {
+  const scale = Math.min(1, maxPx / Math.max(img.naturalWidth, img.naturalHeight));
+  const w = Math.max(1, Math.round(img.naturalWidth * scale));
+  const h = Math.max(1, Math.round(img.naturalHeight * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = w;
+  canvas.height = h;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("This browser cannot process images.");
+  ctx.drawImage(img, 0, 0, w, h);
+
+  const toBlob = (type: string) =>
+    new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, type, quality));
+  let blob = await toBlob("image/webp");
+  let ext = "webp";
+  if (!blob || blob.type !== "image/webp") {
+    ctx.globalCompositeOperation = "destination-over";
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, w, h);
+    blob = await toBlob("image/jpeg");
+    ext = "jpg";
+  }
+  if (!blob) throw new Error("Could not prepare this image.");
+  const base = fileName.replace(/\.[^.]+$/, "") || "image";
+  return new File([blob], `${base}.${ext}`, { type: blob.type });
+}

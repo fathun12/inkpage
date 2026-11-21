@@ -6,6 +6,7 @@ import { mediaConfig } from "@/config/media";
 import { siteConfig } from "@/config/site";
 import type { BlockType } from "@/types/block";
 import type { FormAction } from "@/types/form";
+import { CardMediaFields } from "./CardMediaFields";
 
 type CardProps = {
   type: BlockType;
@@ -60,7 +61,7 @@ function TypeCard({ type, label, hint, action, open, children }: CardProps) {
 
 const imageHint = `JPG, PNG or WebP, up to ${mediaConfig.maxMb} MB.`;
 
-export function BlockCreateForm({ action }: { action: FormAction }) {
+export function BlockCreateForm({ action, allowGif = true }: { action: FormAction; allowGif?: boolean }) {
   return (
     <details>
       <summary className="ink-border press inline-flex cursor-pointer list-none items-center rounded-md bg-accent px-5 py-3 font-body font-semibold text-accent-ink">
@@ -83,6 +84,9 @@ export function BlockCreateForm({ action }: { action: FormAction }) {
             <ImageInput id="new-link-image" name="image" kind="photo" accept={mediaConfig.accept} />
           </Field>
         </Wide>
+        <Wide>
+          <CardMediaFields id="new-link-media" media={null} allowGif={allowGif} />
+        </Wide>
       </TypeCard>
 
       <TypeCard type="project" label="Project card" hint="A large cover image with text." action={action}>
@@ -100,6 +104,9 @@ export function BlockCreateForm({ action }: { action: FormAction }) {
           <Field label="Project URL" htmlFor="new-project-url" hint="Optional. Makes the card clickable.">
             <Input id="new-project-url" name="url" type="url" placeholder="https://" />
           </Field>
+        </Wide>
+        <Wide>
+          <CardMediaFields id="new-project-media" media={null} allowGif={allowGif} />
         </Wide>
       </TypeCard>
 
