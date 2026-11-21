@@ -187,3 +187,80 @@ export async function sweepBackgroundVideos(userId: string, keepUrl: string | nu
     });
   }
 }
+
+// Background photo: the browser uploads the ORIGINAL file straight to Storage (no crop, no shrinking),
+// in its own folder. Same flow as the background video: the server only checks the claim and makes a token.
+const photoRules = mediaConfig.backgroundPhoto;
+
+export async function signPhotoUpload(userId: string, input: VideoSignInput): Promise<VideoSignResult> {
+  const type = typeof input?.type === "string" ? input.type : "";
+  const size = typeof input?.size === "number" ? input.size : 0;
+  const kind = photoRules.types.find((t) => t.mime === type);
+  if (!kind) return { error: "Background photos must be JPG, PNG or WebP." };
+  if (!Number.isFinite(size) || size <= 0 || size > photoRules.maxMb * 1024 * 1024) {
+    return { error: `This photo is too large. The limit is ${photoRules.maxMb} MB.` };
+  }
+
+  const supabase = await createClient();
+  const path = `${userId}/${photoRules.folder}/${randomUUID()}.${kind.ext}`;
+  const { data, error } = await supabase.storage.from(mediaConfig.bucket).createSignedUploadUrl(path);
+  if (error || !data) {
+    return { error: `Could not prepare the upload: ${error?.message ?? "unknown error"}` };
+  }
+  return { path, token: data.token };
+}
+
+// Checks that a photo uploaded by the browser really exists, belongs to this user and is small enough.
+export async function findPendingPhoto(
+  userId: string,
+  path: string,
+): Promise<{ url: string } | { error: string }> {
+  const prefix = `${userId}/${photoRules.folder}/`;
+  const name = path.startsWith(prefix) ? path.slice(prefix.length) : "";
+  if (!/^[0-9a-f-]{36}\.(jpg|png|webp)$/.test(name)) {
+    return { error: "The uploaded photo is not valid. Pick it again." };
+  }
+
+  const supabase = await createClient();
+  const bucket = supabase.storage.from(mediaConfig.bucket);
+  const { data, error } = await bucket.list(prefix.slice(0, -1), { limit: 100 });
+  const file = error ? undefined : data?.find((f) => f.name === name);
+  if (!file) {
+    return { error: "The uploaded photo was not found. Pick it again and wait until it says Uploaded." };
+  }
+
+  if (Number(file.metadata?.size ?? 0) > photoRules.maxMb * 1024 * 1024) {
+    await bucket.remove([path]);
+    return { error: `The uploaded photo is larger than ${photoRules.maxMb} MB.` };
+  }
+  return { url: bucket.getPublicUrl(path).data.publicUrl };
+}
+
+// Keeps ONE background photo in the photo folder: deletes every file there except the one in use.
+// Also cleans up photos that were uploaded but never saved.
+export async function sweepBackgroundPhotos(userId: string, keepUrl: string | null): Promise<void> {
+  const supabase = await createClient();
+  const bucket = supabase.storage.from(mediaConfig.bucket);
+  const folder = `${userId}/${photoRules.folder}`;
+  const { data, error } = await bucket.list(folder, { limit: 100 });
+  if (error || !data) {
+    console.error("sweepBackgroundPhotos: could not list the folder", error?.message);
+    return;
+  }
+
+  const keep = keepUrl ? pathFromUrl(keepUrl, userId) : null;
+  const stale = data
+    .filter((f) => !f.name.startsWith("."))
+    .map((f) => `${folder}/${f.name}`)
+    .filter((p) => p !== keep);
+  if (stale.length === 0) return;
+
+  const { data: removed, error: removeError } = await bucket.remove(stale);
+  if (removeError || (removed?.length ?? 0) < stale.length) {
+    console.error("sweepBackgroundPhotos: some files were not deleted", {
+      wanted: stale.length,
+      removed: removed?.length ?? 0,
+      error: removeError?.message,
+    });
+  }
+}

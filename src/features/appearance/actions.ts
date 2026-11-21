@@ -1,15 +1,17 @@
 "use server";
 
 import { photoModes, type BackgroundMode } from "@/config/background";
+import { mediaConfig } from "@/config/media";
 import { routes } from "@/config/site";
 import { requireUser } from "@/features/auth/queries";
 import {
-  filesFrom,
+  findPendingPhoto,
   findPendingVideo,
   removeImages,
+  signPhotoUpload,
   signVideoUpload,
+  sweepBackgroundPhotos,
   sweepBackgroundVideos,
-  uploadImage,
 } from "@/features/media/upload";
 import { getProfileById } from "@/features/profile/queries";
 import { redirectWithError, redirectWithSaved } from "@/lib/flash";
@@ -20,6 +22,7 @@ import type { VideoSignInput, VideoSignResult } from "@/types/media";
 import { appearanceSchema } from "./schema";
 
 const back = routes.customize;
+const photoMimes: readonly string[] = mediaConfig.backgroundPhoto.types.map((t) => t.mime);
 
 // Reads a JSON text field (the card style). Missing or broken JSON becomes undefined,
 // and the schema then answers with "Card style is invalid."
@@ -33,9 +36,11 @@ function readJson(formData: FormData, name: string): unknown {
   }
 }
 
-// Called by the browser before it uploads a background video or GIF straight to Storage.
+// Called by the browser before it uploads a background photo, video or GIF straight to Storage.
+// Photos (JPG, PNG, WebP) go to the photo folder, everything else to the video folder.
 export async function createVideoUploadAction(input: VideoSignInput): Promise<VideoSignResult> {
   const user = await requireUser();
+  if (photoMimes.includes(input?.type)) return signPhotoUpload(user.id, input);
   return signVideoUpload(user.id, input);
 }
 
@@ -44,10 +49,12 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
   const current = await getProfileById(user.id);
   const oldBg = current?.bg_image_url ?? null;
   const oldVideo = current?.bg_video_url ?? null;
+  const pendingPhoto = field(formData, "bg_photo_path");
   const pendingVideo = field(formData, "bg_video_path");
 
-  // A video that was uploaded but not saved is lost after a redirect, so it is deleted on every failure.
+  // A photo or video that was uploaded but not saved is lost after a redirect, so it is deleted on every failure.
   const abort = async (message: string): Promise<void> => {
+    if (pendingPhoto) await sweepBackgroundPhotos(user.id, oldBg);
     if (pendingVideo) await sweepBackgroundVideos(user.id, oldVideo);
     return redirectWithError(back, message);
   };
@@ -67,8 +74,7 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
   });
   if (!parsed.success) return abort(firstError(parsed.error));
 
-  const bgFile = filesFrom(formData, "bg_image")[0];
-  const removeBg = formData.get("remove_bg_image") === "on" && !bgFile;
+  const removeBg = formData.get("remove_bg_image") === "on" && !pendingPhoto;
   const removeVideo = formData.get("remove_bg_video") === "on" && !pendingVideo;
 
   // Removing a photo or video drops its style back to the theme color. Uploading a photo or video
@@ -76,10 +82,17 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
   let mode: BackgroundMode = parsed.data.bg_mode;
   if (removeBg && photoModes.includes(mode)) mode = "color";
   if (removeVideo && mode === "video") mode = "color";
-  const switchedPhoto = Boolean(bgFile) && mode === "color";
+  const switchedPhoto = Boolean(pendingPhoto) && mode === "color";
   if (switchedPhoto) mode = "full";
   const switchedVideo = Boolean(pendingVideo) && mode === "color";
   if (switchedVideo) mode = "video";
+
+  let bgUrl = removeBg ? null : oldBg;
+  if (pendingPhoto) {
+    const found = await findPendingPhoto(user.id, pendingPhoto);
+    if ("error" in found) return abort(found.error);
+    bgUrl = found.url;
+  }
 
   let videoUrl = removeVideo ? null : oldVideo;
   if (pendingVideo) {
@@ -88,22 +101,11 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
     videoUrl = found.url;
   }
 
-  const hasBg = Boolean(bgFile) || (Boolean(oldBg) && !removeBg);
-  if (photoModes.includes(mode) && !hasBg) {
+  if (photoModes.includes(mode) && !bgUrl) {
     return abort("Upload a photo to use this background style, or pick another style.");
   }
   if (mode === "video" && !videoUrl) {
     return abort("Upload a video or GIF to use this background style, or pick another style.");
-  }
-
-  let bgUrl = removeBg ? null : oldBg;
-  const fresh: string[] = [];
-
-  if (bgFile) {
-    const result = await uploadImage(user.id, bgFile);
-    if ("error" in result) return abort(result.error);
-    bgUrl = result.url;
-    fresh.push(result.url);
   }
 
   const supabase = await createClient();
@@ -126,7 +128,6 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
     })
     .eq("id", user.id);
   if (error) {
-    await removeImages(user.id, fresh);
     const missing = error.code === "PGRST204" || error.code === "42703" || error.code === "23514";
     return abort(
       missing
@@ -135,7 +136,9 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
     );
   }
 
+  // The replaced or removed photo and any unsaved leftovers are deleted from Storage.
   await removeImages(user.id, [bgUrl !== oldBg ? oldBg : null]);
+  await sweepBackgroundPhotos(user.id, bgUrl);
   await sweepBackgroundVideos(user.id, videoUrl);
 
   const text = switchedPhoto

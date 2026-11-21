@@ -7,7 +7,7 @@ import { ProfileHeader } from "@/components/layout/ProfileHeader";
 import { PublicFrame } from "@/components/layout/PublicFrame";
 import { Field } from "@/components/ui/Field";
 import { Img } from "@/components/ui/Img";
-import { ImageInput } from "@/components/ui/ImageInput";
+import { PhotoInput } from "@/components/ui/PhotoInput";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { VideoInput } from "@/components/ui/VideoInput";
 import {
@@ -476,9 +476,9 @@ export function CustomizeStudio({
               <Field
                 label="Background photo"
                 htmlFor="bg_image"
-                hint={`JPG, PNG or WebP, up to ${mediaConfig.maxMb} MB. Leave empty to keep the current one.`}
+                hint={`JPG, PNG or WebP, up to ${mediaConfig.backgroundPhoto.maxMb} MB, kept in original quality (no crop, no shrinking). It uploads as soon as you pick it, then press Save changes. Leave empty to keep the current one.`}
               >
-                <ImageInput id="bg_image" name="bg_image" kind="background" accept={mediaConfig.accept} onFile={pickPhoto} />
+                <PhotoInput id="bg_image" name="bg_photo_path" sign={signVideo} onFile={pickPhoto} />
               </Field>
               {background.imageUrl && (
                 <label className="flex items-center gap-2 text-sm">
