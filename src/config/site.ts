@@ -22,7 +22,6 @@ export const routes = {
   setup: "/admin/setup",
   admin: "/admin",
   links: "/admin/links",
-  appearance: "/admin/appearance",
   profileEdit: "/admin/profile",
   customize: "/admin/customize",
   analytics: "/admin/analytics",
