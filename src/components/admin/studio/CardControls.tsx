@@ -342,19 +342,19 @@ export function CardControls({ card, onChange, plainBackground }: Props) {
             label="Refraction"
             value={g.refraction}
             range={cardRanges.effect}
-            hint="Bends the background at the edges. 0 turns it off. Chrome and Edge only."
+            hint="Bends the background at the edges. Heavy: it can make the page lag, most of all on phones. Chrome and Edge only. Keep it at 0 unless you really want it."
             onChange={(refraction) => setGlass({ refraction })}
           />
-          <Slider id="card_depth" label="Depth" value={g.depth} range={cardRanges.effect} onChange={(depth) => setGlass({ depth })} />
+          <Slider id="card_depth" label="Depth" value={g.depth} range={cardRanges.effect} hint="Only works when Refraction is above 0." onChange={(depth) => setGlass({ depth })} />
           <Slider
             id="card_dispersion"
             label="Dispersion"
             value={g.dispersion}
             range={cardRanges.effect}
-            hint="Splits colors at the edges."
+            hint="Splits colors at the edges. The heaviest setting, and only works when Refraction is above 0."
             onChange={(dispersion) => setGlass({ dispersion })}
           />
-          <Slider id="card_splay" label="Splay" value={g.splay} range={cardRanges.effect} onChange={(splay) => setGlass({ splay })} />
+          <Slider id="card_splay" label="Splay" value={g.splay} range={cardRanges.effect} hint="Only works when Refraction is above 0." onChange={(splay) => setGlass({ splay })} />
           <Slider
             id="card_frost"
             label="Frost"

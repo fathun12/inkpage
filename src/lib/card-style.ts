@@ -8,6 +8,7 @@ import {
   cardTextColors,
   glassFillColor,
   glassFillOpacity,
+  glassGlow,
   glassPresets,
   lensTuning,
   newDrop,
@@ -105,7 +106,7 @@ export function readCard(raw: unknown): CardStyle {
   };
 }
 
-// Clicking a preset sets the glass numbers (not the colors). It adds one soft drop shadow if there is none.
+// Clicking a preset sets the glass numbers (not the colors). It adds one soft drop shadow and two inner glow layers if there are none.
 export function applyPreset(card: CardStyle, preset: GlassPreset): CardStyle {
   const p = glassPresets[preset];
   return {
@@ -124,6 +125,7 @@ export function applyPreset(card: CardStyle, preset: GlassPreset): CardStyle {
       specular: p.specular,
     },
     drop: card.drop.length > 0 ? card.drop : [{ ...newDrop }],
+    inner: card.inner.length > 0 ? card.inner : [{ ...newInner }, { ...glassGlow }],
   };
 }
 

@@ -92,9 +92,9 @@ export const cardDefaults: CardStyle = {
   glass: {
     frost: 14,
     vibrancy: 150,
-    refraction: 30,
+    refraction: 0,
     depth: 35,
-    dispersion: 10,
+    dispersion: 0,
     splay: 30,
     specular: 60,
     light: { angle: 135, intensity: 70 },
@@ -116,6 +116,9 @@ export const ringWidth = 1.5;
 export const newDrop: Shadow = { x: 0, y: 8, blur: 24, spread: 0, color: "#000000", opacity: 18 };
 export const newInner: Shadow = { x: 0, y: 1, blur: 0, spread: 0, color: "#ffffff", opacity: 40 };
 
+// Soft inner glow: gives a glass card a thick, liquid edge without the heavy lens. Added by the presets.
+export const glassGlow: Shadow = { x: 0, y: 0, blur: 14, spread: 0, color: "#ffffff", opacity: 18 };
+
 type GlassPresetValues = {
   frost: number;
   fillOpacity: number;
@@ -129,9 +132,9 @@ type GlassPresetValues = {
 
 // First guesses: tune them in the browser, not from theory.
 export const glassPresets: Record<GlassPreset, GlassPresetValues> = {
-  clear: { frost: 6, fillOpacity: 6, vibrancy: 150, refraction: 50, depth: 40, dispersion: 20, splay: 30, specular: 70 },
-  regular: { frost: 14, fillOpacity: 14, vibrancy: 160, refraction: 30, depth: 35, dispersion: 10, splay: 30, specular: 60 },
-  tinted: { frost: 12, fillOpacity: 32, vibrancy: 150, refraction: 25, depth: 30, dispersion: 5, splay: 30, specular: 50 },
+  clear: { frost: 6, fillOpacity: 6, vibrancy: 150, refraction: 0, depth: 40, dispersion: 0, splay: 30, specular: 80 },
+  regular: { frost: 14, fillOpacity: 14, vibrancy: 160, refraction: 0, depth: 35, dispersion: 0, splay: 30, specular: 70 },
+  tinted: { frost: 12, fillOpacity: 32, vibrancy: 150, refraction: 0, depth: 30, dispersion: 0, splay: 30, specular: 60 },
   frosted: { frost: 28, fillOpacity: 45, vibrancy: 120, refraction: 0, depth: 0, dispersion: 0, splay: 0, specular: 25 },
 };
 
