@@ -60,7 +60,7 @@ export default async function OverviewPage() {
 
       <div className="flex flex-wrap gap-4">
         <ButtonLink href={routes.links} variant="accent">Edit links</ButtonLink>
-        <ButtonLink href={routes.appearance}>Change appearance</ButtonLink>
+        <ButtonLink href={routes.customize}>Customize page</ButtonLink>
       </div>
 
       <QrCard svg={qr} url={pageUrl} />

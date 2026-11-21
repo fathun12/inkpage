@@ -8,7 +8,12 @@ import { videoAccept, videoConfig, videoTypes } from "@/config/video";
 import { uploadToSignedPath } from "@/lib/direct-upload";
 import type { VideoSignAction } from "@/types/media";
 
-type Props = { id: string; name: string; sign: VideoSignAction };
+type Props = {
+  id: string;
+  name: string;
+  sign: VideoSignAction;
+  onFile?: (file: File | null) => void;
+};
 type Note = { tone: "info" | "error"; text: string } | null;
 
 const MB = 1024 * 1024;
@@ -34,7 +39,7 @@ function readDuration(file: File): Promise<number> {
 
 // The file itself is NOT part of the form (the input has no name). It is uploaded straight to
 // Storage as soon as it is picked, and only its storage path travels with the form.
-export function VideoInput({ id, name, sign }: Props) {
+export function VideoInput({ id, name, sign, onFile }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const runRef = useRef(0);
   const [path, setPath] = useState("");
@@ -50,6 +55,7 @@ export function VideoInput({ id, name, sign }: Props) {
   function fail(input: HTMLInputElement, text: string) {
     input.value = "";
     setPath("");
+    onFile?.(null);
     setNote({ tone: "error", text });
     lockSave(false);
   }
@@ -62,6 +68,7 @@ export function VideoInput({ id, name, sign }: Props) {
     setPath("");
 
     if (!file) {
+      onFile?.(null);
       setNote(null);
       lockSave(false);
       return;
@@ -99,6 +106,7 @@ export function VideoInput({ id, name, sign }: Props) {
       if (failure) return fail(input, `Upload failed: ${failure}`);
 
       setPath(signed.path);
+      onFile?.(file);
       setNote({
         tone: "info",
         text: `Uploaded (${(file.size / MB).toFixed(1)} MB). Now press Save changes to use it.`,

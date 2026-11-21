@@ -13,6 +13,7 @@ type Props = {
   accept: string;
   multiple?: boolean;
   required?: boolean;
+  onFile?: (file: File | null) => void;
 };
 
 const readError = "This image could not be read. Try a JPG, PNG or WebP file.";
@@ -29,7 +30,7 @@ function jpgName(name: string) {
 
 // File input with a crop step. The cropped, resized JPEG replaces the chosen file,
 // so the form sends a small file and the server action stays unchanged.
-export function ImageInput({ id, name, kind, accept, multiple, required }: Props) {
+export function ImageInput({ id, name, kind, accept, multiple, required, onFile }: Props) {
   const preset = cropPresets[kind];
   const wrapRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
@@ -80,6 +81,7 @@ export function ImageInput({ id, name, kind, accept, multiple, required }: Props
       const file = await cropToFile(img, area, preset.aspect, preset.maxPx, cropQuality, nameRef.current);
       if (ticket !== runRef.current) return;
       putFiles(input, [file]);
+      onFile?.(file);
       setMessage(`Ready to upload: ${Math.max(1, Math.round(file.size / 1024))} KB. Drag to move, slide to zoom.`);
     } catch {
       if (ticket === runRef.current) setMessage(readError);
@@ -95,6 +97,7 @@ export function ImageInput({ id, name, kind, accept, multiple, required }: Props
     setSource(null);
     setPreviews([]);
     if (files.length === 0) {
+      onFile?.(null);
       setMessage("");
       return;
     }
@@ -135,6 +138,7 @@ export function ImageInput({ id, name, kind, accept, multiple, required }: Props
     } catch {
       if (run === runRef.current) {
         input.value = "";
+        onFile?.(null);
         setMessage(readError);
       }
     }

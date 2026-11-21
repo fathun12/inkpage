@@ -1,10 +1,14 @@
-type Props = { current: string; options: { name: string; label: string }[] };
+type Props = {
+  value: string;
+  options: { name: string; label: string }[];
+  onChange: (name: string) => void;
+};
 
-export function ThemePicker({ current, options }: Props) {
+export function ThemePicker({ value, options, onChange }: Props) {
   return (
     <fieldset className="flex flex-col gap-2">
-      <legend className="mb-1.5 text-sm font-medium text-ink-soft">Theme</legend>
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+      <legend className="sr-only">Theme</legend>
+      <div className="grid grid-cols-2 gap-3">
         {options.map((o) => (
           <label
             key={o.name}
@@ -12,9 +16,9 @@ export function ThemePicker({ current, options }: Props) {
           >
             <input
               type="radio"
-              name="theme"
               value={o.name}
-              defaultChecked={o.name === current}
+              checked={o.name === value}
+              onChange={() => onChange(o.name)}
               className="sr-only"
             />
             <span data-theme={o.name} className="ink-border block rounded-md bg-bg p-3 text-ink">

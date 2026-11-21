@@ -23,6 +23,8 @@ export const routes = {
   admin: "/admin",
   links: "/admin/links",
   appearance: "/admin/appearance",
+  profileEdit: "/admin/profile",
+  customize: "/admin/customize",
   analytics: "/admin/analytics",
   track: "/api/track",
   profile: (username: string) => `/${username}`,

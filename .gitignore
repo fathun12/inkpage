@@ -42,3 +42,5 @@ next-env.d.ts
 
 # private AI handoff spec
 SPEC.md
+
+SPEC-CUSTOMIZE.md
