@@ -14,5 +14,7 @@ export type Profile = {
   bg_color2: string | null;
   bg_angle: number | null;
   bg_video_url: string | null;
+  font_heading: string | null;
+  font_body: string | null;
   created_at: string;
 };

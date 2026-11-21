@@ -30,8 +30,10 @@
   --color-accent-ink: var(--c-accent-ink);
   --color-highlight: var(--c-highlight);
 
-  --font-display: var(--nf-body), system-ui, sans-serif;
-  --font-body: var(--nf-body), system-ui, sans-serif;
+  /* --nf-display and --nf-body are set per public page (config/font-choices.ts).
+     Without them the admin falls back to Instrument Sans. */
+  --font-display: var(--nf-display, var(--nf-body, var(--nf-f-instrument-sans))), system-ui, sans-serif;
+  --font-body: var(--nf-body, var(--nf-f-instrument-sans)), system-ui, sans-serif;
   --font-voice: var(--nf-voice), Georgia, serif;
   --font-mono: var(--nf-mono), ui-monospace, monospace;
 

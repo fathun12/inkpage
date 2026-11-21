@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { CustomizeStudio } from "@/components/admin/CustomizeStudio";
 import { FlashNotice } from "@/components/ui/FlashNotice";
 import { readBackground } from "@/config/background";
+import { readFonts } from "@/config/font-choices";
 import { resolveTheme, routes, themeLabels, themeNames } from "@/config/site";
 import { createVideoUploadAction, updateAppearanceAction } from "@/features/appearance/actions";
 import { requireUser } from "@/features/auth/queries";
@@ -45,6 +46,7 @@ export default async function CustomizePage({ searchParams }: Props) {
       }}
       theme={resolveTheme(profile.theme)}
       background={readBackground(profile)}
+      fonts={readFonts(profile)}
       blocks={blocks}
       themes={themes}
       notice={notice}

@@ -23,6 +23,14 @@ import {
   type BackgroundMode,
   type BackgroundView,
 } from "@/config/background";
+import {
+  defaultFont,
+  fontChoices,
+  fontGroups,
+  fontIds,
+  type FontId,
+  type FontPair,
+} from "@/config/font-choices";
 import { mediaConfig } from "@/config/media";
 import { resolveTheme, routes, siteConfig, type ThemeName } from "@/config/site";
 import { videoConfig } from "@/config/video";
@@ -38,6 +46,7 @@ type Props = {
   profile: { username: string; displayName: string; bio: string | null; avatarUrl: string | null };
   theme: ThemeName;
   background: BackgroundView;
+  fonts: FontPair;
   blocks: Block[];
   themes: { name: string; label: string }[];
   notice?: ReactNode;
@@ -53,6 +62,8 @@ type Draft = {
   angle: number;
   tint: number;
   gray: boolean;
+  fontHeading: FontId;
+  fontBody: FontId;
 };
 
 const modeOptions = backgroundModes.map((m) => ({ value: m, label: backgroundLabels[m] }));
@@ -168,7 +179,53 @@ function Pills({
   );
 }
 
-export function CustomizeStudio({ action, signVideo, profile, theme, background, blocks, themes, notice }: Props) {
+function FontPicker({
+  legend,
+  value,
+  onChange,
+}: {
+  legend: string;
+  value: FontId;
+  onChange: (id: FontId) => void;
+}) {
+  return (
+    <fieldset className="flex flex-col gap-3">
+      <legend className="mb-1 text-sm font-medium text-ink-soft">{legend}</legend>
+      {fontGroups.map((group) => (
+        <div key={group.id} className="flex flex-col gap-2">
+          <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">{group.label}</span>
+          <div className="grid grid-cols-2 gap-2">
+            {fontIds
+              .filter((id) => fontChoices[id].group === group.id)
+              .map((id) => (
+                <label
+                  key={id}
+                  className="ink-border cursor-pointer rounded-md px-3 py-2 has-checked:bg-ink has-checked:text-bg has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink"
+                >
+                  <input
+                    type="radio"
+                    value={id}
+                    checked={id === value}
+                    onChange={() => onChange(id)}
+                    className="sr-only"
+                  />
+                  <span
+                    className="block text-2xl leading-none"
+                    style={{ fontFamily: `var(${fontChoices[id].cssVar}), system-ui, sans-serif` }}
+                  >
+                    Aa
+                  </span>
+                  <span className="mt-1 block text-xs">{fontChoices[id].label}</span>
+                </label>
+              ))}
+          </div>
+        </div>
+      ))}
+    </fieldset>
+  );
+}
+
+export function CustomizeStudio({ action, signVideo, profile, theme, background, fonts, blocks, themes, notice }: Props) {
   const [initial] = useState<Draft>(() => ({
     theme,
     mode: background.mode,
@@ -178,6 +235,8 @@ export function CustomizeStudio({ action, signVideo, profile, theme, background,
     angle: background.angle,
     tint: background.tint,
     gray: background.gray,
+    fontHeading: fonts.heading,
+    fontBody: fonts.body,
   }));
   const [draft, setDraft] = useState<Draft>(initial);
   const [device, setDevice] = useState<"phone" | "desktop">("phone");
@@ -236,6 +295,8 @@ export function CustomizeStudio({ action, signVideo, profile, theme, background,
       <input type="hidden" name="bg_color2" value={draft.color2} />
       <input type="hidden" name="bg_angle" value={draft.angle} />
       <input type="hidden" name="bg_tint" value={draft.tint} />
+      <input type="hidden" name="font_heading" value={draft.fontHeading} />
+      <input type="hidden" name="font_body" value={draft.fontBody} />
       {draft.gray && <input type="hidden" name="bg_gray" value="on" />}
       {removePhoto && <input type="hidden" name="remove_bg_image" value="on" />}
       {removeVideo && <input type="hidden" name="remove_bg_video" value="on" />}
@@ -435,6 +496,18 @@ export function CustomizeStudio({ action, signVideo, profile, theme, background,
               )}
             </div>
           </Section>
+
+          <Section
+            title="Font"
+            onReset={() => setDraft((d) => ({ ...d, fontHeading: defaultFont, fontBody: defaultFont }))}
+          >
+            <FontPicker
+              legend="Heading font"
+              value={draft.fontHeading}
+              onChange={(id) => set("fontHeading", id)}
+            />
+            <FontPicker legend="Body font" value={draft.fontBody} onChange={(id) => set("fontBody", id)} />
+          </Section>
         </aside>
 
         <section
@@ -447,7 +520,11 @@ export function CustomizeStudio({ action, signVideo, profile, theme, background,
             style={{ maxWidth: device === "phone" ? 390 : undefined }}
           >
             <div className="absolute inset-0 overflow-y-auto" onClickCapture={stopLinks}>
-              <PublicFrame theme={draft.theme} background={view}>
+              <PublicFrame
+                theme={draft.theme}
+                background={view}
+                fonts={{ heading: draft.fontHeading, body: draft.fontBody }}
+              >
                 <ProfileHeader
                   displayName={profile.displayName}
                   username={profile.username}

@@ -42,6 +42,8 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
 
   const parsed = appearanceSchema.safeParse({
     theme: field(formData, "theme"),
+    font_heading: field(formData, "font_heading"),
+    font_body: field(formData, "font_body"),
     bg_mode: field(formData, "bg_mode"),
     bg_fade: field(formData, "bg_fade"),
     bg_color: field(formData, "bg_color"),
@@ -96,6 +98,8 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
     .from("profiles")
     .update({
       theme: parsed.data.theme,
+      font_heading: parsed.data.font_heading,
+      font_body: parsed.data.font_body,
       bg_mode: mode,
       bg_fade: parsed.data.bg_fade,
       bg_image_url: bgUrl,
@@ -112,7 +116,7 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
     const missing = error.code === "PGRST204" || error.code === "42703" || error.code === "23514";
     return abort(
       missing
-        ? "The database does not know the background settings yet. Run the migration 20261119060000_profile_background_modes.sql in Supabase, then save again."
+        ? "The database does not know these settings yet. Run the newest migration (20261121010000_profile_fonts.sql) in Supabase, then save again."
         : `Could not save: ${error.message}`,
     );
   }

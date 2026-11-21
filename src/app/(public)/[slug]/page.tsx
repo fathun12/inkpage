@@ -5,6 +5,7 @@ import { ProfileHeader } from "@/components/layout/ProfileHeader";
 import { PublicFrame } from "@/components/layout/PublicFrame";
 import { ViewBeacon } from "@/components/ui/ViewBeacon";
 import { readBackground } from "@/config/background";
+import { readFonts } from "@/config/font-choices";
 import { resolveTheme, routes, siteConfig } from "@/config/site";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
@@ -34,7 +35,11 @@ export default async function PublicPage({ params }: Props) {
   const blocks = await getPublicBlocks(profile.id);
 
   return (
-    <PublicFrame theme={resolveTheme(profile.theme)} background={readBackground(profile)}>
+    <PublicFrame
+      theme={resolveTheme(profile.theme)}
+      background={readBackground(profile)}
+      fonts={readFonts(profile)}
+    >
       <ProfileHeader
         displayName={profile.display_name}
         username={profile.username}

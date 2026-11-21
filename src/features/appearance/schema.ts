@@ -5,6 +5,7 @@ import {
   hexColor,
   tintRange,
 } from "@/config/background";
+import { fontIds } from "@/config/font-choices";
 import { themeNames } from "@/config/site";
 
 const color = z
@@ -15,6 +16,8 @@ const color = z
 
 export const appearanceSchema = z.object({
   theme: z.enum(themeNames, { error: "Pick a theme." }),
+  font_heading: z.enum(fontIds, { error: "Pick a heading font." }),
+  font_body: z.enum(fontIds, { error: "Pick a body font." }),
   bg_mode: z.enum(backgroundModes, { error: "Pick a background style." }),
   bg_fade: z.enum(backgroundFades, { error: "Pick where the photo fades." }),
   bg_color: color,

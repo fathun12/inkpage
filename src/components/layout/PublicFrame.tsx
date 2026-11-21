@@ -1,10 +1,11 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Img } from "@/components/ui/Img";
 import { customPalette, plainBackground, type BackgroundView } from "@/config/background";
+import { defaultFonts, fontStyle, type FontPair } from "@/config/font-choices";
 import { siteConfig, type ThemeName } from "@/config/site";
 import { isGifUrl } from "@/config/video";
 
-type Props = { theme: ThemeName; background?: BackgroundView; children: ReactNode };
+type Props = { theme: ThemeName; background?: BackgroundView; fonts?: FontPair; children: ReactNode };
 
 // Theme color at a given strength (0 to 100), so the fade follows the chosen theme.
 function mix(percent: number) {
@@ -22,7 +23,7 @@ function fullFade(tint: number, fade: "top" | "bottom") {
   return `linear-gradient(${dir}, ${clear} 0%, ${mid} 40%, ${end} 88%)`;
 }
 
-export function PublicFrame({ theme, background = plainBackground, children }: Props) {
+export function PublicFrame({ theme, background = plainBackground, fonts = defaultFonts, children }: Props) {
   const { mode, fade, imageUrl, videoUrl, tint, gray, color, color2, angle } = background;
   const photo = gray ? "grayscale" : "";
   const full = mode === "full" && imageUrl;
@@ -40,7 +41,11 @@ export function PublicFrame({ theme, background = plainBackground, children }: P
   }
 
   return (
-    <div data-theme={theme} style={style} className="relative min-h-screen bg-bg text-ink">
+    <div
+      data-theme={theme}
+      style={{ ...fontStyle(fonts), ...style }}
+      className="relative min-h-screen bg-bg font-body text-ink [font-synthesis-weight:none]"
+    >
       {full && (
         <>
           <Img src={imageUrl} loading="eager" className={`fixed inset-0 size-full object-cover ${photo}`} />
