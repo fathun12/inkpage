@@ -70,6 +70,9 @@ type Draft = {
   card: CardStyle;
 };
 
+// Width (px) of the preview in Phone mode. Change this one number to make it wider or narrower.
+const phoneWidth = 480;
+
 const modeOptions = backgroundModes.map((m) => ({ value: m, label: backgroundLabels[m] }));
 const fadeOptions = backgroundFades.map((f) => ({ value: f, label: fadeLabels[f] }));
 const angleOptions = gradientDirections.map((d) => ({ value: String(d.value), label: d.label }));
@@ -539,7 +542,7 @@ export function CustomizeStudio({
           {/* translateZ(0) keeps the "fixed" background of the page inside this box. */}
           <div
             className="relative mx-auto h-full overflow-hidden rounded-lg border border-line [transform:translateZ(0)]"
-            style={{ maxWidth: device === "phone" ? 390 : undefined }}
+            style={{ maxWidth: device === "phone" ? phoneWidth : undefined }}
           >
             <div className="absolute inset-0 overflow-y-auto" onClickCapture={stopLinks}>
               <PublicFrame
