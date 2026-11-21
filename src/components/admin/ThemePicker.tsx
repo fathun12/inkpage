@@ -1,10 +1,14 @@
+import { customThemePalette, type CustomTheme } from "@/config/custom-theme";
+
 type Props = {
   value: string;
   options: { name: string; label: string }[];
   onChange: (name: string) => void;
+  // Colors of the "Custom" theme, so its card shows them.
+  custom?: CustomTheme;
 };
 
-export function ThemePicker({ value, options, onChange }: Props) {
+export function ThemePicker({ value, options, onChange, custom }: Props) {
   return (
     <fieldset className="flex flex-col gap-2">
       <legend className="sr-only">Theme</legend>
@@ -21,7 +25,11 @@ export function ThemePicker({ value, options, onChange }: Props) {
               onChange={() => onChange(o.name)}
               className="sr-only"
             />
-            <span data-theme={o.name} className="ink-border block rounded-md bg-bg p-3 text-ink">
+            <span
+              data-theme={o.name}
+              style={o.name === "custom" && custom ? customThemePalette(custom) : undefined}
+              className="ink-border block rounded-md bg-bg p-3 text-ink"
+            >
               <span className="block font-display text-lg font-medium">{o.label}</span>
               <span className="mt-2 flex gap-1.5">
                 <span className="size-4 rounded-full bg-accent" />

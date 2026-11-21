@@ -5,6 +5,7 @@ import { ProfileHeader } from "@/components/layout/ProfileHeader";
 import { PublicFrame } from "@/components/layout/PublicFrame";
 import { ViewBeacon } from "@/components/ui/ViewBeacon";
 import { readBackground } from "@/config/background";
+import { readCustomTheme } from "@/config/custom-theme";
 import { readFonts } from "@/config/font-choices";
 import { resolveTheme, routes, siteConfig } from "@/config/site";
 import { getPublicBlocks } from "@/features/blocks/queries";
@@ -39,6 +40,7 @@ export default async function PublicPage({ params }: Props) {
   return (
     <PublicFrame
       theme={resolveTheme(profile.theme)}
+      customTheme={readCustomTheme(profile)}
       background={readBackground(profile)}
       fonts={readFonts(profile)}
       card={card}

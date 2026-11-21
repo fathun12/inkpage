@@ -2,6 +2,7 @@ import { z } from "zod";
 import {
   backgroundFades,
   backgroundModes,
+  fadeReachRange,
   hexColor,
   tintRange,
 } from "@/config/background";
@@ -87,4 +88,13 @@ export const appearanceSchema = z.object({
     .min(tintRange.min, "Photo overlay is out of range.")
     .max(tintRange.max, "Photo overlay is out of range."),
   bg_gray: z.boolean(),
+  bg_fade_color: color,
+  bg_fade_custom: z.boolean(),
+  bg_fade_reach: z.coerce
+    .number({ error: "Fade reach must be a number." })
+    .int("Fade reach must be a whole number.")
+    .min(fadeReachRange.min, "Fade reach is out of range.")
+    .max(fadeReachRange.max, "Fade reach is out of range."),
+  theme_bg: color,
+  theme_accent: color,
 });

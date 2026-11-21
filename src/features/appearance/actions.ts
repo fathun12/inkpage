@@ -71,6 +71,11 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
     bg_angle: field(formData, "bg_angle"),
     bg_tint: field(formData, "bg_tint"),
     bg_gray: formData.get("bg_gray") === "on",
+    bg_fade_color: field(formData, "bg_fade_color"),
+    bg_fade_custom: formData.get("bg_fade_custom") === "on",
+    bg_fade_reach: field(formData, "bg_fade_reach"),
+    theme_bg: field(formData, "theme_bg"),
+    theme_accent: field(formData, "theme_accent"),
   });
   if (!parsed.success) return abort(firstError(parsed.error));
 
@@ -125,13 +130,17 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
       bg_angle: parsed.data.bg_angle,
       bg_tint: parsed.data.bg_tint,
       bg_gray: parsed.data.bg_gray,
+      bg_fade_color: parsed.data.bg_fade_custom ? parsed.data.bg_fade_color : null,
+      bg_fade_reach: parsed.data.bg_fade_reach,
+      theme_bg: parsed.data.theme_bg,
+      theme_accent: parsed.data.theme_accent,
     })
     .eq("id", user.id);
   if (error) {
     const missing = error.code === "PGRST204" || error.code === "42703" || error.code === "23514";
     return abort(
       missing
-        ? "The database does not know these settings yet. Run the newest migration (20261121020000_profile_card_style.sql) in Supabase, then save again."
+        ? "The database does not know these settings yet. Run the newest migration (20261122010000_profile_custom_theme.sql) in Supabase, then save again."
         : `Could not save: ${error.message}`,
     );
   }

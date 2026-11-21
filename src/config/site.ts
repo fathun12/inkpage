@@ -1,4 +1,4 @@
-export const themeNames = ["cream", "charcoal", "sand", "ember"] as const;
+export const themeNames = ["cream", "charcoal", "sand", "ember", "custom"] as const;
 export type ThemeName = (typeof themeNames)[number];
 
 export const themeLabels: Record<ThemeName, string> = {
@@ -6,6 +6,7 @@ export const themeLabels: Record<ThemeName, string> = {
   charcoal: "Charcoal",
   sand: "Sand",
   ember: "Ember",
+  custom: "Custom",
 };
 
 export const siteConfig = {

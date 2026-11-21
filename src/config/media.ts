@@ -12,7 +12,7 @@ export const mediaConfig = {
     maxImageMb: 2,
     maxGifMb: 3,
     maxSourceMb: 20, // the browser shrinks still images, but refuses to open a huge file
-    maxAnimatedPerPage: 3,
+    maxAnimatedPerPage: 10,
     maxPx: 1280, // longest side after shrinking
     quality: 0.85,
   },

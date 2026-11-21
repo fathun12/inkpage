@@ -36,10 +36,10 @@ export const gradientDirections = [
   { value: 45, label: "Diagonal up" },
 ] as const;
 
-const angles: number[] = gradientDirections.map((d) => d.value);
-
 export const hexColor = /^#[0-9a-fA-F]{6}$/;
 export const tintRange = { min: 0, max: 90, step: 5 } as const;
+// How much of the page the Full page fade covers (percent), counted from the faded end.
+export const fadeReachRange = { min: 20, max: 100, step: 5 } as const;
 
 export const backgroundDefaults = {
   mode: "color" as BackgroundMode,
@@ -49,6 +49,9 @@ export const backgroundDefaults = {
   color: "#1e1e1c",
   color2: "#d9541e",
   angle: 180,
+  fadeCustom: false,
+  fadeColor: "#1e1e1c",
+  fadeReach: 100,
 };
 
 export type BackgroundView = {
@@ -61,6 +64,8 @@ export type BackgroundView = {
   color: string;
   color2: string;
   angle: number;
+  fadeColor: string | null;
+  fadeReach: number;
 };
 
 export const plainBackground: BackgroundView = {
@@ -73,6 +78,8 @@ export const plainBackground: BackgroundView = {
   color: backgroundDefaults.color,
   color2: backgroundDefaults.color2,
   angle: backgroundDefaults.angle,
+  fadeColor: null,
+  fadeReach: backgroundDefaults.fadeReach,
 };
 
 // Safe reader: works even if the database columns are missing or empty.
@@ -86,6 +93,8 @@ export function readBackground(p: {
   bg_color?: string | null;
   bg_color2?: string | null;
   bg_angle?: number | null;
+  bg_fade_color?: string | null;
+  bg_fade_reach?: number | null;
 }): BackgroundView {
   const mode = (backgroundModes as readonly string[]).includes(p.bg_mode ?? "")
     ? (p.bg_mode as BackgroundMode)
@@ -104,14 +113,24 @@ export function readBackground(p: {
     gray: p.bg_gray ?? backgroundDefaults.gray,
     color: pick(p.bg_color, backgroundDefaults.color),
     color2: pick(p.bg_color2, backgroundDefaults.color2),
+    fadeColor: p.bg_fade_color && hexColor.test(p.bg_fade_color) ? p.bg_fade_color.toLowerCase() : null,
+    fadeReach:
+      typeof p.bg_fade_reach === "number" &&
+      p.bg_fade_reach >= fadeReachRange.min &&
+      p.bg_fade_reach <= fadeReachRange.max
+        ? p.bg_fade_reach
+        : backgroundDefaults.fadeReach,
     angle:
-      typeof p.bg_angle === "number" && angles.includes(p.bg_angle)
+      typeof p.bg_angle === "number" &&
+      Number.isInteger(p.bg_angle) &&
+      p.bg_angle >= 0 &&
+      p.bg_angle <= 359
         ? p.bg_angle
         : backgroundDefaults.angle,
   };
 }
 
-function luminance(hex: string): number {
+export function luminance(hex: string): number {
   const n = parseInt(hex.slice(1), 16);
   const channel = (shift: number) => {
     const s = ((n >> shift) & 255) / 255;

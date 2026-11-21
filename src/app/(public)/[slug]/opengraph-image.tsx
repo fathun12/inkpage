@@ -4,7 +4,8 @@ import { ImageResponse } from "next/og";
 import { mediaConfig } from "@/config/media";
 import { resolveTheme, siteConfig } from "@/config/site";
 import { getProfileByUsername } from "@/features/profile/queries";
-import { ogPalette } from "@/styles/og-palette";
+import { readCustomTheme } from "@/config/custom-theme";
+import { ogColors } from "@/styles/og-palette";
 
 export const alt = "Profile preview";
 export const size = { width: 1200, height: 630 };
@@ -51,7 +52,7 @@ async function loadAvatar(url: string | null | undefined): Promise<string | null
 export default async function OpengraphImage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const profile = await getProfileByUsername(slug.toLowerCase());
-  const p = ogPalette[resolveTheme(profile?.theme)];
+  const p = ogColors(resolveTheme(profile?.theme), readCustomTheme(profile ?? {}));
   const [fonts, avatar] = await Promise.all([loadFonts(), loadAvatar(profile?.avatar_url)]);
 
   const name = (profile?.display_name ?? siteConfig.name).slice(0, 40);

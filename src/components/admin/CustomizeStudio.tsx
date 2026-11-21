@@ -16,6 +16,7 @@ import {
   backgroundLabels,
   backgroundModes,
   fadeLabels,
+  fadeReachRange,
   gradientDirections,
   photoModes,
   tintRange,
@@ -32,6 +33,7 @@ import {
   type FontPair,
 } from "@/config/font-choices";
 import { cardDefaults, type CardStyle } from "@/config/card";
+import { customThemeDefaults, type CustomTheme } from "@/config/custom-theme";
 import { mediaConfig } from "@/config/media";
 import { resolveTheme, routes, siteConfig, type ThemeName } from "@/config/site";
 import { videoConfig } from "@/config/video";
@@ -47,6 +49,7 @@ type Props = {
   signVideo: VideoSignAction;
   profile: { username: string; displayName: string; bio: string | null; avatarUrl: string | null };
   theme: ThemeName;
+  customTheme: CustomTheme;
   background: BackgroundView;
   fonts: FontPair;
   card: CardStyle;
@@ -65,6 +68,11 @@ type Draft = {
   angle: number;
   tint: number;
   gray: boolean;
+  fadeCustom: boolean;
+  fadeColor: string;
+  fadeReach: number;
+  themeBg: string;
+  themeAccent: string;
   fontHeading: FontId;
   fontBody: FontId;
   card: CardStyle;
@@ -237,6 +245,7 @@ export function CustomizeStudio({
   signVideo,
   profile,
   theme,
+  customTheme,
   background,
   fonts,
   card,
@@ -253,6 +262,11 @@ export function CustomizeStudio({
     angle: background.angle,
     tint: background.tint,
     gray: background.gray,
+    fadeCustom: background.fadeColor !== null,
+    fadeColor: background.fadeColor ?? backgroundDefaults.fadeColor,
+    fadeReach: background.fadeReach,
+    themeBg: customTheme.bg,
+    themeAccent: customTheme.accent,
     fontHeading: fonts.heading,
     fontBody: fonts.body,
     card,
@@ -286,6 +300,8 @@ export function CustomizeStudio({
     color: draft.color,
     color2: draft.color2,
     angle: draft.angle,
+    fadeColor: draft.fadeCustom ? draft.fadeColor : null,
+    fadeReach: draft.fadeReach,
   };
 
   const dirty =
@@ -315,6 +331,11 @@ export function CustomizeStudio({
       <input type="hidden" name="bg_color2" value={draft.color2} />
       <input type="hidden" name="bg_angle" value={draft.angle} />
       <input type="hidden" name="bg_tint" value={draft.tint} />
+      <input type="hidden" name="bg_fade_color" value={draft.fadeColor} />
+      <input type="hidden" name="bg_fade_reach" value={draft.fadeReach} />
+      <input type="hidden" name="theme_bg" value={draft.themeBg} />
+      <input type="hidden" name="theme_accent" value={draft.themeAccent} />
+      {draft.fadeCustom && <input type="hidden" name="bg_fade_custom" value="on" />}
       <input type="hidden" name="font_heading" value={draft.fontHeading} />
       <input type="hidden" name="font_body" value={draft.fontBody} />
       <input type="hidden" name="card" value={JSON.stringify(draft.card)} />
@@ -366,8 +387,46 @@ export function CustomizeStudio({
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         <aside className="relative order-2 min-h-0 flex-1 overflow-y-auto border-t border-line lg:order-1 lg:w-[360px] lg:flex-none lg:border-r lg:border-t-0">
-          <Section title="Theme" open onReset={() => set("theme", siteConfig.defaultTheme)}>
-            <ThemePicker value={draft.theme} options={themes} onChange={(v) => set("theme", resolveTheme(v))} />
+          <Section
+            title="Theme"
+            open
+            onReset={() =>
+              setDraft((d) => ({
+                ...d,
+                theme: siteConfig.defaultTheme,
+                themeBg: customThemeDefaults.bg,
+                themeAccent: customThemeDefaults.accent,
+              }))
+            }
+          >
+            <ThemePicker
+              value={draft.theme}
+              options={themes}
+              onChange={(v) => set("theme", resolveTheme(v))}
+              custom={{ bg: draft.themeBg, accent: draft.themeAccent }}
+            />
+            {draft.theme === "custom" && (
+              <div className="grid grid-cols-2 gap-4">
+                <Field label="Background color" htmlFor="ui_theme_bg" hint="Text, cards and lines adapt to it.">
+                  <input
+                    id="ui_theme_bg"
+                    type="color"
+                    value={draft.themeBg}
+                    onChange={(e) => set("themeBg", e.target.value)}
+                    className={colorInput}
+                  />
+                </Field>
+                <Field label="Accent color" htmlFor="ui_theme_accent" hint="Buttons and small highlights.">
+                  <input
+                    id="ui_theme_accent"
+                    type="color"
+                    value={draft.themeAccent}
+                    onChange={(e) => set("themeAccent", e.target.value)}
+                    className={colorInput}
+                  />
+                </Field>
+              </div>
+            )}
           </Section>
 
           <Section title="Background" open onReset={() => setDraft((d) => ({ ...d, ...backgroundDefaults }))}>
@@ -441,7 +500,7 @@ export function CustomizeStudio({
                   />
                 </div>
                 <Field
-                  label={`Photo overlay: ${draft.tint}`}
+                  label={`Fade strength: ${draft.tint}`}
                   htmlFor="ui_tint"
                   hint="Higher makes the fade stronger so text stays readable."
                 >
@@ -456,6 +515,48 @@ export function CustomizeStudio({
                     className="w-full accent-accent"
                   />
                 </Field>
+                <Field
+                  label={`Fade reach: ${draft.fadeReach}%`}
+                  htmlFor="ui_fade_reach"
+                  hint="How much of the page the fade covers, counted from the faded end. 100% is the whole page."
+                >
+                  <input
+                    id="ui_fade_reach"
+                    type="range"
+                    min={fadeReachRange.min}
+                    max={fadeReachRange.max}
+                    step={fadeReachRange.step}
+                    value={draft.fadeReach}
+                    onChange={(e) => set("fadeReach", Number(e.target.value))}
+                    className="w-full accent-accent"
+                  />
+                </Field>
+                <div className="flex flex-col gap-2">
+                  <label className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={draft.fadeCustom}
+                      onChange={(e) => set("fadeCustom", e.target.checked)}
+                      className="accent-accent"
+                    />
+                    Use my own fade color
+                  </label>
+                  {draft.fadeCustom && (
+                    <Field
+                      label="Fade color"
+                      htmlFor="ui_fade_color"
+                      hint="Text color follows your theme, so pick a color close to it to keep text readable."
+                    >
+                      <input
+                        id="ui_fade_color"
+                        type="color"
+                        value={draft.fadeColor}
+                        onChange={(e) => set("fadeColor", e.target.value)}
+                        className={colorInput}
+                      />
+                    </Field>
+                  )}
+                </div>
                 <label className="flex items-center gap-2 text-sm">
                   <input
                     type="checkbox"
@@ -547,6 +648,7 @@ export function CustomizeStudio({
             <div className="absolute inset-0 overflow-y-auto" onClickCapture={stopLinks}>
               <PublicFrame
                 theme={draft.theme}
+                customTheme={{ bg: draft.themeBg, accent: draft.themeAccent }}
                 background={view}
                 fonts={{ heading: draft.fontHeading, body: draft.fontBody }}
                 card={draft.card}
