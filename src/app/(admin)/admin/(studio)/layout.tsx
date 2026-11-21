@@ -10,5 +10,10 @@ export default async function StudioLayout({ children }: { children: ReactNode }
   const profile = await getProfileById(user.id);
   if (!profile) redirect(routes.setup);
 
-  return <>{children}</>;
+  return (
+  <>
+    <style>{"html,body{overflow:hidden}"}</style>
+    {children}
+  </>
+);
 }

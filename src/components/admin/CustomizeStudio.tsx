@@ -303,7 +303,7 @@ export function CustomizeStudio({
   }
 
   return (
-    <form action={action} className="flex h-dvh flex-col overflow-hidden">
+    <form action={action} className="fixed inset-0 z-40 flex flex-col overflow-hidden bg-bg">
       {/* The sidebar controls have no name. These hidden inputs are what the server receives. */}
       <input type="hidden" name="theme" value={draft.theme} />
       <input type="hidden" name="bg_mode" value={draft.mode} />

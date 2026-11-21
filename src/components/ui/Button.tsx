@@ -13,7 +13,7 @@ const variants: Record<Variant, string> = {
   accent: "bg-ink text-bg",
   ghost: "bg-transparent text-ink",
   danger: "bg-accent text-accent-ink",
-  studio: "bg-ink text-accent uppercase tracking-wider",
+  studio: "bg-ink text-bg uppercase tracking-wider",
 };
 
 const sizes: Record<Size, string> = {
