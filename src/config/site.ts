@@ -12,6 +12,8 @@ export const themeLabels: Record<ThemeName, string> = {
 export const siteConfig = {
   name: "inkpage",
   description: "All your links in one simple page.",
+  // Small line at the bottom of every public page. Change the wording here.
+  footer: "Made with inkpage by MFNiam",
   defaultTheme: "cream" as ThemeName,
   utcOffsetMinutes: 420,
   timezoneLabel: "WIB (UTC+7)",

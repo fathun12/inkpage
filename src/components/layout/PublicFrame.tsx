@@ -125,7 +125,7 @@ export function PublicFrame({
           </div>
         )}
         {children}
-        <footer className="pt-6 text-center text-xs text-ink-soft">Made with {siteConfig.name}</footer>
+        <footer className="pt-6 text-center text-xs text-ink-soft">{siteConfig.footer}</footer>
       </main>
     </div>
   );
