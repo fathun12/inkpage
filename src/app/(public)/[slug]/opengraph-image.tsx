@@ -5,6 +5,7 @@ import { mediaConfig } from "@/config/media";
 import { resolveTheme, siteConfig } from "@/config/site";
 import { getProfileByUsername } from "@/features/profile/queries";
 import { readCustomTheme } from "@/config/custom-theme";
+import { photoModes, readBackground } from "@/config/background";
 import { ogColors } from "@/styles/og-palette";
 
 export const alt = "Profile preview";
@@ -49,11 +50,39 @@ async function loadAvatar(url: string | null | undefined): Promise<string | null
   }
 }
 
+// Text colors on top of a background photo. The photo is always darkened, so the text is always light.
+const photoColors = { ink: "#f3eee3", soft: "#e6e0d2" };
+// Background photos can be up to 10 MB. Bigger than this and the share image would be slow, so the theme color is used.
+const photoMaxBytes = 6 * 1024 * 1024;
+
+// Same rule as the avatar: only JPEG and PNG are drawn reliably, anything else falls back to the theme color.
+async function loadBackgroundPhoto(url: string | null): Promise<string | null> {
+  if (!url) return null;
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+    const type = res.headers.get("content-type")?.split(";")[0] ?? "";
+    if (!res.ok || (type !== "image/jpeg" && type !== "image/png")) return null;
+    if (Number(res.headers.get("content-length") ?? 0) > photoMaxBytes) return null;
+    const bytes = Buffer.from(await res.arrayBuffer());
+    if (bytes.length > photoMaxBytes) return null;
+    return `data:${type};base64,${bytes.toString("base64")}`;
+  } catch {
+    return null;
+  }
+}
+
 export default async function OpengraphImage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const profile = await getProfileByUsername(slug.toLowerCase());
-  const p = ogColors(resolveTheme(profile?.theme), readCustomTheme(profile ?? {}));
-  const [fonts, avatar] = await Promise.all([loadFonts(), loadAvatar(profile?.avatar_url)]);
+  const base = ogColors(resolveTheme(profile?.theme), readCustomTheme(profile ?? {}));
+  const bg = profile ? readBackground(profile) : null;
+  const usePhoto = bg !== null && photoModes.includes(bg.mode);
+  const [fonts, avatar, photo] = await Promise.all([
+    loadFonts(),
+    loadAvatar(profile?.avatar_url),
+    usePhoto ? loadBackgroundPhoto(bg?.imageUrl ?? null) : Promise.resolve(null),
+  ]);
+  const p = photo ? { ...base, ink: photoColors.ink, soft: photoColors.soft } : base;
 
   const name = (profile?.display_name ?? siteConfig.name).slice(0, 40);
   const initial = name.trim().charAt(0).toUpperCase();
@@ -69,12 +98,47 @@ export default async function OpengraphImage({ params }: { params: Promise<{ slu
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
+          position: "relative",
           background: p.bg,
           color: p.ink,
           padding: 80,
           fontFamily: sans,
         }}
       >
+        {photo ? (
+          <>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={photo}
+              alt=""
+              width={1200}
+              height={630}
+              style={{ position: "absolute", top: 0, left: 0, width: 1200, height: 630, objectFit: "cover" }}
+            />
+            <div
+              style={{
+                display: "flex",
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: 1200,
+                height: 630,
+                background: "rgba(0, 0, 0, 0.6)",
+              }}
+            />
+            <div
+              style={{
+                display: "flex",
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: 1200,
+                height: 630,
+                background: "linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.35))",
+              }}
+            />
+          </>
+        ) : null}
         <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
           <div
             style={{
