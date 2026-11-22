@@ -52,14 +52,14 @@ async function loadAvatar(url: string | null | undefined): Promise<string | null
 
 // Text colors on top of a background photo. The photo is always darkened, so the text is always light.
 const photoColors = { ink: "#f3eee3", soft: "#e6e0d2" };
-// Background photos can be up to 10 MB. Bigger than this and the share image would be slow, so the theme color is used.
-const photoMaxBytes = 6 * 1024 * 1024;
+// Same limit as the upload (10 MB), so any background photo that can be uploaded can be drawn here.
+const photoMaxBytes = mediaConfig.backgroundPhoto.maxMb * 1024 * 1024;
 
 // Same rule as the avatar: only JPEG and PNG are drawn reliably, anything else falls back to the theme color.
 async function loadBackgroundPhoto(url: string | null): Promise<string | null> {
   if (!url) return null;
   try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(6000) });
+    const res = await fetch(url, { signal: AbortSignal.timeout(9000) });
     const type = res.headers.get("content-type")?.split(";")[0] ?? "";
     if (!res.ok || (type !== "image/jpeg" && type !== "image/png")) return null;
     if (Number(res.headers.get("content-length") ?? 0) > photoMaxBytes) return null;
