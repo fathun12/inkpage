@@ -52,6 +52,7 @@ export type Block = {
   image_url: string | null;
   data: BlockData;
   position: number;
+  page: "home" | "projects" | "writing";
   is_visible: boolean;
   is_pinned: boolean;
   publish_at: string | null;

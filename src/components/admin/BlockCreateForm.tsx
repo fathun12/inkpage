@@ -7,6 +7,7 @@ import { siteConfig } from "@/config/site";
 import type { BlockType } from "@/types/block";
 import type { FormAction } from "@/types/form";
 import { CardMediaFields } from "./CardMediaFields";
+import { PageSelect } from "./PageSelect";
 
 type CardProps = {
   type: BlockType;
@@ -49,6 +50,11 @@ function TypeCard({ type, label, hint, action, open, children }: CardProps) {
             <Input id={`${id}-title`} name="title" required maxLength={80} />
           </Field>
         </Wide>
+        {(type === "link" || type === "project" || type === "header") && (
+          <Wide>
+            <PageSelect id={`${id}-page`} />
+          </Wide>
+        )}
         {children}
         <Schedule id={id} />
         <Wide>

@@ -28,8 +28,10 @@ export const routes = {
   profileEdit: "/admin/profile",
   customize: "/admin/customize",
   analytics: "/admin/analytics",
+  pages: "/admin/pages",
   track: "/api/track",
   profile: (username: string) => `/${username}`,
+  section: (username: string, section: string) => `/${username}/${section}`,
   go: (id: string) => `/go/${id}`,
 } as const;
 

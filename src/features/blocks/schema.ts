@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { cardRanges, mediaDefaults } from "@/config/card";
+import { blockPages } from "@/config/site-content";
 import { mediaConfig } from "@/config/media";
 import { parseEmbed } from "@/lib/embed";
 import { field } from "@/lib/form";
@@ -16,6 +17,7 @@ import {
 export const blockSchema = z
   .object({
     type: z.enum(blockTypes, { error: "Pick a block type." }),
+    page: z.enum(blockPages, { error: "Pick a page." }),
     title: z
       .string({ error: "Title is required." })
       .trim()
@@ -92,6 +94,7 @@ export type BlockInput = z.infer<typeof blockSchema>;
 export function parseBlockForm(formData: FormData) {
   return blockSchema.safeParse({
     type: field(formData, "type"),
+    page: field(formData, "page") ?? "home",
     title: field(formData, "title"),
     url: field(formData, "url"),
     body: field(formData, "body"),

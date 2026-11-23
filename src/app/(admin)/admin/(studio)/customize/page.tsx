@@ -5,13 +5,15 @@ import { FlashNotice } from "@/components/ui/FlashNotice";
 import { readBackground } from "@/config/background";
 import { readCustomTheme } from "@/config/custom-theme";
 import { readFonts } from "@/config/font-choices";
+import { readSite } from "@/config/site-content";
+import { readSiteStyle } from "@/config/site-style";
 import { resolveTheme, routes, themeLabels, themeNames } from "@/config/site";
-import { createVideoUploadAction, updateAppearanceAction } from "@/features/appearance/actions";
+import { updateAppearanceAction } from "@/features/appearance/actions";
 import { requireUser } from "@/features/auth/queries";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileById } from "@/features/profile/queries";
-import { readCard } from "@/lib/card-style";
 import { savedText } from "@/lib/flash";
+import { buildNav, listBlocks, resolveHomeMedia, socialsOf } from "@/lib/site-view";
 
 export const metadata: Metadata = { title: "Customize" };
 
@@ -25,8 +27,9 @@ export default async function CustomizePage({ searchParams }: Props) {
   const profile = await getProfileById(user.id);
   if (!profile) redirect(routes.setup);
 
-  // The preview shows up to 6 live blocks. Embeds are skipped to keep it light.
-  const blocks = (await getPublicBlocks(profile.id)).filter((b) => b.type !== "embed").slice(0, 6);
+  const blocks = await getPublicBlocks(profile.id);
+  const site = readSite(profile.site);
+  const base = routes.profile(profile.username);
 
   const notice = error ? (
     <FlashNotice tone="error">{error}</FlashNotice>
@@ -39,19 +42,16 @@ export default async function CustomizePage({ searchParams }: Props) {
     <CustomizeStudio
       key={t ?? "initial"}
       action={updateAppearanceAction}
-      signVideo={createVideoUploadAction}
-      profile={{
-        username: profile.username,
-        displayName: profile.display_name,
-        bio: profile.bio,
-        avatarUrl: profile.avatar_url,
-      }}
+      profile={{ username: profile.username, displayName: profile.display_name, bio: profile.bio }}
       theme={resolveTheme(profile.theme)}
       customTheme={readCustomTheme(profile)}
-      background={readBackground(profile)}
       fonts={readFonts(profile)}
-      card={readCard(profile.card)}
-      blocks={blocks}
+      style={readSiteStyle(profile.site_style)}
+      site={site}
+      media={resolveHomeMedia(site, readBackground(profile), blocks)}
+      rows={listBlocks(blocks, "home").slice(0, 6)}
+      socials={socialsOf(blocks)}
+      nav={buildNav(base, site, blocks)}
       themes={themes}
       notice={notice}
     />

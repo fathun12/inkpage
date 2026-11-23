@@ -1,29 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useRef, useState, type MouseEvent, type ReactNode } from "react";
-import { BlockRenderer } from "@/components/blocks/BlockRenderer";
-import { ProfileHeader } from "@/components/layout/ProfileHeader";
-import { PublicFrame } from "@/components/layout/PublicFrame";
+import { useState, type MouseEvent, type ReactNode } from "react";
+import { FadeGallery } from "@/components/site/FadeGallery";
+import { Hero } from "@/components/site/Hero";
+import { IndexSection } from "@/components/site/IndexSection";
+import { NewsBar } from "@/components/site/NewsBar";
+import { SiteFooter } from "@/components/site/SiteFooter";
+import { SiteFrame } from "@/components/site/SiteFrame";
+import { SiteHeader } from "@/components/site/SiteHeader";
 import { Field } from "@/components/ui/Field";
-import { Img } from "@/components/ui/Img";
-import { PhotoInput } from "@/components/ui/PhotoInput";
 import { SubmitButton } from "@/components/ui/SubmitButton";
-import { VideoInput } from "@/components/ui/VideoInput";
-import {
-  backgroundDefaults,
-  backgroundFades,
-  backgroundLabels,
-  backgroundModes,
-  fadeLabels,
-  fadeReachRange,
-  gradientDirections,
-  photoModes,
-  tintRange,
-  type BackgroundFade,
-  type BackgroundMode,
-  type BackgroundView,
-} from "@/config/background";
+import { customThemeDefaults, type CustomTheme } from "@/config/custom-theme";
 import {
   defaultFont,
   fontChoices,
@@ -32,68 +20,50 @@ import {
   type FontId,
   type FontPair,
 } from "@/config/font-choices";
-import { cardDefaults, type CardStyle } from "@/config/card";
-import { customThemeDefaults, type CustomTheme } from "@/config/custom-theme";
-import { mediaConfig } from "@/config/media";
+import type { SiteSettings } from "@/config/site-content";
+import {
+  motionHints,
+  motionLabels,
+  motionModes,
+  siteStyleDefaults,
+  styleRanges,
+  type MotionMode,
+  type SiteStyle,
+} from "@/config/site-style";
 import { resolveTheme, routes, siteConfig, type ThemeName } from "@/config/site";
-import { videoConfig } from "@/config/video";
+import type { HomeMedia } from "@/lib/site-view";
 import { cn } from "@/lib/utils";
-import type { Block } from "@/types/block";
+import type { Block, SocialItem } from "@/types/block";
 import type { FormAction } from "@/types/form";
-import type { VideoSignAction } from "@/types/media";
-import { CardControls } from "./studio/CardControls";
 import { ThemePicker } from "./ThemePicker";
 
 type Props = {
   action: FormAction;
-  signVideo: VideoSignAction;
-  profile: { username: string; displayName: string; bio: string | null; avatarUrl: string | null };
+  profile: { username: string; displayName: string; bio: string | null };
   theme: ThemeName;
   customTheme: CustomTheme;
-  background: BackgroundView;
   fonts: FontPair;
-  card: CardStyle;
-  blocks: Block[];
+  style: SiteStyle;
+  site: SiteSettings;
+  media: HomeMedia;
+  rows: Block[];
+  socials: SocialItem[];
+  nav: { label: string; href: string }[];
   themes: { name: string; label: string }[];
   notice?: ReactNode;
 };
 
-// Everything the sidebar can change. Sent to the server as hidden inputs (see the form below).
 type Draft = {
   theme: ThemeName;
-  mode: BackgroundMode;
-  fade: BackgroundFade;
-  color: string;
-  color2: string;
-  angle: number;
-  tint: number;
-  gray: boolean;
-  fadeCustom: boolean;
-  fadeColor: string;
-  fadeReach: number;
   themeBg: string;
   themeAccent: string;
   fontHeading: FontId;
   fontBody: FontId;
-  card: CardStyle;
+  style: SiteStyle;
 };
 
 // Width (px) of the preview in Phone mode. Change this one number to make it wider or narrower.
 const phoneWidth = 480;
-
-const modeOptions = backgroundModes.map((m) => ({ value: m, label: backgroundLabels[m] }));
-const fadeOptions = backgroundFades.map((f) => ({ value: f, label: fadeLabels[f] }));
-const angleOptions = gradientDirections.map((d) => ({ value: String(d.value), label: d.label }));
-
-const modeHints: Record<BackgroundMode, string> = {
-  color: "Uses the colors of your theme.",
-  solid: "One color of your choice.",
-  gradient: "Two colors blending into each other.",
-  full: "Your photo fills the whole page.",
-  banner: "Your photo as a strip at the top.",
-  frame: "Your photo in a frame.",
-  video: "Your video or GIF fills the whole page.",
-};
 
 const pill =
   "ink-border cursor-pointer rounded-full px-3 py-1.5 text-sm has-checked:bg-ink has-checked:text-bg has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink";
@@ -101,9 +71,9 @@ const colorInput = "ink-border h-10 w-20 cursor-pointer rounded-md bg-surface p-
 const resetButton =
   "self-start font-mono text-xs uppercase tracking-widest text-ink-soft underline underline-offset-4 hover:text-ink";
 
-// Shown in the preview when you have no live blocks yet.
-function sampleBlocks(): Block[] {
-  return ["Your first link", "Another link", "One more link"].map(
+// Shown in the preview when no link is on Home yet.
+function sampleRows(): Block[] {
+  return ["Your first project", "An article you wrote", "A download"].map(
     (title, index): Block => ({
       id: `sample-${index}`,
       user_id: "",
@@ -114,6 +84,7 @@ function sampleBlocks(): Block[] {
       image_url: null,
       data: {},
       position: index,
+      page: "home",
       is_visible: true,
       is_pinned: false,
       publish_at: null,
@@ -121,19 +92,6 @@ function sampleBlocks(): Block[] {
       created_at: "",
     }),
   );
-}
-
-// Temporary preview address for a file picked on this page. A GIF gets "#.gif" so the public
-// components still recognise it as a GIF (they look at how the address ends).
-function useLocalUrl(): [string | null, (file: File | null) => void] {
-  const ref = useRef<string | null>(null);
-  const [url, setUrl] = useState<string | null>(null);
-  const pick = useCallback((file: File | null) => {
-    if (ref.current) URL.revokeObjectURL(ref.current);
-    ref.current = file ? URL.createObjectURL(file) : null;
-    setUrl(ref.current ? (file?.type === "image/gif" ? `${ref.current}#.gif` : ref.current) : null);
-  }, []);
-  return [url, pick];
 }
 
 function Section({
@@ -167,30 +125,36 @@ function Section({
   );
 }
 
-function Pills({
-  options,
+function Slider({
+  id,
+  label,
   value,
+  range,
+  unit = "",
+  hint,
   onChange,
 }: {
-  options: { value: string; label: string }[];
-  value: string;
-  onChange: (value: string) => void;
+  id: string;
+  label: string;
+  value: number;
+  range: { min: number; max: number; step: number };
+  unit?: string;
+  hint?: string;
+  onChange: (value: number) => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-2">
-      {options.map((o) => (
-        <label key={o.value} className={pill}>
-          <input
-            type="radio"
-            value={o.value}
-            checked={o.value === value}
-            onChange={() => onChange(o.value)}
-            className="sr-only"
-          />
-          {o.label}
-        </label>
-      ))}
-    </div>
+    <Field label={`${label}: ${value}${unit}`} htmlFor={id} hint={hint}>
+      <input
+        id={id}
+        type="range"
+        min={range.min}
+        max={range.max}
+        step={range.step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="w-full accent-accent"
+      />
+    </Field>
   );
 }
 
@@ -242,79 +206,41 @@ function FontPicker({
 
 export function CustomizeStudio({
   action,
-  signVideo,
   profile,
   theme,
   customTheme,
-  background,
   fonts,
-  card,
-  blocks,
+  style,
+  site,
+  media,
+  rows,
+  socials,
+  nav,
   themes,
   notice,
 }: Props) {
   const [initial] = useState<Draft>(() => ({
     theme,
-    mode: background.mode,
-    fade: background.fade,
-    color: background.color,
-    color2: background.color2,
-    angle: background.angle,
-    tint: background.tint,
-    gray: background.gray,
-    fadeCustom: background.fadeColor !== null,
-    fadeColor: background.fadeColor ?? backgroundDefaults.fadeColor,
-    fadeReach: background.fadeReach,
     themeBg: customTheme.bg,
     themeAccent: customTheme.accent,
     fontHeading: fonts.heading,
     fontBody: fonts.body,
-    card,
+    style,
   }));
   const [draft, setDraft] = useState<Draft>(initial);
   const [device, setDevice] = useState<"phone" | "desktop">("phone");
-  const [photo, pickPhoto] = useLocalUrl();
-  const [video, pickVideo] = useLocalUrl();
-  const [removePhoto, setRemovePhoto] = useState(false);
-  const [removeVideo, setRemoveVideo] = useState(false);
 
   function set<K extends keyof Draft>(key: K, value: Draft[K]) {
     setDraft((d) => ({ ...d, [key]: value }));
   }
+  function setStyle(patch: Partial<SiteStyle>) {
+    setDraft((d) => ({ ...d, style: { ...d.style, ...patch } }));
+  }
 
-  const photoSrc = photo ?? (removePhoto ? null : background.imageUrl);
-  const videoSrc = video ?? (removeVideo ? null : background.videoUrl);
-
-  // Same rule as the server: picking a photo or video while the style is "Theme color" switches to it.
-  let mode: BackgroundMode = draft.mode;
-  if (photo && mode === "color") mode = "full";
-  if (video && mode === "color") mode = "video";
-
-  const view: BackgroundView = {
-    mode,
-    fade: draft.fade,
-    imageUrl: photoSrc,
-    videoUrl: videoSrc,
-    tint: draft.tint,
-    gray: draft.gray,
-    color: draft.color,
-    color2: draft.color2,
-    angle: draft.angle,
-    fadeColor: draft.fadeCustom ? draft.fadeColor : null,
-    fadeReach: draft.fadeReach,
-  };
-
-  const dirty =
-    JSON.stringify(draft) !== JSON.stringify(initial) ||
-    photo !== null ||
-    video !== null ||
-    removePhoto ||
-    removeVideo;
-
-  const needsPhoto = photoModes.includes(draft.mode) && !photoSrc;
-  const needsVideo = draft.mode === "video" && !videoSrc;
-  const previewBlocks = blocks.length > 0 ? blocks : sampleBlocks();
-  const plainBg = view.mode === "color" || view.mode === "solid";
+  const dirty = JSON.stringify(draft) !== JSON.stringify(initial);
+  const previewRows = rows.length > 0 ? rows : sampleRows();
+  const autoplay = draft.style.motion !== "off";
+  const base = routes.profile(profile.username);
 
   // Links in the preview must not leave the studio.
   function stopLinks(event: MouseEvent<HTMLDivElement>) {
@@ -325,23 +251,16 @@ export function CustomizeStudio({
     <form action={action} className="fixed inset-0 z-40 flex flex-col overflow-hidden bg-bg">
       {/* The sidebar controls have no name. These hidden inputs are what the server receives. */}
       <input type="hidden" name="theme" value={draft.theme} />
-      <input type="hidden" name="bg_mode" value={draft.mode} />
-      <input type="hidden" name="bg_fade" value={draft.fade} />
-      <input type="hidden" name="bg_color" value={draft.color} />
-      <input type="hidden" name="bg_color2" value={draft.color2} />
-      <input type="hidden" name="bg_angle" value={draft.angle} />
-      <input type="hidden" name="bg_tint" value={draft.tint} />
-      <input type="hidden" name="bg_fade_color" value={draft.fadeColor} />
-      <input type="hidden" name="bg_fade_reach" value={draft.fadeReach} />
       <input type="hidden" name="theme_bg" value={draft.themeBg} />
       <input type="hidden" name="theme_accent" value={draft.themeAccent} />
-      {draft.fadeCustom && <input type="hidden" name="bg_fade_custom" value="on" />}
       <input type="hidden" name="font_heading" value={draft.fontHeading} />
       <input type="hidden" name="font_body" value={draft.fontBody} />
-      <input type="hidden" name="card" value={JSON.stringify(draft.card)} />
-      {draft.gray && <input type="hidden" name="bg_gray" value="on" />}
-      {removePhoto && <input type="hidden" name="remove_bg_image" value="on" />}
-      {removeVideo && <input type="hidden" name="remove_bg_video" value="on" />}
+      <input type="hidden" name="site_motion" value={draft.style.motion} />
+      <input type="hidden" name="site_hero_seconds" value={draft.style.heroSeconds} />
+      <input type="hidden" name="site_gallery_seconds" value={draft.style.gallerySeconds} />
+      <input type="hidden" name="site_hero_overlay" value={draft.style.heroOverlay} />
+      <input type="hidden" name="site_index_veil" value={draft.style.indexVeil} />
+      {draft.style.heroGray && <input type="hidden" name="site_hero_gray" value="on" />}
 
       <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line px-5 py-3">
         <Link
@@ -369,13 +288,16 @@ export function CustomizeStudio({
               </button>
             ))}
           </div>
+          <Link href={routes.pages} className="font-mono text-sm underline underline-offset-4">
+            Pages
+          </Link>
           <a
-            href={routes.profile(profile.username)}
+            href={base}
             target="_blank"
             rel="noopener noreferrer"
             className="font-mono text-sm underline underline-offset-4"
           >
-            View page
+            View site
           </a>
           <SubmitButton variant="accent" size="sm">
             Save changes
@@ -388,7 +310,7 @@ export function CustomizeStudio({
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         <aside className="relative order-2 min-h-0 flex-1 overflow-y-auto border-t border-line lg:order-1 lg:w-[360px] lg:flex-none lg:border-r lg:border-t-0">
           <Section
-            title="Theme"
+            title="Colors"
             open
             onReset={() =>
               setDraft((d) => ({
@@ -407,7 +329,7 @@ export function CustomizeStudio({
             />
             {draft.theme === "custom" && (
               <div className="grid grid-cols-2 gap-4">
-                <Field label="Background color" htmlFor="ui_theme_bg" hint="Text, cards and lines adapt to it.">
+                <Field label="Page color" htmlFor="ui_theme_bg" hint="White or black. Text and lines adapt to it.">
                   <input
                     id="ui_theme_bg"
                     type="color"
@@ -416,7 +338,7 @@ export function CustomizeStudio({
                     className={colorInput}
                   />
                 </Field>
-                <Field label="Accent color" htmlFor="ui_theme_accent" hint="Buttons and small highlights.">
+                <Field label="Accent color" htmlFor="ui_theme_accent" hint="Numbers, lines and the active menu item.">
                   <input
                     id="ui_theme_accent"
                     type="color"
@@ -427,196 +349,6 @@ export function CustomizeStudio({
                 </Field>
               </div>
             )}
-          </Section>
-
-          <Section title="Background" open onReset={() => setDraft((d) => ({ ...d, ...backgroundDefaults }))}>
-            <div className="flex flex-col gap-2">
-              <Pills options={modeOptions} value={draft.mode} onChange={(v) => set("mode", v as BackgroundMode)} />
-              <p className="text-xs text-ink-soft">{modeHints[draft.mode]}</p>
-              {needsPhoto && (
-                <p className="text-xs text-accent">Upload a photo below to use this style, or pick another one.</p>
-              )}
-              {needsVideo && (
-                <p className="text-xs text-accent">Upload a video or GIF below to use this style, or pick another one.</p>
-              )}
-            </div>
-
-            {(draft.mode === "solid" || draft.mode === "gradient") && (
-              <div className="grid grid-cols-2 gap-4">
-                <Field label="Color" htmlFor="ui_color" hint="Text turns light or dark by itself.">
-                  <input
-                    id="ui_color"
-                    type="color"
-                    value={draft.color}
-                    onChange={(e) => set("color", e.target.value)}
-                    className={colorInput}
-                  />
-                </Field>
-                {draft.mode === "gradient" && (
-                  <Field label="Second color" htmlFor="ui_color2">
-                    <input
-                      id="ui_color2"
-                      type="color"
-                      value={draft.color2}
-                      onChange={(e) => set("color2", e.target.value)}
-                      className={colorInput}
-                    />
-                  </Field>
-                )}
-              </div>
-            )}
-
-            {draft.mode === "gradient" && (
-              <div className="flex flex-col gap-3">
-                <span className="text-sm font-medium text-ink-soft">Gradient direction</span>
-                <Pills
-                  options={angleOptions}
-                  value={String(draft.angle)}
-                  onChange={(v) => set("angle", Number(v))}
-                />
-                <Field label={`Angle: ${draft.angle}°`} htmlFor="ui_angle">
-                  <input
-                    id="ui_angle"
-                    type="range"
-                    min={0}
-                    max={359}
-                    step={5}
-                    value={draft.angle}
-                    onChange={(e) => set("angle", Number(e.target.value))}
-                    className="w-full accent-accent"
-                  />
-                </Field>
-              </div>
-            )}
-
-            {(draft.mode === "full" || draft.mode === "video") && (
-              <div className="flex flex-col gap-4">
-                <div className="flex flex-col gap-2">
-                  <span className="text-sm font-medium text-ink-soft">Fade</span>
-                  <Pills
-                    options={fadeOptions}
-                    value={draft.fade}
-                    onChange={(v) => set("fade", v as BackgroundFade)}
-                  />
-                </div>
-                <Field
-                  label={`Fade strength: ${draft.tint}`}
-                  htmlFor="ui_tint"
-                  hint="Higher makes the fade stronger so text stays readable."
-                >
-                  <input
-                    id="ui_tint"
-                    type="range"
-                    min={tintRange.min}
-                    max={tintRange.max}
-                    step={tintRange.step}
-                    value={draft.tint}
-                    onChange={(e) => set("tint", Number(e.target.value))}
-                    className="w-full accent-accent"
-                  />
-                </Field>
-                <Field
-                  label={`Fade reach: ${draft.fadeReach}%`}
-                  htmlFor="ui_fade_reach"
-                  hint="How much of the page the fade covers, counted from the faded end. 100% is the whole page."
-                >
-                  <input
-                    id="ui_fade_reach"
-                    type="range"
-                    min={fadeReachRange.min}
-                    max={fadeReachRange.max}
-                    step={fadeReachRange.step}
-                    value={draft.fadeReach}
-                    onChange={(e) => set("fadeReach", Number(e.target.value))}
-                    className="w-full accent-accent"
-                  />
-                </Field>
-                <div className="flex flex-col gap-2">
-                  <label className="flex items-center gap-2 text-sm">
-                    <input
-                      type="checkbox"
-                      checked={draft.fadeCustom}
-                      onChange={(e) => set("fadeCustom", e.target.checked)}
-                      className="accent-accent"
-                    />
-                    Use my own fade color
-                  </label>
-                  {draft.fadeCustom && (
-                    <Field
-                      label="Fade color"
-                      htmlFor="ui_fade_color"
-                      hint="Text color follows your theme, so pick a color close to it to keep text readable."
-                    >
-                      <input
-                        id="ui_fade_color"
-                        type="color"
-                        value={draft.fadeColor}
-                        onChange={(e) => set("fadeColor", e.target.value)}
-                        className={colorInput}
-                      />
-                    </Field>
-                  )}
-                </div>
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={draft.gray}
-                    onChange={(e) => set("gray", e.target.checked)}
-                    className="accent-accent"
-                  />
-                  Show the photo or video in black and white
-                </label>
-              </div>
-            )}
-
-            {/* The file inputs are always on the page (never hidden by the style), so a picked file is not lost. */}
-            <div className="flex flex-col gap-2">
-              {background.imageUrl && !photo && !removePhoto && (
-                <Img src={background.imageUrl} className="ink-border h-24 w-20 rounded-md object-cover" />
-              )}
-              <Field
-                label="Background photo"
-                htmlFor="bg_image"
-                hint={`JPG, PNG or WebP, up to ${mediaConfig.backgroundPhoto.maxMb} MB, kept in original quality (no crop, no shrinking). It uploads as soon as you pick it, then press Save changes. Leave empty to keep the current one.`}
-              >
-                <PhotoInput id="bg_image" name="bg_photo_path" sign={signVideo} onFile={pickPhoto} />
-              </Field>
-              {background.imageUrl && (
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={removePhoto}
-                    onChange={(e) => setRemovePhoto(e.target.checked)}
-                    className="accent-accent"
-                  />
-                  Remove the current photo
-                </label>
-              )}
-            </div>
-
-            <div className="flex flex-col gap-2">
-              {background.videoUrl && !video && !removeVideo && (
-                <p className="text-xs text-ink-soft">A video or GIF is saved.</p>
-              )}
-              <Field
-                label="Background video or GIF"
-                htmlFor="bg_video"
-                hint={`MP4, WebM or GIF. Videos: up to ${videoConfig.maxSeconds} seconds and ${videoConfig.videoMaxMb} MB. GIFs: up to ${videoConfig.gifMaxMb} MB. It uploads as soon as you pick it, then press Save changes.`}
-              >
-                <VideoInput id="bg_video" name="bg_video_path" sign={signVideo} onFile={pickVideo} />
-              </Field>
-              {background.videoUrl && (
-                <label className="flex items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={removeVideo}
-                    onChange={(e) => setRemoveVideo(e.target.checked)}
-                    className="accent-accent"
-                  />
-                  Remove the current video
-                </label>
-              )}
-            </div>
           </Section>
 
           <Section
@@ -631,36 +363,132 @@ export function CustomizeStudio({
             <FontPicker legend="Body font" value={draft.fontBody} onChange={(id) => set("fontBody", id)} />
           </Section>
 
-          <Section title="Card" onReset={() => set("card", cardDefaults)}>
-            <CardControls card={draft.card} onChange={(next) => set("card", next)} plainBackground={plainBg} />
+          <Section
+            title="Motion"
+            onReset={() => setStyle({ motion: siteStyleDefaults.motion })}
+          >
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-wrap gap-2">
+                {motionModes.map((m) => (
+                  <label key={m} className={pill}>
+                    <input
+                      type="radio"
+                      value={m}
+                      checked={draft.style.motion === m}
+                      onChange={() => setStyle({ motion: m as MotionMode })}
+                      className="sr-only"
+                    />
+                    {motionLabels[m]}
+                  </label>
+                ))}
+              </div>
+              <p className="text-xs text-ink-soft">{motionHints[draft.style.motion]}</p>
+            </div>
           </Section>
+
+          <Section
+            title="Hero"
+            onReset={() =>
+              setStyle({
+                heroSeconds: siteStyleDefaults.heroSeconds,
+                heroOverlay: siteStyleDefaults.heroOverlay,
+                heroGray: siteStyleDefaults.heroGray,
+              })
+            }
+          >
+            <Slider
+              id="ui_hero_seconds"
+              label="Time per slide"
+              unit=" s"
+              value={draft.style.heroSeconds}
+              range={styleRanges.seconds}
+              hint="Also the time per line of the news bar."
+              onChange={(heroSeconds) => setStyle({ heroSeconds })}
+            />
+            <Slider
+              id="ui_hero_overlay"
+              label="Dark overlay"
+              unit="%"
+              value={draft.style.heroOverlay}
+              range={styleRanges.heroOverlay}
+              hint="Darkens the media so the caption stays readable."
+              onChange={(heroOverlay) => setStyle({ heroOverlay })}
+            />
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={draft.style.heroGray}
+                onChange={(e) => setStyle({ heroGray: e.target.checked })}
+                className="accent-accent"
+              />
+              Show the hero in black and white
+            </label>
+          </Section>
+
+          <Section
+            title="List and gallery"
+            onReset={() =>
+              setStyle({
+                indexVeil: siteStyleDefaults.indexVeil,
+                gallerySeconds: siteStyleDefaults.gallerySeconds,
+              })
+            }
+          >
+            <Slider
+              id="ui_index_veil"
+              label="List overlay"
+              unit="%"
+              value={draft.style.indexVeil}
+              range={styleRanges.indexVeil}
+              hint="How much the media behind the list is covered, so the titles stay readable."
+              onChange={(indexVeil) => setStyle({ indexVeil })}
+            />
+            <Slider
+              id="ui_gallery_seconds"
+              label="Gallery time per photo"
+              unit=" s"
+              value={draft.style.gallerySeconds}
+              range={styleRanges.seconds}
+              onChange={(gallerySeconds) => setStyle({ gallerySeconds })}
+            />
+          </Section>
+
+          <p className="px-5 py-4 text-xs text-ink-soft">
+            Media, text and pages are set in <Link href={routes.pages} className="underline underline-offset-4">Pages</Link>.
+          </p>
         </aside>
 
         <section
           aria-label="Preview"
           className="order-1 h-[45dvh] shrink-0 bg-highlight p-3 lg:order-2 lg:h-auto lg:min-w-0 lg:flex-1 lg:shrink lg:p-6"
         >
-          {/* translateZ(0) keeps the "fixed" background of the page inside this box. */}
+          {/* translateZ(0) keeps everything of the page inside this box. */}
           <div
-            className="relative mx-auto h-full overflow-hidden rounded-lg border border-line [transform:translateZ(0)]"
+            className="relative mx-auto h-full overflow-hidden border border-line [transform:translateZ(0)]"
             style={{ maxWidth: device === "phone" ? phoneWidth : undefined }}
           >
             <div className="absolute inset-0 overflow-y-auto" onClickCapture={stopLinks}>
-              <PublicFrame
+              <SiteFrame
                 theme={draft.theme}
                 customTheme={{ bg: draft.themeBg, accent: draft.themeAccent }}
-                background={view}
                 fonts={{ heading: draft.fontHeading, body: draft.fontBody }}
-                card={draft.card}
+                style={draft.style}
+                viewportHeight={device === "phone" ? "620px" : "560px"}
               >
-                <ProfileHeader
-                  displayName={profile.displayName}
-                  username={profile.username}
-                  bio={profile.bio}
-                  avatarUrl={profile.avatarUrl}
+                <NewsBar items={site.news} seconds={draft.style.heroSeconds} autoplay={autoplay} />
+                <SiteHeader brand={profile.username} home={base} items={nav} />
+                <Hero
+                  slides={media.hero}
+                  name={profile.displayName}
+                  caption={site.heroCaption ?? profile.bio}
+                  seconds={draft.style.heroSeconds}
+                  autoplay={autoplay}
+                  gray={draft.style.heroGray}
                 />
-                <BlockRenderer blocks={previewBlocks} glass={draft.card.kind === "glass"} />
-              </PublicFrame>
+                <IndexSection blocks={previewRows} mediaUrl={media.indexMedia} />
+                <FadeGallery images={media.gallery} seconds={draft.style.gallerySeconds} autoplay={autoplay} />
+                <SiteFooter brand={profile.username} note={site.footerNote} socials={socials} />
+              </SiteFrame>
             </div>
           </div>
         </section>

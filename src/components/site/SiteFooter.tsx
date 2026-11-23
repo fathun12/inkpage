@@ -1,13 +1,16 @@
 import { siteConfig } from "@/config/site";
 import type { SocialItem } from "@/types/block";
 
-type Props = { brand: string; socials: SocialItem[] };
+type Props = { brand: string; note: string | null; socials: SocialItem[] };
 
-export function SiteFooter({ brand, socials }: Props) {
+export function SiteFooter({ brand, note, socials }: Props) {
   return (
     <footer className="border-t border-line px-5 py-10 sm:px-8">
       <div className="mx-auto flex max-w-5xl flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-        <span className="font-voice text-3xl leading-none">{brand}</span>
+        <div className="flex flex-col gap-3">
+          <span className="font-voice text-3xl leading-none">{brand}</span>
+          {note && <p className="max-w-sm whitespace-pre-line text-sm text-ink-soft">{note}</p>}
+        </div>
         <div className="flex flex-col gap-3 text-sm sm:items-end">
           {socials.length > 0 && (
             <ul className="flex flex-wrap gap-x-5 gap-y-1">

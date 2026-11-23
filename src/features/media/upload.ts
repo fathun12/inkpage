@@ -264,3 +264,86 @@ export async function sweepBackgroundPhotos(userId: string, keepUrl: string | nu
     });
   }
 }
+
+// Website media (hero, list background, gallery, About photo): the browser uploads the ORIGINAL file
+// straight to Storage. Same flow as the background photo: the server only checks the claim and makes a token.
+const siteRules = mediaConfig.siteMedia;
+
+export async function signSiteUpload(userId: string, input: VideoSignInput): Promise<VideoSignResult> {
+  const type = typeof input?.type === "string" ? input.type : "";
+  const size = typeof input?.size === "number" ? input.size : 0;
+  const kind = siteRules.types.find((t) => t.mime === type);
+  if (!kind) return { error: "Use a JPG, PNG, WebP, GIF, MP4 or WebM file." };
+  if (!Number.isFinite(size) || size <= 0 || size > siteRules.maxMb * 1024 * 1024) {
+    return { error: `This file is too large. The limit is ${siteRules.maxMb} MB.` };
+  }
+
+  const supabase = await createClient();
+  const path = `${userId}/${siteRules.folder}/${randomUUID()}.${kind.ext}`;
+  const { data, error } = await supabase.storage.from(mediaConfig.bucket).createSignedUploadUrl(path);
+  if (error || !data) {
+    return { error: `Could not prepare the upload: ${error?.message ?? "unknown error"}` };
+  }
+  return { path, token: data.token };
+}
+
+// Checks that files uploaded by the browser really exist, belong to this user and are small enough.
+// Returns their public addresses in the same order.
+export async function findSitePaths(
+  userId: string,
+  paths: string[],
+): Promise<{ urls: string[] } | { error: string }> {
+  if (paths.length === 0) return { urls: [] };
+  const prefix = `${userId}/${siteRules.folder}/`;
+  const supabase = await createClient();
+  const bucket = supabase.storage.from(mediaConfig.bucket);
+  const { data, error } = await bucket.list(prefix.slice(0, -1), { limit: 200 });
+  if (error || !data) return { error: "Could not check the uploaded files. Try again." };
+
+  const urls: string[] = [];
+  for (const path of paths) {
+    const name = path.startsWith(prefix) ? path.slice(prefix.length) : "";
+    if (!/^[0-9a-f-]{36}\.(jpg|png|webp|gif|mp4|webm)$/.test(name)) {
+      return { error: "An uploaded file is not valid. Pick it again." };
+    }
+    const file = data.find((f) => f.name === name);
+    if (!file) {
+      return { error: "An uploaded file was not found. Pick it again and wait until it says Uploaded." };
+    }
+    if (Number(file.metadata?.size ?? 0) > siteRules.maxMb * 1024 * 1024) {
+      await bucket.remove([path]);
+      return { error: `An uploaded file is larger than ${siteRules.maxMb} MB.` };
+    }
+    urls.push(bucket.getPublicUrl(path).data.publicUrl);
+  }
+  return { urls };
+}
+
+// Deletes every file in the user's site folder except the ones the settings use. Also cleans up
+// files that were uploaded but never saved, and files that were replaced or removed.
+export async function sweepSiteMedia(userId: string, keepUrls: string[]): Promise<void> {
+  const supabase = await createClient();
+  const bucket = supabase.storage.from(mediaConfig.bucket);
+  const folder = `${userId}/${siteRules.folder}`;
+  const { data, error } = await bucket.list(folder, { limit: 200 });
+  if (error || !data) {
+    console.error("sweepSiteMedia: could not list the folder", error?.message);
+    return;
+  }
+
+  const keep = new Set(keepUrls.map((u) => pathFromUrl(u, userId)).filter((p): p is string => p !== null));
+  const stale = data
+    .filter((f) => !f.name.startsWith("."))
+    .map((f) => `${folder}/${f.name}`)
+    .filter((p) => !keep.has(p));
+  if (stale.length === 0) return;
+
+  const { data: removed, error: removeError } = await bucket.remove(stale);
+  if (removeError || (removed?.length ?? 0) < stale.length) {
+    console.error("sweepSiteMedia: some files were not deleted", {
+      wanted: stale.length,
+      removed: removed?.length ?? 0,
+      error: removeError?.message,
+    });
+  }
+}

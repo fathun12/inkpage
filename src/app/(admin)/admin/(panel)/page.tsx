@@ -35,7 +35,10 @@ export default async function OverviewPage() {
             </a>
           </p>
         </div>
-        <ButtonLink href={routes.customize} variant="studio">Customize</ButtonLink>
+        <div className="flex gap-2">
+          <ButtonLink href={routes.pages} variant="studio">Pages</ButtonLink>
+          <ButtonLink href={routes.customize} variant="studio">Customize</ButtonLink>
+        </div>
       </div>
 
       <section className="grid grid-cols-2 gap-4 sm:grid-cols-4">

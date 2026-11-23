@@ -1,0 +1,44 @@
+import type { ReactNode } from "react";
+import { notFound } from "next/navigation";
+import { NewsBar } from "@/components/site/NewsBar";
+import { SiteFooter } from "@/components/site/SiteFooter";
+import { SiteFrame } from "@/components/site/SiteFrame";
+import { SiteHeader } from "@/components/site/SiteHeader";
+import { ViewBeacon } from "@/components/ui/ViewBeacon";
+import { readCustomTheme } from "@/config/custom-theme";
+import { readFonts } from "@/config/font-choices";
+import { readSite } from "@/config/site-content";
+import { readSiteStyle } from "@/config/site-style";
+import { resolveTheme, routes } from "@/config/site";
+import { getPublicBlocks } from "@/features/blocks/queries";
+import { getProfileByUsername } from "@/features/profile/queries";
+import { buildNav, socialsOf } from "@/lib/site-view";
+
+type Props = { children: ReactNode; params: Promise<{ slug: string }> };
+
+// Shared by Home, Projects, Writing and About: news bar, menu and footer.
+export default async function SiteLayout({ children, params }: Props) {
+  const { slug } = await params;
+  const profile = await getProfileByUsername(slug.toLowerCase());
+  if (!profile) notFound();
+
+  const blocks = await getPublicBlocks(profile.id);
+  const site = readSite(profile.site);
+  const style = readSiteStyle(profile.site_style);
+  const base = routes.profile(profile.username);
+
+  return (
+    <SiteFrame
+      theme={resolveTheme(profile.theme)}
+      customTheme={readCustomTheme(profile)}
+      fonts={readFonts(profile)}
+      style={style}
+    >
+      <NewsBar items={site.news} seconds={style.heroSeconds} autoplay={style.motion !== "off"} />
+      <SiteHeader brand={profile.username} home={base} items={buildNav(base, site, blocks)} />
+      {children}
+      <SiteFooter brand={profile.username} note={site.footerNote} socials={socialsOf(blocks)} />
+      <ViewBeacon endpoint={routes.track} username={profile.username} />
+    </SiteFrame>
+  );
+}

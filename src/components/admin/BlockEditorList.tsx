@@ -3,12 +3,14 @@ import { Img } from "@/components/ui/Img";
 import { ImageInput } from "@/components/ui/ImageInput";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { mediaConfig } from "@/config/media";
+import { blockPageLabels, resolvePage } from "@/config/site-content";
 import { readMedia } from "@/lib/card-media";
 import { isoToLocalInput } from "@/lib/datetime";
 import { cn } from "@/lib/utils";
 import type { BlockStatus, BlockView } from "@/types/block";
 import type { FormAction } from "@/types/form";
 import { CardMediaFields } from "./CardMediaFields";
+import { PageSelect } from "./PageSelect";
 import { SortableList } from "./SortableList";
 
 type Actions = {
@@ -81,7 +83,12 @@ function BlockCard({ block, index, total, actions, gifCount }: CardProps) {
         <div className="min-w-0 flex-1">
           <p className="truncate font-display text-lg font-bold">{block.title}</p>
           <div className="mt-1 flex flex-wrap items-center gap-2">
-            <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">{type}</span>
+            <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">
+              {type}
+              {type === "link" || type === "project" || type === "header"
+                ? ` · ${blockPageLabels[resolvePage(block.page)]}`
+                : ""}
+            </span>
             <span
               className={cn(
                 "ink-border rounded-sm px-2 py-0.5 font-mono text-[11px] uppercase",
@@ -118,6 +125,12 @@ function BlockCard({ block, index, total, actions, gifCount }: CardProps) {
                 <Input id={`title-${block.id}`} name="title" defaultValue={block.title} required maxLength={80} />
               </Field>
             </div>
+
+            {(type === "link" || type === "project" || type === "header") && (
+              <div className="sm:col-span-2">
+                <PageSelect id={`page-${block.id}`} value={resolvePage(block.page)} />
+              </div>
+            )}
 
             {hasUrl && (
               <div className="sm:col-span-2">

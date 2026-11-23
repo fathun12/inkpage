@@ -32,7 +32,10 @@ export default async function LinksPage({ searchParams }: Props) {
     <div className="flex flex-col gap-8">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="font-display text-4xl font-black">Links</h1>
-        <ButtonLink href={routes.customize} variant="studio">Customize</ButtonLink>
+        <div className="flex gap-2">
+          <ButtonLink href={routes.pages} variant="studio">Pages</ButtonLink>
+          <ButtonLink href={routes.customize} variant="studio">Customize</ButtonLink>
+        </div>
       </div>
       {error && <FlashNotice key={t} tone="error">{error}</FlashNotice>}
       {saved && <FlashNotice key={t} tone="ok">{savedText(saved)}</FlashNotice>}

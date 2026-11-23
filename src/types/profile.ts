@@ -17,6 +17,8 @@ export type Profile = {
   font_heading: string | null;
   font_body: string | null;
   card: unknown;
+  site: unknown;
+  site_style: unknown;
   theme_bg: string | null;
   theme_accent: string | null;
   bg_fade_color: string | null;

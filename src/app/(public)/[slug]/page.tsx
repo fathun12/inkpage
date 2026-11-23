@@ -3,18 +3,14 @@ import { notFound } from "next/navigation";
 import { FadeGallery } from "@/components/site/FadeGallery";
 import { Hero } from "@/components/site/Hero";
 import { IndexSection } from "@/components/site/IndexSection";
-import { SiteFooter } from "@/components/site/SiteFooter";
-import { SiteFrame } from "@/components/site/SiteFrame";
-import { SiteHeader } from "@/components/site/SiteHeader";
-import { ViewBeacon } from "@/components/ui/ViewBeacon";
 import { readBackground } from "@/config/background";
-import { readCustomTheme } from "@/config/custom-theme";
-import { readFonts } from "@/config/font-choices";
-import { resolveTheme, routes, siteConfig } from "@/config/site";
+import { readSite } from "@/config/site-content";
+import { readSiteStyle } from "@/config/site-style";
+import { siteConfig } from "@/config/site";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
 import { getSiteUrl } from "@/lib/site-url";
-import type { SocialItem } from "@/types/block";
+import { listBlocks, resolveHomeMedia } from "@/lib/site-view";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -32,37 +28,30 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function PublicPage({ params }: Props) {
+export default async function HomePage({ params }: Props) {
   const { slug } = await params;
   const profile = await getProfileByUsername(slug.toLowerCase());
   if (!profile) notFound();
 
   const blocks = await getPublicBlocks(profile.id);
-  const rows = blocks.filter((b) => b.type === "link" || b.type === "project" || b.type === "header");
-  const images = blocks.flatMap((b) => (b.type === "gallery" ? (b.data.images ?? []) : []));
-  const socials: SocialItem[] = blocks.flatMap((b) => (b.type === "socials" ? (b.data.items ?? []) : []));
-
-  // Until the Pages menu exists (Phase 12b): with 3 or more gallery photos the first one sits behind the list.
-  const indexMedia = images.length > 2 ? images[0] : null;
-  const gallery = indexMedia ? images.slice(1) : images;
-
-  const links = [
-    ...(rows.length > 0 ? [{ label: "Work", href: "#work" }] : []),
-    ...(gallery.length > 0 ? [{ label: "Gallery", href: "#gallery" }] : []),
-  ];
+  const site = readSite(profile.site);
+  const style = readSiteStyle(profile.site_style);
+  const media = resolveHomeMedia(site, readBackground(profile), blocks);
+  const rows = listBlocks(blocks, "home");
+  const autoplay = style.motion !== "off";
 
   return (
-    <SiteFrame
-      theme={resolveTheme(profile.theme)}
-      customTheme={readCustomTheme(profile)}
-      fonts={readFonts(profile)}
-    >
-      <SiteHeader brand={profile.username} links={links} />
-      <Hero background={readBackground(profile)} name={profile.display_name} bio={profile.bio} />
-      {rows.length > 0 && <IndexSection blocks={rows} mediaUrl={indexMedia} />}
-      <FadeGallery images={gallery} />
-      <SiteFooter brand={profile.username} socials={socials} />
-      <ViewBeacon endpoint={routes.track} username={profile.username} />
-    </SiteFrame>
+    <>
+      <Hero
+        slides={media.hero}
+        name={profile.display_name}
+        caption={site.heroCaption ?? profile.bio}
+        seconds={style.heroSeconds}
+        autoplay={autoplay}
+        gray={style.heroGray}
+      />
+      {rows.length > 0 && <IndexSection blocks={rows} mediaUrl={media.indexMedia} />}
+      <FadeGallery images={media.gallery} seconds={style.gallerySeconds} autoplay={autoplay} />
+    </>
   );
 }

@@ -85,6 +85,7 @@ function toRow(v: BlockInput, imageUrl: string | null, images: string[], media: 
 
   return {
     type: v.type,
+    page: v.page,
     title: v.title,
     url: hasUrl ? (v.url ?? null) : null,
     body: hasBody ? (v.body ?? null) : null,
