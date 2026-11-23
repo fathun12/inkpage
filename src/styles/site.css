@@ -1,0 +1,112 @@
+/* site.css: layout and motion of the public website (Phase 12). Colors come from the theme. */
+
+.site-hero {
+  color: #fff;
+}
+.site-hero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 0.25);
+  pointer-events: none;
+}
+.site-hero-caption {
+  z-index: 10;
+  animation: site-caption 1.2s var(--ease-out) 0.4s both;
+}
+
+.site-index {
+  background: var(--c-ink);
+  color: var(--c-bg);
+}
+.site-index-veil {
+  background: color-mix(in srgb, var(--c-ink) 62%, transparent);
+}
+
+/* Scroll reveal: rows rise, lines draw from the left, media opens from the bottom. */
+[data-reveal="rise"] {
+  transition:
+    opacity calc(var(--dur-slow) * 1.6) var(--ease-out) var(--reveal-delay, 0ms),
+    transform calc(var(--dur-slow) * 1.6) var(--ease-out) var(--reveal-delay, 0ms);
+}
+.site-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.35;
+  transform-origin: left center;
+  transition: transform calc(var(--dur-slow) * 2.4) var(--ease-out) var(--reveal-delay, 0ms);
+}
+.site-media-reveal {
+  clip-path: inset(0);
+  transition: clip-path calc(var(--dur-slow) * 2.6) var(--ease-out);
+}
+
+/* Hidden only when JavaScript runs, so the page still reads without it. */
+@media (scripting: enabled) {
+  [data-reveal="rise"]:not([data-in]) {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  [data-reveal]:not([data-in]) .site-line {
+    transform: scaleX(0);
+  }
+  [data-reveal]:not([data-in]) .site-media-reveal {
+    clip-path: inset(100% 0 0 0);
+  }
+}
+
+/* Hero media drifts slower than the page (Chrome and Edge; others keep it still). */
+@supports (animation-timeline: scroll()) {
+  .site-hero-media {
+    animation: site-hero-drift linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 100svh;
+  }
+}
+
+.site-dot {
+  width: 22px;
+  height: 2px;
+  background: rgb(255 255 255 / 0.45);
+  transition: background-color var(--dur-slow) var(--ease-out);
+}
+.site-dot[data-active] {
+  background: var(--c-accent);
+}
+
+@keyframes site-hero-drift {
+  to {
+    transform: translateY(6svh) scale(1.15);
+  }
+}
+@keyframes site-caption {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal="rise"]:not([data-in]) {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  [data-reveal]:not([data-in]) .site-line {
+    transform: none !important;
+  }
+  [data-reveal]:not([data-in]) .site-media-reveal {
+    clip-path: none !important;
+  }
+  .site-hero-media,
+  .site-hero-caption {
+    animation: none;
+  }
+}
