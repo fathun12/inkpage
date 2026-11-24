@@ -1,7 +1,6 @@
 "use server";
 
 import { z } from "zod";
-import { dayParts, type DayPart } from "@/config/intro";
 import { resolveTab, tabHref, type PagesTab } from "@/config/item-data";
 import {
   fileKey,
@@ -187,17 +186,9 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
       }
       headlines.push(h);
     }
-    const greetings = {} as Record<DayPart, string | null>;
-    for (const part of dayParts) {
-      const g = field(formData, `intro_greeting_${part}`);
-      if (g && g.length > siteLimits.greeting) {
-        return abort(`A greeting can be at most ${siteLimits.greeting} characters.`);
-      }
-      greetings[part] = g ?? null;
-    }
     next.intro = {
       enabled: formData.get("intro_enabled") === "on",
-      greetings,
+      greetings: old.intro.greetings,
       note: v.intro_note ?? null,
       headlines,
     };

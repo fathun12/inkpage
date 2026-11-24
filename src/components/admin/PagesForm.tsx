@@ -2,7 +2,6 @@ import type { ReactNode } from "react";
 import { Field, Input, Textarea } from "@/components/ui/Field";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import type { PagesTab } from "@/config/item-data";
-import { dayParts, dayPartLabels, defaultGreetings } from "@/config/intro";
 import { mediaConfig } from "@/config/media";
 import { siteLimits, type PageText, type SiteSettings } from "@/config/site-content";
 import type { FormAction } from "@/types/form";
@@ -88,20 +87,8 @@ export function HomeForm({ action, sign, site }: WithMedia) {
           <Input id="intro_note" name="intro_note" defaultValue={site.intro.note ?? ""} maxLength={siteLimits.introNote} />
         </Field>
         <p className="text-xs text-ink-soft">
-          The greeting changes by itself with the visitor&apos;s clock. Write your own wording only if you want to replace
-          a built-in one. Empty = built-in.
+          The greeting (good morning, afternoon, evening) and the date are automatic. They follow each visitor&apos;s clock.
         </p>
-        {dayParts.map((part) => (
-          <Field key={part} label={dayPartLabels[part]} htmlFor={`intro_greeting_${part}`}>
-            <Input
-              id={`intro_greeting_${part}`}
-              name={`intro_greeting_${part}`}
-              placeholder={defaultGreetings[part]}
-              defaultValue={site.intro.greetings[part] ?? ""}
-              maxLength={siteLimits.greeting}
-            />
-          </Field>
-        ))}
       </Section>
 
       <Section title="Hero" hint="The big media at the top of Home.">
