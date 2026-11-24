@@ -75,7 +75,7 @@ export async function fetchDesigns(address: string | null, count: number): Promi
     });
     const projects = shuffle(all)
       .slice(0, count)
-      .map((p) => ({ ...p, photos: shuffle(p.photos).slice(0, 3) }));
+      .map((p) => ({ ...p, photos: shuffle(p.photos) }));
     return { total: typeof json.total === "number" ? json.total : all.length, projects };
   } catch {
     return null;

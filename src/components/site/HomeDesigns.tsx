@@ -3,7 +3,17 @@ import { DesignCard } from "./DesignCard";
 import { Reveal } from "./Reveal";
 
 // The design projects section of Home: random projects from House Showcase. It only appears when that site answered.
-export function HomeDesigns({ data, title }: { data: DesignsData; title: string }) {
+export function HomeDesigns({
+  data,
+  title,
+  seconds,
+  autoplay,
+}: {
+  data: DesignsData;
+  title: string;
+  seconds: number;
+  autoplay: boolean;
+}) {
   if (data.projects.length === 0) return null;
   return (
     <section id="designs" aria-label={title} className="pt-16 sm:pt-24">
@@ -13,10 +23,10 @@ export function HomeDesigns({ data, title }: { data: DesignsData; title: string 
         </Reveal>
       </div>
       <ul className="mx-auto grid max-w-5xl gap-x-5 gap-y-12 px-5 pb-16 sm:grid-cols-2 sm:px-8 sm:pb-24 lg:grid-cols-3">
-        {data.projects.map((project) => (
+        {data.projects.map((project, i) => (
           <li key={project.slug}>
             <Reveal variant="still">
-              <DesignCard project={project} />
+              <DesignCard project={project} seconds={seconds} autoplay={autoplay} offset={i} />
             </Reveal>
           </li>
         ))}

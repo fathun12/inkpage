@@ -1,11 +1,22 @@
 import { Img } from "@/components/ui/Img";
 import type { DesignProject } from "@/types/designs";
+import { DesignStrip } from "./DesignStrip";
 
 const kindLabel = { house: "House", furniture: "Furniture" } as const;
 
 // One project: the cover, up to 3 documentation photos under it, then the title. It opens the project
 // on House Showcase in a new tab.
-export function DesignCard({ project }: { project: DesignProject }) {
+export function DesignCard({
+  project,
+  seconds,
+  autoplay,
+  offset,
+}: {
+  project: DesignProject;
+  seconds: number;
+  autoplay: boolean;
+  offset: number;
+}) {
   return (
     <a href={project.href} target="_blank" rel="noopener noreferrer" className="group block">
       <span className="relative block overflow-hidden transition-transform duration-(--dur-base) group-hover:-translate-y-1">
@@ -24,21 +35,13 @@ export function DesignCard({ project }: { project: DesignProject }) {
           {kindLabel[project.kind]}
         </span>
       </span>
-      {project.photos.length > 0 && (
-        <span
-          className="mt-1 grid gap-1"
-          style={{ gridTemplateColumns: `repeat(${project.photos.length}, minmax(0, 1fr))` }}
-        >
-          {project.photos.map((src) => (
-            <Img
-              key={src}
-              src={src}
-              alt={`Documentation of ${project.title}`}
-              className="aspect-[4/3] w-full object-cover"
-            />
-          ))}
-        </span>
-      )}
+      <DesignStrip
+        photos={project.photos}
+        alt={`Documentation of ${project.title}`}
+        seconds={seconds}
+        autoplay={autoplay}
+        offset={offset}
+      />
       <span className="mt-3 block font-display text-lg leading-tight underline-offset-4 group-hover:underline">
         {project.title}
       </span>

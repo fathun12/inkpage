@@ -98,7 +98,14 @@ export default async function HomePage({ params }: Props) {
         <IndexSection blocks={rows} mediaUrl={media.indexMedia} credit={creditOf(site.credits, media.indexMedia)} />
       )}
       <HomeShowcase items={showcase} title={site.showcaseTitle ?? "Showcase"} />
-      {designs && <HomeDesigns data={designs} title={site.designsTitle ?? "Design"} />}
+      {designs && (
+        <HomeDesigns
+          data={designs}
+          title={site.designsTitle ?? "Design"}
+          seconds={style.gallerySeconds}
+          autoplay={autoplay}
+        />
+      )}
       <FadeGallery images={media.gallery} seconds={style.gallerySeconds} autoplay={autoplay} credits={site.credits} />
     </>
   );

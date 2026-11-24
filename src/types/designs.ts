@@ -7,7 +7,7 @@ export type DesignProject = {
   title: string;
   tagline: string;
   cover: string | null;
-  // Documentation photos, already in random order (at most 3).
+  // Documentation photos, already in random order (up to 12). They slide on the card.
   photos: string[];
   href: string;
 };
