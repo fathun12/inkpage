@@ -5,6 +5,7 @@ export const articleLimits = {
   excerpt: 160,
   slug: 80,
   caption: 300,
+  footnote: 1000,
   contentChars: 500_000, // size of the saved JSON
   nodes: 20_000,
   depth: 12,

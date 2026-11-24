@@ -7,7 +7,14 @@ export const emptyDoc: DocNode = { type: "doc", content: [{ type: "paragraph" }]
 // Only what the editor can make. Anything else is dropped when saving (the server never trusts the browser).
 const blockTypes = new Set(["paragraph", "heading", "blockquote", "bulletList", "orderedList", "listItem"]);
 const leafTypes = new Set(["horizontalRule", "hardBreak"]);
-const markTypes = new Set(["bold", "italic", "underline", "code", "link"]);
+const markTypes = new Set(["bold", "italic", "underline", "code", "link", "highlight", "superscript"]);
+
+// The only highlight colors. The look of each is in article.css (it works in light and dark).
+export const highlightColors = ["yellow", "green", "blue", "pink"] as const;
+export type HighlightColor = (typeof highlightColors)[number];
+export function isHighlightColor(value: unknown): value is HighlightColor {
+  return typeof value === "string" && (highlightColors as readonly string[]).includes(value);
+}
 const textBlocks = new Set(["paragraph", "heading", "listItem", "blockquote"]);
 
 export function isUuid(value: string): boolean {
@@ -58,8 +65,13 @@ function cleanMarks(raw: unknown): DocMark[] | undefined {
   const out: DocMark[] = [];
   for (const item of raw) {
     if (typeof item !== "object" || item === null) continue;
-    const mark = item as { type?: unknown; attrs?: { href?: unknown } };
+    const mark = item as { type?: unknown; attrs?: { href?: unknown; color?: unknown } };
     if (typeof mark.type !== "string" || !markTypes.has(mark.type)) continue;
+    if (mark.type === "highlight") {
+      const color = mark.attrs?.color;
+      out.push({ type: "highlight", attrs: { color: isHighlightColor(color) ? color : "yellow" } });
+      continue;
+    }
     if (mark.type === "link") {
       const href = mark.attrs?.href;
       if (isSafeHref(href)) out.push({ type: "link", attrs: { href: href.trim() } });
@@ -93,11 +105,19 @@ function cleanNode(raw: unknown, depth: number, budget: Budget): DocNode | null 
     const caption = typeof n.attrs?.caption === "string" ? n.attrs.caption.trim().slice(0, articleLimits.caption) : "";
     return { type: "image", attrs: caption ? { src, caption } : { src } };
   }
+  if (n.type === "footnote") {
+    const note =
+      typeof n.attrs?.note === "string" ? n.attrs.note.replace(/\s+/g, " ").trim().slice(0, articleLimits.footnote) : "";
+    return note ? { type: "footnote", attrs: { note } } : null;
+  }
   if (leafTypes.has(n.type)) return { type: n.type };
   if (!blockTypes.has(n.type)) return null;
 
   const node: DocNode = { type: n.type };
   if (n.type === "heading") node.attrs = { level: n.attrs?.level === 3 ? 3 : 2 };
+  if ((n.type === "paragraph" || n.type === "heading") && n.attrs?.dir === "rtl") {
+    node.attrs = { ...node.attrs, dir: "rtl" };
+  }
   if (n.type === "orderedList") {
     const start = n.attrs?.start;
     if (typeof start === "number" && Number.isInteger(start) && start > 1 && start < 10_000) node.attrs = { start };

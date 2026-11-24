@@ -154,3 +154,90 @@
   outline: 2px solid var(--c-ink);
   outline-offset: 2px;
 }
+
+/* Highlight: four colors, see-through so they work on light and dark. Tiptap writes an inline color; this wins. */
+.article-prose mark {
+  color: inherit;
+  padding: 0.05em 0.15em;
+  border-radius: 2px;
+}
+
+.article-prose mark[data-color="yellow"] {
+  background-color: rgba(255, 214, 10, 0.35) !important;
+}
+
+.article-prose mark[data-color="green"] {
+  background-color: rgba(52, 199, 89, 0.3) !important;
+}
+
+.article-prose mark[data-color="blue"] {
+  background-color: rgba(10, 132, 255, 0.28) !important;
+}
+
+.article-prose mark[data-color="pink"] {
+  background-color: rgba(255, 55, 140, 0.28) !important;
+}
+
+.article-prose sup {
+  font-size: 0.75em;
+  line-height: 0;
+}
+
+/* Right to left (Arabic): system Arabic fonts, bigger and airier. */
+.article-prose [dir="rtl"] {
+  font-family: "Noto Naskh Arabic", "Amiri", "Traditional Arabic", "Segoe UI", serif;
+  text-align: right;
+}
+
+.article-prose p[dir="rtl"] {
+  font-size: 1.3em;
+  line-height: 2.1;
+}
+
+/* Footnotes. In the editor the number is a CSS counter on the marker; the reader prints the number itself. */
+.article-prose {
+  counter-reset: footnote;
+}
+
+.article-prose sup[data-footnote] {
+  cursor: pointer;
+  font-weight: 600;
+  margin-inline: 0.1em;
+}
+
+.article-prose sup[data-footnote]::after {
+  counter-increment: footnote;
+  content: counter(footnote);
+}
+
+.article-prose sup[data-footnote].ProseMirror-selectednode {
+  outline: 1px solid var(--c-ink);
+  outline-offset: 2px;
+}
+
+.article-prose sup.fn-ref a {
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.article-notes {
+  margin-top: 3rem;
+  border-top: 1px solid var(--c-line);
+  padding-top: 1.25rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: var(--c-ink-soft);
+}
+
+.article-notes ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+}
+
+.article-notes li + li {
+  margin-top: 0.5rem;
+}
+
+.article-notes a {
+  text-decoration: none;
+}

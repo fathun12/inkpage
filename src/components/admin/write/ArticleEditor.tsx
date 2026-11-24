@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type ChangeEvent } from "react";
+import Highlight from "@tiptap/extension-highlight";
 import { Placeholder } from "@tiptap/extension-placeholder";
+import Superscript from "@tiptap/extension-superscript";
 import { EditorContent, useEditor, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Button } from "@/components/ui/Button";
@@ -22,6 +24,7 @@ import type {
 } from "@/types/article";
 import type { FormAction } from "@/types/form";
 import { ArticleImage } from "./ArticleImage";
+import { ArticleDirection, ArticleFootnote } from "./ArticleExtras";
 import { EditorMenus } from "./EditorMenus";
 import { PublishDrawer, type DrawerSnapshot } from "./PublishDrawer";
 
@@ -172,6 +175,10 @@ export function ArticleEditor({ initial, username, backHref, viewHref, save, sig
       }),
       Placeholder.configure({ placeholder: "Start writing..." }),
       ArticleImage.configure({ inline: false, allowBase64: false }),
+      Highlight.configure({ multicolor: true }),
+      Superscript,
+      ArticleDirection,
+      ArticleFootnote,
     ],
     content: initial.doc,
     editorProps: {
