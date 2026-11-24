@@ -7,6 +7,7 @@ import { routes } from "@/config/site";
 import { getProfileByUsername } from "@/features/profile/queries";
 import { getSiteUrl } from "@/lib/site-url";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { sendReceipt } from "./email";
 import { getActiveProvider } from "./providers";
 import { expireHolds } from "./stock";
 import { hashToken, newToken } from "./token";
@@ -41,7 +42,7 @@ export async function startCheckoutAction(username: string, productSlug: string,
   // Price and status come from the database, never from the browser.
   const { data: product } = await db
     .from("products")
-    .select("id, title, price_usd_cents")
+    .select("id, title, price_usd_cents, license_note")
     .eq("user_id", profile.id)
     .eq("slug", productSlug)
     .eq("status", "active")
@@ -53,7 +54,11 @@ export async function startCheckoutAction(username: string, productSlug: string,
   if (paid && !provider) return fail("Paid checkout is not connected yet.");
 
   await expireHolds();
-  const settings = await db.from("shop_settings").select("updated_at").eq("user_id", profile.id).maybeSingle();
+  const settings = await db
+    .from("shop_settings")
+    .select("updated_at, contact_email")
+    .eq("user_id", profile.id)
+    .maybeSingle();
 
   const token = newToken();
   const reserved = await db.rpc("shop_reserve", {
@@ -72,10 +77,25 @@ export async function startCheckoutAction(username: string, productSlug: string,
   const orderId = reserved.data as string;
   const orderPath = `${routes.profile(profile.username)}/order/${token}`;
 
-  // Free product: the order is already paid. Go to the order page to download.
-  if (!provider) redirect(orderPath);
-
   const origin = (await getSiteUrl()).replace(/\/$/, "");
+
+  // Free product: the order is already paid. Send the receipt, then go to the order page to download.
+  // A failed email never blocks the order: the buyer still has the order page.
+  if (!provider) {
+    const sent = await sendReceipt({
+      to: email,
+      orderId,
+      title: product.title,
+      priceCents: product.price_usd_cents,
+      paidAt: new Date(),
+      orderUrl: `${origin}${orderPath}`,
+      license: product.license_note,
+      replyTo: settings.data?.contact_email ?? null,
+    });
+    if (!sent.ok) console.error("shop receipt failed", orderId, sent.error);
+    redirect(orderPath);
+  }
+
   let url: string;
   try {
     url = await provider.createCheckout({

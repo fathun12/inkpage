@@ -1,7 +1,6 @@
 import { siteConfig } from "@/config/site";
 
-const link =
-  "underline underline-offset-2 transition-opacity duration-(--dur-base) hover:opacity-60";
+const link = "relative z-10 cursor-pointer underline-offset-2 hover:underline";
 
 // "Made with inkpage by MFNiam": both names are links. Change the wording or the addresses in config/site.ts.
 export function Credit() {

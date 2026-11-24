@@ -9,6 +9,7 @@ export const shopConfig = {
   grantMaxDownloads: 5,
   grantDays: 30,
   signedUrlSeconds: 300,
+  mail: { timeoutMs: 8000, fallbackSenderName: "inkpage" },
   // Frame of a product card (media is cropped to it). A product page shows media in full.
   cardAspect: "4 / 5",
   limits: {
