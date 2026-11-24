@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { CardSlider } from "@/components/site/CardSlider";
 import { FadeGallery } from "@/components/site/FadeGallery";
 import { Hero } from "@/components/site/Hero";
+import { Intro } from "@/components/site/Intro";
+import { resolveGreetings } from "@/config/intro";
 import { HomeBiblia } from "@/components/site/HomeBiblia";
 import { HomeProjects } from "@/components/site/HomeProjects";
 import { HomeShowcase } from "@/components/site/HomeShowcase";
@@ -61,6 +63,15 @@ export default async function HomePage({ params }: Props) {
         gray={style.heroGray}
         credits={site.credits}
       />
+      {site.intro.enabled && site.intro.headlines.length > 0 && (
+        <Intro
+          greetings={resolveGreetings(site.intro.greetings)}
+          note={site.intro.note}
+          headlines={site.intro.headlines}
+          seconds={style.heroSeconds}
+          autoplay={autoplay}
+        />
+      )}
       {writing.length > 0 && (
         <CardSlider
           items={writing}

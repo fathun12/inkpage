@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Field, Input, Textarea } from "@/components/ui/Field";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import type { PagesTab } from "@/config/item-data";
+import { dayParts, dayPartLabels, defaultGreetings } from "@/config/intro";
 import { mediaConfig } from "@/config/media";
 import { siteLimits, type PageText, type SiteSettings } from "@/config/site-content";
 import type { FormAction } from "@/types/form";
@@ -61,6 +62,45 @@ export function HomeForm({ action, sign, site }: WithMedia) {
               <Input id={`news_url_${i}`} name={`news_url_${i}`} type="url" placeholder="https://" defaultValue={item?.url ?? ""} />
             </Field>
           </div>
+        ))}
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="show_clock" defaultChecked={site.showClock} className="accent-accent" />
+          Show a clock at the left of the bar (Jakarta time, 24 hours)
+        </label>
+      </Section>
+
+      <Section title="Intro" hint="Greeting, date and big sentences under the hero.">
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="intro_enabled" defaultChecked={site.intro.enabled} className="accent-accent" />
+          Show the intro (it needs at least one big sentence)
+        </label>
+        {Array.from({ length: siteLimits.introHeadlines }, (_, i) => site.intro.headlines[i]).map((line, i) => (
+          <Field
+            key={i}
+            label={`Big sentence ${i + 1}`}
+            htmlFor={`intro_headline_${i}`}
+            hint={i === 0 ? "With more than one, they swap by fading. Leave a row empty to skip it." : undefined}
+          >
+            <Input id={`intro_headline_${i}`} name={`intro_headline_${i}`} defaultValue={line ?? ""} maxLength={siteLimits.introHeadline} />
+          </Field>
+        ))}
+        <Field label="Note after the date" htmlFor="intro_note" hint="Optional. Shown after &quot;Today is Tuesday, November 24.&quot;">
+          <Input id="intro_note" name="intro_note" defaultValue={site.intro.note ?? ""} maxLength={siteLimits.introNote} />
+        </Field>
+        <p className="text-xs text-ink-soft">
+          The greeting changes by itself with the visitor&apos;s clock. Write your own wording only if you want to replace
+          a built-in one. Empty = built-in.
+        </p>
+        {dayParts.map((part) => (
+          <Field key={part} label={dayPartLabels[part]} htmlFor={`intro_greeting_${part}`}>
+            <Input
+              id={`intro_greeting_${part}`}
+              name={`intro_greeting_${part}`}
+              placeholder={defaultGreetings[part]}
+              defaultValue={site.intro.greetings[part] ?? ""}
+              maxLength={siteLimits.greeting}
+            />
+          </Field>
         ))}
       </Section>
 

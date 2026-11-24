@@ -1,6 +1,7 @@
 // Content settings of the public website. Plain data: no database and no React here.
 // The Pages menu writes them to profiles.site. readSite reads them and never throws.
 
+import { dayParts, type DayPart } from "@/config/intro";
 import type { ItemShape } from "@/types/block";
 
 export const blockPages = ["home", "projects", "writing"] as const;
@@ -37,7 +38,19 @@ export const siteLimits = {
   highlightMedia: 6,
   credit: 120,
   creditCount: 80,
+  introHeadline: 120,
+  introHeadlines: 3,
+  greeting: 60,
+  introNote: 160,
 } as const;
+
+export type IntroSettings = {
+  enabled: boolean;
+  // Own wording per part of the day. null = the built-in text (config/intro.ts).
+  greetings: Record<DayPart, string | null>;
+  note: string | null;
+  headlines: string[];
+};
 
 export type NewsItem = { text: string; url: string | null };
 export type PageText = { title: string | null; intro: string | null };
@@ -75,6 +88,8 @@ export type SiteSettings = {
   writing: PageText;
   about: AboutText;
   footerNote: string | null;
+  intro: IntroSettings;
+  showClock: boolean;
 };
 
 const httpUrl = /^https?:\/\//i;
@@ -132,6 +147,21 @@ function readHighlights(v: unknown): Highlight[] {
   });
 }
 
+function readIntro(v: unknown): IntroSettings {
+  const r = obj(v);
+  const g = obj(r.greetings);
+  const greetings = Object.fromEntries(
+    dayParts.map((part) => [part, text(g[part], siteLimits.greeting)]),
+  ) as Record<DayPart, string | null>;
+  const headlines = Array.isArray(r.headlines)
+    ? r.headlines
+        .map((h) => text(h, siteLimits.introHeadline))
+        .filter((h): h is string => h !== null)
+        .slice(0, siteLimits.introHeadlines)
+    : [];
+  return { enabled: r.enabled !== false, greetings, note: text(r.note, siteLimits.introNote), headlines };
+}
+
 export function readSite(raw: unknown): SiteSettings {
   const r = obj(raw);
   const projects = obj(r.projects);
@@ -166,6 +196,8 @@ export function readSite(raw: unknown): SiteSettings {
       photo: link(about.photo),
     },
     footerNote: text(r.footerNote, siteLimits.footerNote),
+    intro: readIntro(r.intro),
+    showClock: r.showClock === true,
   };
 }
 

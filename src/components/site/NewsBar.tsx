@@ -3,10 +3,35 @@
 import { useEffect, useState } from "react";
 import type { NewsItem } from "@/config/site-content";
 
-type Props = { items: NewsItem[]; seconds: number; autoplay: boolean };
+type Props = { items: NewsItem[]; seconds: number; autoplay: boolean; showClock?: boolean };
+
+// Jakarta time, 24 hours. Empty until the browser has mounted, so the server and browser HTML match.
+function Clock() {
+  const [text, setText] = useState("");
+  useEffect(() => {
+    const format = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Asia/Jakarta",
+      hour: "2-digit",
+      minute: "2-digit",
+      hourCycle: "h23",
+    });
+    const tick = () => setText(format.format(new Date()));
+    const first = window.setTimeout(tick, 0);
+    const id = window.setInterval(tick, 1000);
+    return () => {
+      window.clearTimeout(first);
+      window.clearInterval(id);
+    };
+  }, []);
+  return (
+    <span aria-label="Time in Jakarta" className="min-w-[7ch] font-mono tabular-nums opacity-60">
+      {text ? `${text} WIB` : ""}
+    </span>
+  );
+}
 
 // The thin bar at the very top. The lines slide sideways.
-export function NewsBar({ items, seconds, autoplay }: Props) {
+export function NewsBar({ items, seconds, autoplay, showClock = false }: Props) {
   const [index, setIndex] = useState(0);
   const count = items.length;
 
@@ -23,6 +48,7 @@ export function NewsBar({ items, seconds, autoplay }: Props) {
   return (
     <div role="region" aria-label="News" className="bg-ink text-xs text-bg">
       <div className="mx-auto flex h-9 max-w-6xl items-center gap-3 px-3">
+        {showClock && <Clock />}
         {count > 1 ? (
           <button type="button" onClick={() => go(-1)} aria-label="Previous news" className="w-5 text-base leading-none opacity-70 hover:opacity-100">
             ‹

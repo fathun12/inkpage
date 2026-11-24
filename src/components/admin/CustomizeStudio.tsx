@@ -5,6 +5,8 @@ import { useState, type MouseEvent, type ReactNode } from "react";
 import { CardSlider } from "@/components/site/CardSlider";
 import { FadeGallery } from "@/components/site/FadeGallery";
 import { Hero } from "@/components/site/Hero";
+import { Intro } from "@/components/site/Intro";
+import { resolveGreetings } from "@/config/intro";
 import { HomeProjects } from "@/components/site/HomeProjects";
 import { HomeShowcase } from "@/components/site/HomeShowcase";
 import { IndexSection } from "@/components/site/IndexSection";
@@ -255,6 +257,7 @@ export function CustomizeStudio({
       <input type="hidden" name="site_gallery_seconds" value={draft.style.gallerySeconds} />
       <input type="hidden" name="site_hero_overlay" value={draft.style.heroOverlay} />
       <input type="hidden" name="site_index_veil" value={draft.style.indexVeil} />
+      <input type="hidden" name="site_hero_zoom" value={draft.style.heroZoom} />
       {draft.style.heroGray && <input type="hidden" name="site_hero_gray" value="on" />}
 
       <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line px-5 py-3">
@@ -387,6 +390,7 @@ export function CustomizeStudio({
               setStyle({
                 heroSeconds: siteStyleDefaults.heroSeconds,
                 heroOverlay: siteStyleDefaults.heroOverlay,
+                heroZoom: siteStyleDefaults.heroZoom,
                 heroGray: siteStyleDefaults.heroGray,
               })
             }
@@ -408,6 +412,15 @@ export function CustomizeStudio({
               range={styleRanges.heroOverlay}
               hint="Darkens the media so the caption stays readable."
               onChange={(heroOverlay) => setStyle({ heroOverlay })}
+            />
+            <Slider
+              id="ui_hero_zoom"
+              label="Scroll zoom"
+              unit="%"
+              value={draft.style.heroZoom}
+              range={styleRanges.heroZoom}
+              hint="How far the hero media zooms in while you scroll down. Seen in Chrome and Edge."
+              onChange={(heroZoom) => setStyle({ heroZoom })}
             />
             <label className="flex items-center gap-2 text-sm">
               <input
@@ -468,7 +481,7 @@ export function CustomizeStudio({
                 style={draft.style}
                 viewportHeight={device === "phone" ? "620px" : "560px"}
               >
-                <NewsBar items={site.news} seconds={draft.style.heroSeconds} autoplay={autoplay} />
+                <NewsBar items={site.news} seconds={draft.style.heroSeconds} autoplay={autoplay} showClock={site.showClock} />
                 <SiteHeader brand={profile.username} home={base} items={nav} overlay />
                 <Hero
                   slides={media.hero}
@@ -479,6 +492,15 @@ export function CustomizeStudio({
                   gray={draft.style.heroGray}
                   credits={site.credits}
                 />
+                {site.intro.enabled && site.intro.headlines.length > 0 && (
+                  <Intro
+                    greetings={resolveGreetings(site.intro.greetings)}
+                    note={site.intro.note}
+                    headlines={site.intro.headlines}
+                    seconds={draft.style.heroSeconds}
+                    autoplay={autoplay}
+                  />
+                )}
                 {cards.length > 0 && (
                   <CardSlider
                     items={cards}

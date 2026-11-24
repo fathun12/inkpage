@@ -1,6 +1,7 @@
 "use server";
 
 import { z } from "zod";
+import { dayParts, type DayPart } from "@/config/intro";
 import { resolveTab, tabHref, type PagesTab } from "@/config/item-data";
 import {
   fileKey,
@@ -61,6 +62,7 @@ const textSchema = z.object({
   about_title: text("The About title", siteLimits.title),
   about_body: text("The About text", siteLimits.aboutBody),
   footer_note: text("The footer note", siteLimits.footerNote),
+  intro_note: text("The intro note", siteLimits.introNote),
 });
 
 function readNews(formData: FormData): { items: NewsItem[] } | { error: string } {
@@ -138,6 +140,7 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     about_title: field(formData, "about_title"),
     about_body: field(formData, "about_body"),
     footer_note: field(formData, "footer_note"),
+    intro_note: field(formData, "intro_note"),
   });
   if (!parsed.success) return abort(firstError(parsed.error));
   const v = parsed.data;
@@ -174,6 +177,31 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     next.hero = got("hero");
     next.indexMedia = got("index")[0] ?? null;
     next.gallery = got("gallery");
+
+    const headlines: string[] = [];
+    for (let i = 0; i < siteLimits.introHeadlines; i++) {
+      const h = field(formData, `intro_headline_${i}`);
+      if (!h) continue;
+      if (h.length > siteLimits.introHeadline) {
+        return abort(`Big sentence ${i + 1} can be at most ${siteLimits.introHeadline} characters.`);
+      }
+      headlines.push(h);
+    }
+    const greetings = {} as Record<DayPart, string | null>;
+    for (const part of dayParts) {
+      const g = field(formData, `intro_greeting_${part}`);
+      if (g && g.length > siteLimits.greeting) {
+        return abort(`A greeting can be at most ${siteLimits.greeting} characters.`);
+      }
+      greetings[part] = g ?? null;
+    }
+    next.intro = {
+      enabled: formData.get("intro_enabled") === "on",
+      greetings,
+      note: v.intro_note ?? null,
+      headlines,
+    };
+    next.showClock = formData.get("show_clock") === "on";
   }
   if (tab === "projects") next.projects = { title: v.projects_title ?? null, intro: v.projects_intro ?? null };
   if (tab === "writing") next.writing = { title: v.writing_title ?? null, intro: v.writing_intro ?? null };

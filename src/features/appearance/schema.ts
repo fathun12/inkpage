@@ -28,5 +28,6 @@ export const appearanceSchema = z.object({
   site_gallery_seconds: whole("Gallery fade time", styleRanges.seconds),
   site_hero_overlay: whole("Hero overlay", styleRanges.heroOverlay),
   site_index_veil: whole("List overlay", styleRanges.indexVeil),
+  site_hero_zoom: whole("Scroll zoom", styleRanges.heroZoom),
   site_hero_gray: z.boolean(),
 });

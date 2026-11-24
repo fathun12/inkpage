@@ -24,6 +24,7 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
     site_gallery_seconds: field(formData, "site_gallery_seconds"),
     site_hero_overlay: field(formData, "site_hero_overlay"),
     site_index_veil: field(formData, "site_index_veil"),
+    site_hero_zoom: field(formData, "site_hero_zoom"),
     site_hero_gray: formData.get("site_hero_gray") === "on",
   });
   if (!parsed.success) return redirectWithError(back, firstError(parsed.error));
@@ -41,6 +42,7 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
         gallerySeconds: v.site_gallery_seconds,
         heroOverlay: v.site_hero_overlay,
         indexVeil: v.site_index_veil,
+        heroZoom: v.site_hero_zoom,
         heroGray: v.site_hero_gray,
         colorBg: v.site_color_bg,
         colorInk: v.site_color_ink,

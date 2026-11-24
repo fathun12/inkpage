@@ -20,6 +20,7 @@ export function SiteFrame({
   const vars = {
     ...sitePalette(style),
     "--site-hero-overlay": String(style.heroOverlay / 100),
+    "--site-hero-zoom": String(style.heroZoom / 100),
     "--site-veil": `${style.indexVeil}%`,
     ...(viewportHeight ? { "--site-vh": viewportHeight } : {}),
   } as CSSProperties;
