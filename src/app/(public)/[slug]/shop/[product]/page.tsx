@@ -3,10 +3,12 @@ import { notFound } from "next/navigation";
 import { ProductDetail } from "@/components/shop/ProductDetail";
 import { routes } from "@/config/site";
 import { getProfileByUsername } from "@/features/profile/queries";
+import { startCheckoutAction } from "@/features/shop/checkout-actions";
 import { getPublicShop, legalLinks } from "@/features/shop/public";
 import { productState } from "@/lib/shop-status";
 
 type Props = { params: Promise<{ slug: string; product: string }> };
+type PageProps = Props & { searchParams: Promise<{ buy_error?: string | string[] }> };
 
 async function load(slug: string, productSlug: string) {
   const profile = await getProfileByUsername(slug.toLowerCase());
@@ -26,11 +28,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function ProductPage({ params }: Props) {
+export default async function ProductPage({ params, searchParams }: PageProps) {
   const { slug, product: productSlug } = await params;
+  const { buy_error } = await searchParams;
   const found = await load(slug, productSlug);
   if (!found) notFound();
   const { profile, shop, product } = found;
+  const rawError = Array.isArray(buy_error) ? buy_error[0] : buy_error;
 
   return (
     <ProductDetail
@@ -40,6 +44,8 @@ export default async function ProductPage({ params }: Props) {
       backLabel={shop.settings.home_title ?? "Shop"}
       links={legalLinks(shop.settings, routes.profile(profile.username))}
       email={shop.settings.contact_email}
+      action={startCheckoutAction.bind(null, profile.username, product.slug)}
+      error={rawError ? rawError.slice(0, 200) : null}
     />
   );
 }
