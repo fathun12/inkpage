@@ -482,15 +482,11 @@ export function CustomizeStudio({
                 viewportHeight={device === "phone" ? "620px" : "560px"}
               >
                 <NewsBar items={site.news} seconds={draft.style.heroSeconds} autoplay={autoplay} showClock={site.showClock} />
-                <SiteHeader brand={profile.username} home={base} items={nav} overlay />
-                <Hero
-                  slides={media.hero}
-                  name={profile.displayName}
-                  caption={site.heroCaption ?? profile.bio}
-                  seconds={draft.style.heroSeconds}
-                  autoplay={autoplay}
-                  gray={draft.style.heroGray}
-                  credits={site.credits}
+                <SiteHeader
+                  brand={profile.username}
+                  home={base}
+                  items={nav}
+                  overlay={!(site.intro.enabled && site.intro.headlines.length > 0)}
                 />
                 {site.intro.enabled && site.intro.headlines.length > 0 && (
                   <Intro
@@ -501,6 +497,15 @@ export function CustomizeStudio({
                     autoplay={autoplay}
                   />
                 )}
+                <Hero
+                  slides={media.hero}
+                  name={profile.displayName}
+                  caption={site.heroCaption ?? profile.bio}
+                  seconds={draft.style.heroSeconds}
+                  autoplay={autoplay}
+                  gray={draft.style.heroGray}
+                  credits={site.credits}
+                />
                 {cards.length > 0 && (
                   <CardSlider
                     items={cards}

@@ -54,15 +54,6 @@ export default async function HomePage({ params }: Props) {
 
   return (
     <>
-      <Hero
-        slides={media.hero}
-        name={profile.display_name}
-        caption={site.heroCaption ?? profile.bio}
-        seconds={style.heroSeconds}
-        autoplay={autoplay}
-        gray={style.heroGray}
-        credits={site.credits}
-      />
       {site.intro.enabled && site.intro.headlines.length > 0 && (
         <Intro
           greetings={resolveGreetings(site.intro.greetings)}
@@ -72,6 +63,15 @@ export default async function HomePage({ params }: Props) {
           autoplay={autoplay}
         />
       )}
+      <Hero
+        slides={media.hero}
+        name={profile.display_name}
+        caption={site.heroCaption ?? profile.bio}
+        seconds={style.heroSeconds}
+        autoplay={autoplay}
+        gray={style.heroGray}
+        credits={site.credits}
+      />
       {writing.length > 0 && (
         <CardSlider
           items={writing}

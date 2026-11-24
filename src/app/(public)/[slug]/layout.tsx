@@ -29,7 +29,12 @@ export default async function SiteLayout({ children, params }: Props) {
   return (
     <SiteFrame fonts={readFonts(profile)} style={style}>
       <NewsBar items={site.news} seconds={style.heroSeconds} autoplay={style.motion !== "off"} showClock={site.showClock} />
-      <SiteHeader brand={profile.username} home={base} items={buildNav(base, site)} />
+      <SiteHeader
+        brand={profile.username}
+        home={base}
+        items={buildNav(base, site)}
+        overlay={site.intro.enabled && site.intro.headlines.length > 0 ? false : undefined}
+      />
       {children}
       <SiteFooter brand={profile.username} note={site.footerNote} socials={socialsOf(blocks)} />
       <ViewBeacon endpoint={routes.track} username={profile.username} />
