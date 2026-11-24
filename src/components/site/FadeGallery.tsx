@@ -24,7 +24,7 @@ export function FadeGallery({ images, seconds = 6, autoplay = true }: Props) {
     <section
       id="gallery"
       aria-label="Gallery"
-      className="relative h-[calc(var(--site-vh,100svh)*0.8)] w-full overflow-hidden bg-ink"
+      className="relative h-[calc(var(--site-vh,100svh)*0.8)] w-full overflow-hidden site-black"
     >
       {images.map((src, i) => (
         <Img

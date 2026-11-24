@@ -4,6 +4,9 @@
 .site-hero {
   color: #fff;
 }
+.site-black {
+  background: #000;
+}
 .site-hero-track {
   display: flex;
   height: 100%;
@@ -38,15 +41,15 @@
 }
 
 .site-index {
-  background: var(--c-ink);
-  color: var(--c-bg);
+  background: #000;
+  color: #fff;
 }
 .site-index-light {
   background: var(--c-bg);
   color: var(--c-ink);
 }
 .site-index-veil {
-  background: color-mix(in srgb, var(--c-ink) var(--site-veil, 62%), transparent);
+  background: rgb(0 0 0 / var(--site-veil, 62%));
 }
 
 [data-reveal="rise"] {
