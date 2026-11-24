@@ -39,3 +39,7 @@ export type ArticleSaveResult =
   | { ok: true; savedAt: string; words: number; minutes: number }
   | { ok: false; error: string };
 export type SaveArticleAction = (input: ArticleDraftInput) => Promise<ArticleSaveResult>;
+
+export type ArticleImageSignInput = { kind: "image" | "cover"; type: string; size: number };
+export type ArticleImageSignResult = { path: string; token: string; url: string } | { error: string };
+export type SignArticleImageAction = (input: ArticleImageSignInput) => Promise<ArticleImageSignResult>;

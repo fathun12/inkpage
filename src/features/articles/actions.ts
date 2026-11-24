@@ -5,9 +5,11 @@ import { articleLimits } from "@/config/article";
 import { routes } from "@/config/site";
 import { requireUser } from "@/features/auth/queries";
 import {
+  collectImageUrls,
   docText,
   emptyDoc,
   excerptOf,
+  isArticleImageSrc,
   isUuid,
   readingMinutes,
   sanitizeDoc,
@@ -17,8 +19,15 @@ import {
 import { redirectWithError, redirectWithSaved } from "@/lib/flash";
 import { createClient } from "@/lib/supabase/server";
 import { firstError } from "@/lib/validation";
-import type { ArticleDraftInput, ArticleSaveResult, DocNode } from "@/types/article";
+import type {
+  ArticleDraftInput,
+  ArticleImageSignInput,
+  ArticleImageSignResult,
+  ArticleSaveResult,
+  DocNode,
+} from "@/types/article";
 import { draftSchema, parseWhen, publishSchema } from "./schema";
+import { signArticleImage, sweepArticleImages } from "./upload";
 
 type DbError = { code?: string; message: string };
 
@@ -32,7 +41,7 @@ function dbMessage(error: DbError): string {
 type Prepared = { doc: DocNode; text: string; words: number; minutes: number };
 
 // The browser's document is never trusted: it is size checked, then rebuilt from the allowed parts only.
-function prepareContent(raw: unknown): Prepared | { error: string } {
+function prepareContent(raw: unknown, userId: string): Prepared | { error: string } {
   let size = 0;
   try {
     size = JSON.stringify(raw ?? null).length;
@@ -42,7 +51,7 @@ function prepareContent(raw: unknown): Prepared | { error: string } {
   if (size > articleLimits.contentChars) {
     return { error: `The article is too long (limit ${articleLimits.contentChars.toLocaleString("en-US")} characters of data).` };
   }
-  const doc = sanitizeDoc(raw);
+  const doc = sanitizeDoc(raw, userId);
   const text = docText(doc);
   const words = wordCount(text);
   return { doc, text, words, minutes: readingMinutes(words) };
@@ -69,7 +78,7 @@ export async function saveArticleAction(id: string, input: ArticleDraftInput): P
 
   const parsed = draftSchema.safeParse({ title: String(input?.title ?? ""), subtitle: String(input?.subtitle ?? "") });
   if (!parsed.success) return { ok: false, error: firstError(parsed.error) };
-  const prepared = prepareContent(input?.content);
+  const prepared = prepareContent(input?.content, user.id);
   if ("error" in prepared) return { ok: false, error: prepared.error };
 
   const savedAt = new Date().toISOString();
@@ -86,9 +95,11 @@ export async function saveArticleAction(id: string, input: ArticleDraftInput): P
     })
     .eq("id", id)
     .eq("user_id", user.id)
-    .select("id");
+    .select("id, cover_url");
   if (error) return { ok: false, error: dbMessage(error) };
   if (!data || data.length === 0) return { ok: false, error: "This article no longer exists." };
+  const cover = (data[0] as unknown as { cover_url: string | null }).cover_url;
+  await sweepArticleImages(user.id, id, [...collectImageUrls(prepared.doc), ...(cover ? [cover] : [])]);
   return { ok: true, savedAt, words: prepared.words, minutes: prepared.minutes };
 }
 
@@ -114,9 +125,14 @@ export async function publishArticleAction(id: string, formData: FormData): Prom
   } catch {
     return redirectWithError(back, "The article text could not be read. Reload the editor and try again.");
   }
-  const prepared = prepareContent(raw);
+  const prepared = prepareContent(raw, user.id);
   if ("error" in prepared) return redirectWithError(back, prepared.error);
   if (prepared.words === 0) return redirectWithError(back, "Write something in the article before publishing.");
+
+  const coverField = String(formData.get("cover_url") ?? "").trim();
+  if (coverField !== "" && !(isArticleImageSrc(coverField, user.id) && coverField.includes(`/articles/${id}/`))) {
+    return redirectWithError(back, "The cover picture is not valid. Pick it again.");
+  }
 
   const supabase = await createClient();
   const { data: current, error: readError } = await supabase
@@ -149,6 +165,7 @@ export async function publishArticleAction(id: string, formData: FormData): Prom
       excerpt: excerptOf(prepared.text) || null,
       reading_minutes: prepared.minutes,
       slug: parsed.data.slug,
+      cover_url: coverField || null,
       status: "published",
       published_at: publishedAt.toISOString(),
       updated_at: now.toISOString(),
@@ -164,6 +181,7 @@ export async function publishArticleAction(id: string, formData: FormData): Prom
     );
   }
 
+  await sweepArticleImages(user.id, id, [...collectImageUrls(prepared.doc), ...(coverField ? [coverField] : [])]);
   const message =
     publishedAt.getTime() > now.getTime() ? "Scheduled." : current.status === "published" ? "Updated." : "Published.";
   return redirectWithSaved(back, message);
@@ -192,5 +210,13 @@ export async function deleteArticleAction(id: string): Promise<void> {
   const { data, error } = await supabase.from("articles").delete().eq("id", id).eq("user_id", user.id).select("id");
   if (error) return redirectWithError(routes.writeEdit(id), dbMessage(error));
   if (!data || data.length === 0) return redirectWithError(routes.write, "This article no longer exists.");
+  await sweepArticleImages(user.id, id, [], 0);
   return redirectWithSaved(routes.write, "Article deleted.");
+}
+
+// Gives the browser permission to upload ONE picture of this article straight to Storage.
+export async function signArticleImageAction(id: string, input: ArticleImageSignInput): Promise<ArticleImageSignResult> {
+  const user = await requireUser();
+  if (!isUuid(id)) return { error: "This article address is not valid." };
+  return signArticleImage(user.id, id, input);
 }

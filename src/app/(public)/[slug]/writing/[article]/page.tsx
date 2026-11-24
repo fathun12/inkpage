@@ -38,6 +38,7 @@ export default async function ArticlePage({ params }: Props) {
       subtitle={article.subtitle}
       publishedAt={article.published_at}
       minutes={article.reading_minutes}
+      cover={article.cover_url}
       doc={article.content}
       back={routes.section(profile.username, "writing")}
       backLabel={site.writing.title ?? "Writing"}

@@ -5,6 +5,7 @@ import {
   deleteArticleAction,
   publishArticleAction,
   saveArticleAction,
+  signArticleImageAction,
   unpublishArticleAction,
 } from "@/features/articles/actions";
 import { getOwnArticle } from "@/features/articles/queries";
@@ -45,11 +46,13 @@ export default async function WriteEditPage({ params, searchParams }: Props) {
         status: article.status,
         state: article.state,
         slug: article.slug,
+        cover: article.cover_url,
       }}
       username={profile.username}
       backHref={routes.write}
       viewHref={article.state === "live" && article.slug ? routes.article(profile.username, article.slug) : null}
       save={saveArticleAction.bind(null, article.id)}
+      signImage={signArticleImageAction.bind(null, article.id)}
       publish={publishArticleAction.bind(null, article.id)}
       unpublish={unpublishArticleAction.bind(null, article.id)}
       remove={deleteArticleAction.bind(null, article.id)}

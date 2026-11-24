@@ -115,3 +115,42 @@
 .article-prose[data-indent="true"] > p {
   text-indent: 1.75em;
 }
+
+/* Pictures: one per line, full column width, optional caption. The editor and the reader share this. */
+.article-prose figure {
+  margin-top: 2em;
+  margin-bottom: 2em;
+}
+
+.article-prose figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: var(--c-surface);
+}
+
+.article-prose figure figcaption,
+.article-prose figure input {
+  margin-top: 0.6rem;
+  text-align: center;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--c-ink-soft);
+}
+
+.article-prose figure input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  outline: none;
+}
+
+.article-prose figure input::placeholder {
+  color: var(--c-ink-soft);
+  opacity: 0.7;
+}
+
+.article-prose figure.is-selected img {
+  outline: 2px solid var(--c-ink);
+  outline-offset: 2px;
+}

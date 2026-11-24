@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { isSafeHref } from "@/lib/article-doc";
+import { Img } from "@/components/ui/Img";
+import { isArticleImageSrc, isSafeHref } from "@/lib/article-doc";
 import type { DocMark, DocNode } from "@/types/article";
 
 function wrap(node: ReactNode, mark: DocMark, key: string): ReactNode {
@@ -52,6 +53,17 @@ function renderNode(node: DocNode, key: string): ReactNode {
     }
     case "listItem":
       return <li key={key}>{kids()}</li>;
+    case "image": {
+      const src = node.attrs?.src;
+      if (!isArticleImageSrc(src)) return null;
+      const caption = typeof node.attrs?.caption === "string" ? node.attrs.caption : "";
+      return (
+        <figure key={key}>
+          <Img src={src} />
+          {caption && <figcaption>{caption}</figcaption>}
+        </figure>
+      );
+    }
     case "horizontalRule":
       return <hr key={key} />;
     case "hardBreak":

@@ -44,7 +44,7 @@ function Divider() {
 }
 
 // The menu over selected text, and the menu on an empty line.
-export function EditorMenus({ editor }: { editor: Editor }) {
+export function EditorMenus({ editor, onPickImage }: { editor: Editor; onPickImage: () => void }) {
   const [linkOpen, setLinkOpen] = useState(false);
   const [href, setHref] = useState("");
   const [linkError, setLinkError] = useState(false);
@@ -93,6 +93,7 @@ export function EditorMenus({ editor }: { editor: Editor }) {
     { label: "Quote", run: () => editor.chain().focus().toggleBlockquote().run() },
     { label: "List", title: "Bulleted list", run: () => editor.chain().focus().toggleBulletList().run() },
     { label: "1. List", title: "Numbered list", run: () => editor.chain().focus().toggleOrderedList().run() },
+    { label: "Image", title: "Insert picture", run: onPickImage },
     { label: "* * *", title: "Divider", run: () => editor.chain().focus().setHorizontalRule().run() },
   ];
 

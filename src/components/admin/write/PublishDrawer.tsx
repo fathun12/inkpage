@@ -1,12 +1,17 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import { Button } from "@/components/ui/Button";
 import { Field, Input } from "@/components/ui/Field";
+import { Img } from "@/components/ui/Img";
 import { SubmitButton } from "@/components/ui/SubmitButton";
+import { articleImages } from "@/config/article";
+import { mediaConfig } from "@/config/media";
 import { siteConfig } from "@/config/site";
 import { slugify } from "@/lib/article-doc";
-import type { ArticleStatus } from "@/types/article";
+import { prepareCover } from "@/lib/article-image";
+import { uploadToSignedPath } from "@/lib/direct-upload";
+import type { ArticleStatus, SignArticleImageAction } from "@/types/article";
 import type { FormAction } from "@/types/form";
 
 // What the editor had when the drawer opened. It travels inside the form, so Publish saves the latest text too.
@@ -16,6 +21,8 @@ type Props = {
   snapshot: DrawerSnapshot;
   status: ArticleStatus;
   slug: string | null;
+  cover: string | null;
+  signImage: SignArticleImageAction;
   username: string;
   viewHref: string | null;
   publish: FormAction;
@@ -24,8 +31,53 @@ type Props = {
   onClose: () => void;
 };
 
-export function PublishDrawer({ snapshot, status, slug, username, viewHref, publish, unpublish, remove, onClose }: Props) {
+export function PublishDrawer({
+  snapshot,
+  status,
+  slug,
+  cover: startCover,
+  signImage,
+  username,
+  viewHref,
+  publish,
+  unpublish,
+  remove,
+  onClose,
+}: Props) {
   const published = status === "published";
+  const [cover, setCover] = useState<string | null>(startCover);
+  const [coverStatus, setCoverStatus] = useState<{ text: string; error: boolean } | null>(null);
+
+  // Cuts the picture to 2:1 in the browser and uploads it straight to Storage. Publish or Update saves the address.
+  async function onCover(e: ChangeEvent<HTMLInputElement>) {
+    const input = e.currentTarget;
+    const file = input.files?.[0];
+    input.value = "";
+    if (!file) return;
+    setCoverStatus({ text: "Preparing cover...", error: false });
+    const prepared = await prepareCover(file);
+    if ("error" in prepared) {
+      setCoverStatus({ text: prepared.error, error: true });
+      return;
+    }
+    let sign: Awaited<ReturnType<SignArticleImageAction>>;
+    try {
+      sign = await signImage({ kind: "cover", type: prepared.file.type, size: prepared.file.size });
+    } catch {
+      sign = { error: "Could not reach the server. Check your connection." };
+    }
+    if ("error" in sign) {
+      setCoverStatus({ text: sign.error, error: true });
+      return;
+    }
+    const failure = await uploadToSignedPath(mediaConfig.bucket, sign.path, sign.token, prepared.file);
+    if (failure) {
+      setCoverStatus({ text: `Upload failed: ${failure}`, error: true });
+      return;
+    }
+    setCover(sign.url);
+    setCoverStatus({ text: "Cover ready. Press Publish or Update to keep it.", error: false });
+  }
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -58,6 +110,35 @@ export function PublishDrawer({ snapshot, status, slug, username, viewHref, publ
               <Input id="article-slug" name="slug" defaultValue={slug ?? slugify(snapshot.title)} maxLength={80} />
             </div>
           </Field>
+
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium text-ink-soft">Cover picture</span>
+            <input type="hidden" name="cover_url" value={cover ?? ""} />
+            {cover ? (
+              <Img src={cover} className="ink-border aspect-[2/1] w-full rounded-sm bg-surface object-cover" />
+            ) : (
+              <div className="ink-border flex aspect-[2/1] w-full items-center justify-center rounded-sm bg-surface text-sm text-ink-soft">
+                No cover
+              </div>
+            )}
+            <div className="flex flex-wrap items-center gap-4">
+              <label className="cursor-pointer text-sm underline underline-offset-4">
+                {cover ? "Replace" : "Add a cover"}
+                <input type="file" accept={articleImages.accept} onChange={onCover} className="sr-only" />
+              </label>
+              {cover && (
+                <button type="button" onClick={() => setCover(null)} className="text-sm underline underline-offset-4">
+                  Remove
+                </button>
+              )}
+            </div>
+            <p className="text-xs text-ink-soft">Cut to 2:1 from the middle of the picture. Saved with Publish or Update.</p>
+            {coverStatus && (
+              <p role="status" className={coverStatus.error ? "text-xs text-accent" : "font-mono text-xs text-ink-soft"}>
+                {coverStatus.text}
+              </p>
+            )}
+          </div>
 
           <fieldset className="flex flex-col gap-2">
             <legend className="mb-1 text-sm font-medium text-ink-soft">When</legend>

@@ -1,32 +1,47 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type ChangeEvent } from "react";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import { EditorContent, useEditor, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Button } from "@/components/ui/Button";
 import { FlashNotice } from "@/components/ui/FlashNotice";
-import { articleConfig, articleLimits } from "@/config/article";
+import { articleConfig, articleImages, articleLimits } from "@/config/article";
+import { mediaConfig } from "@/config/media";
 import { readingMinutes, wordCount } from "@/lib/article-doc";
+import { imageFiles, prepareArticleImage } from "@/lib/article-image";
+import { uploadToSignedPath } from "@/lib/direct-upload";
+import { cleanPastedHtml } from "@/lib/paste-word";
 import type {
   ArticleSaveResult,
   ArticleState,
   ArticleStatus,
   DocNode,
   SaveArticleAction,
+  SignArticleImageAction,
 } from "@/types/article";
 import type { FormAction } from "@/types/form";
+import { ArticleImage } from "./ArticleImage";
 import { EditorMenus } from "./EditorMenus";
 import { PublishDrawer, type DrawerSnapshot } from "./PublishDrawer";
 
 type SaveState = { kind: "saved" } | { kind: "dirty" } | { kind: "saving" } | { kind: "error"; message: string };
 
 type Props = {
-  initial: { title: string; subtitle: string; doc: DocNode; status: ArticleStatus; state: ArticleState; slug: string | null };
+  initial: {
+    title: string;
+    subtitle: string;
+    doc: DocNode;
+    status: ArticleStatus;
+    state: ArticleState;
+    slug: string | null;
+    cover: string | null;
+  };
   username: string;
   backHref: string;
   viewHref: string | null;
   save: SaveArticleAction;
+  signImage: SignArticleImageAction;
   publish: FormAction;
   unpublish: FormAction;
   remove: FormAction;
@@ -66,7 +81,7 @@ function AutoTextarea({ value, onChange, onEnter }: AutoProps) {
   );
 }
 
-export function ArticleEditor({ initial, username, backHref, viewHref, save, publish, unpublish, remove, notice }: Props) {
+export function ArticleEditor({ initial, username, backHref, viewHref, save, signImage, publish, unpublish, remove, notice }: Props) {
   const published = initial.status === "published";
   const [title, setTitle] = useState(initial.title);
   const [subtitle, setSubtitle] = useState(initial.subtitle);
@@ -86,6 +101,10 @@ export function ArticleEditor({ initial, username, backHref, viewHref, save, pub
   const startIndent = initial.doc.attrs?.indent === true;
   const [indent, setIndent] = useState(startIndent);
   const indentRef = useRef(startIndent);
+
+  const [imageStatus, setImageStatus] = useState<{ text: string; error: boolean } | null>(null);
+  const fileInput = useRef<HTMLInputElement>(null);
+  const imagesRef = useRef<(files: File[]) => void>(() => {});
 
   // The article's own setting (first line indented or not) travels inside the saved document.
   const docOf = useCallback((ed: Editor): DocNode => {
@@ -152,12 +171,30 @@ export function ArticleEditor({ initial, username, backHref, viewHref, save, pub
         },
       }),
       Placeholder.configure({ placeholder: "Start writing..." }),
+      ArticleImage.configure({ inline: false, allowBase64: false }),
     ],
     content: initial.doc,
     editorProps: {
       attributes: { class: "article-prose", "aria-label": "Article body" },
-      // Word and web pages bring heading levels the editor does not have.
-      transformPastedHTML: (html) => html.replace(/<(\/?)h1\b/gi, "<$1h2").replace(/<(\/?)h[4-6]\b/gi, "<$1h3"),
+      // Word and web pages bring list paragraphs, heading levels and pictures the editor cannot keep.
+      transformPastedHTML: (html) => cleanPastedHtml(html),
+      // A copied picture (no text with it) or a dropped file becomes a picture in the article.
+      handlePaste: (_view, event) => {
+        const data = event.clipboardData;
+        if (!data || data.getData("text/plain").trim() !== "") return false;
+        const files = imageFiles(data.files);
+        if (files.length === 0) return false;
+        event.preventDefault();
+        imagesRef.current(files);
+        return true;
+      },
+      handleDrop: (_view, event) => {
+        const files = imageFiles(event.dataTransfer?.files);
+        if (files.length === 0) return false;
+        event.preventDefault();
+        imagesRef.current(files);
+        return true;
+      },
     },
     onUpdate: () => scheduleRef.current(),
   });
@@ -169,6 +206,61 @@ export function ArticleEditor({ initial, username, backHref, viewHref, save, pub
   useEffect(() => {
     scheduleRef.current = schedule;
   }, [schedule]);
+
+  // Shrinks each picture in the browser, uploads it straight to Storage, then puts it in the text.
+  const insertImages = useCallback(
+    async (files: File[]) => {
+      const ed = editorRef.current;
+      if (!ed) return;
+      let count = 0;
+      ed.state.doc.descendants((node) => {
+        if (node.type.name === "image") count += 1;
+        return true;
+      });
+      if (count + files.length > articleImages.maxPerArticle) {
+        setImageStatus({ text: `An article can have at most ${articleImages.maxPerArticle} pictures.`, error: true });
+        return;
+      }
+      for (const [i, file] of files.entries()) {
+        setImageStatus({ text: `Uploading picture ${i + 1} of ${files.length}...`, error: false });
+        const prepared = await prepareArticleImage(file);
+        if ("error" in prepared) {
+          setImageStatus({ text: prepared.error, error: true });
+          return;
+        }
+        let sign: Awaited<ReturnType<SignArticleImageAction>>;
+        try {
+          sign = await signImage({ kind: "image", type: prepared.file.type, size: prepared.file.size });
+        } catch {
+          sign = { error: "Could not reach the server. Check your connection." };
+        }
+        if ("error" in sign) {
+          setImageStatus({ text: sign.error, error: true });
+          return;
+        }
+        const failure = await uploadToSignedPath(mediaConfig.bucket, sign.path, sign.token, prepared.file);
+        if (failure) {
+          setImageStatus({ text: `Upload failed: ${failure}`, error: true });
+          return;
+        }
+        ed.chain().focus().setImage({ src: sign.url }).run();
+      }
+      setImageStatus(null);
+    },
+    [signImage],
+  );
+
+  useEffect(() => {
+    imagesRef.current = (files) => {
+      void insertImages(files);
+    };
+  }, [insertImages]);
+
+  function onPickFiles(e: ChangeEvent<HTMLInputElement>) {
+    const files = imageFiles(e.currentTarget.files);
+    e.currentTarget.value = "";
+    if (files.length > 0) void insertImages(files);
+  }
 
   useEffect(() => {
     return () => {
@@ -245,6 +337,19 @@ export function ArticleEditor({ initial, username, backHref, viewHref, save, pub
             <span className={saveState.kind === "error" ? "text-accent" : undefined} role="status">
               {statusText}
             </span>
+            {imageStatus &&
+              (imageStatus.error ? (
+                <button
+                  type="button"
+                  onClick={() => setImageStatus(null)}
+                  title="Dismiss"
+                  className="text-accent underline underline-offset-4"
+                >
+                  {imageStatus.text}
+                </button>
+              ) : (
+                <span role="status">{imageStatus.text}</span>
+              ))}
             {saveState.kind === "error" && (
               <Button size="sm" onClick={() => void flush()}>
                 Retry
@@ -306,7 +411,16 @@ export function ArticleEditor({ initial, username, backHref, viewHref, save, pub
         />
         <div className="relative mt-8" data-indent={indent ? "true" : undefined}>
           <EditorContent editor={editor} />
-          {editor && <EditorMenus editor={editor} />}
+          {editor && <EditorMenus editor={editor} onPickImage={() => fileInput.current?.click()} />}
+          <input
+            ref={fileInput}
+            type="file"
+            accept={articleImages.accept}
+            multiple
+            className="hidden"
+            aria-label="Add pictures"
+            onChange={onPickFiles}
+          />
         </div>
       </main>
 
@@ -315,6 +429,8 @@ export function ArticleEditor({ initial, username, backHref, viewHref, save, pub
           snapshot={drawer}
           status={initial.status}
           slug={initial.slug}
+          cover={initial.cover}
+          signImage={signImage}
           username={username}
           viewHref={viewHref}
           publish={publish}

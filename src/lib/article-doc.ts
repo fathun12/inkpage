@@ -1,4 +1,5 @@
-import { articleConfig, articleLimits } from "@/config/article";
+import { articleConfig, articleImages, articleLimits } from "@/config/article";
+import { mediaConfig } from "@/config/media";
 import type { ArticleState, DocMark, DocNode } from "@/types/article";
 
 export const emptyDoc: DocNode = { type: "doc", content: [{ type: "paragraph" }] };
@@ -15,6 +16,27 @@ export function isUuid(value: string): boolean {
 
 export function isSafeHref(href: unknown): href is string {
   return typeof href === "string" && href.length <= 2000 && /^(https?:\/\/|mailto:)/i.test(href.trim());
+}
+
+const bucketName = mediaConfig.bucket.replace(/[^\w-]/g, "");
+
+// A picture of an article lives in OUR bucket: .../public/<bucket>/<user>/articles/<article>/<file>.
+// With userId, it must also be that user's folder.
+export function isArticleImageSrc(src: unknown, userId?: string): src is string {
+  if (typeof src !== "string" || src.length > 500) return false;
+  const owner = userId && /^[0-9a-f-]{36}$/i.test(userId) ? userId : "[0-9a-f-]{36}";
+  const pattern = new RegExp(
+    `^https://[^/\\s]+/storage/v1/object/public/${bucketName}/${owner}/${articleImages.folder}/[0-9a-f-]{36}/(?:cover-)?[0-9a-f-]{36}\\.(?:webp|jpg|png)$`,
+    "i",
+  );
+  return pattern.test(src);
+}
+
+// Every picture address in a document (used to know which stored files are still needed).
+export function collectImageUrls(node: DocNode, out: string[] = []): string[] {
+  if (node.type === "image" && typeof node.attrs?.src === "string") out.push(node.attrs.src);
+  node.content?.forEach((child) => collectImageUrls(child, out));
+  return out;
 }
 
 // What a writer types in the link box: "example.com" becomes https://example.com. null = not a usable link.
@@ -48,7 +70,9 @@ function cleanMarks(raw: unknown): DocMark[] | undefined {
   return out.length > 0 ? out : undefined;
 }
 
-function cleanNode(raw: unknown, depth: number, budget: { nodes: number }): DocNode | null {
+type Budget = { nodes: number; images: number; userId?: string };
+
+function cleanNode(raw: unknown, depth: number, budget: Budget): DocNode | null {
   if (typeof raw !== "object" || raw === null || depth > articleLimits.depth) return null;
   budget.nodes += 1;
   if (budget.nodes > articleLimits.nodes) return null;
@@ -62,6 +86,13 @@ function cleanNode(raw: unknown, depth: number, budget: { nodes: number }): DocN
     return node;
   }
   if (typeof n.type !== "string") return null;
+  if (n.type === "image") {
+    const src = n.attrs?.src;
+    if (!isArticleImageSrc(src, budget.userId) || budget.images >= articleImages.maxPerArticle) return null;
+    budget.images += 1;
+    const caption = typeof n.attrs?.caption === "string" ? n.attrs.caption.trim().slice(0, articleLimits.caption) : "";
+    return { type: "image", attrs: caption ? { src, caption } : { src } };
+  }
   if (leafTypes.has(n.type)) return { type: n.type };
   if (!blockTypes.has(n.type)) return null;
 
@@ -83,10 +114,10 @@ function cleanNode(raw: unknown, depth: number, budget: { nodes: number }): DocN
 }
 
 // Turns anything into a safe document. Used on save and on read, so a broken row can never break a page.
-export function sanitizeDoc(raw: unknown): DocNode {
+export function sanitizeDoc(raw: unknown, userId?: string): DocNode {
   if (typeof raw !== "object" || raw === null || (raw as RawNode).type !== "doc") return emptyDoc;
   const content = (raw as RawNode).content;
-  const budget = { nodes: 0 };
+  const budget: Budget = { nodes: 0, images: 0, userId };
   const kids: DocNode[] = [];
   if (Array.isArray(content)) {
     for (const child of content) {
@@ -99,7 +130,7 @@ export function sanitizeDoc(raw: unknown): DocNode {
   return doc;
 }
 
-export const readDoc = sanitizeDoc;
+export const readDoc = (raw: unknown): DocNode => sanitizeDoc(raw);
 
 function collect(node: DocNode, out: string[]): void {
   if (node.type === "text") {
