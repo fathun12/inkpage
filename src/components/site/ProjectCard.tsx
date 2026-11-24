@@ -11,9 +11,13 @@ type Props = { block: Block; mode: "home" | "page"; first?: boolean; index?: num
 
 // One media: the frame follows the Ratio of the file. No border, no shadow, sharp corners.
 export function ItemMedia({ file, eager }: { file: ProjectFile; eager: boolean }) {
-  const fill = "site-media-reveal absolute inset-0 size-full object-cover";
+  const fill =
+    "site-media-reveal absolute inset-0 size-full object-cover transition-[scale] duration-500 ease-out group-hover/media:scale-105 motion-reduce:transition-none motion-reduce:group-hover/media:scale-100";
   return (
-    <div className="relative w-full overflow-hidden bg-surface" style={{ aspectRatio: ratioAspect[file.ratio] }}>
+    <div
+      className="group/media relative w-full overflow-hidden bg-surface"
+      style={{ aspectRatio: ratioAspect[file.ratio] }}
+    >
       {file.kind === "video" ? (
         <video
           src={file.url}
