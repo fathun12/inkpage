@@ -1,7 +1,6 @@
 import { z } from "zod";
 import { hexColor } from "@/config/background";
 import { fontIds } from "@/config/font-choices";
-import { themeNames } from "@/config/site";
 import { motionModes, styleRanges } from "@/config/site-style";
 
 const color = z
@@ -19,11 +18,11 @@ function whole(label: string, range: { min: number; max: number }) {
 }
 
 export const appearanceSchema = z.object({
-  theme: z.enum(themeNames, { error: "Pick a theme." }),
   font_heading: z.enum(fontIds, { error: "Pick a heading font." }),
   font_body: z.enum(fontIds, { error: "Pick a body font." }),
-  theme_bg: color,
-  theme_accent: color,
+  site_color_bg: color,
+  site_color_ink: color,
+  site_color_accent: color,
   site_motion: z.enum(motionModes, { error: "Pick a motion style." }),
   site_hero_seconds: whole("Hero slide time", styleRanges.seconds),
   site_gallery_seconds: whole("Gallery fade time", styleRanges.seconds),

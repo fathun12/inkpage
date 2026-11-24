@@ -40,6 +40,7 @@ export type BlockData = {
   items?: SocialItem[]; // socials
   target?: string; // countdown, ISO date
   media?: CardMedia; // link and project cards
+  home?: boolean; // item of Projects or Writing that is also shown on Home
 };
 
 export type Block = {

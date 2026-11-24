@@ -23,12 +23,15 @@ export default async function ProjectsPage({ params }: Props) {
 
   const site = readSite(profile.site);
   const rows = listBlocks(await getPublicBlocks(profile.id), "projects");
-  if (rows.length === 0) notFound();
 
   return (
     <>
       <PageIntro title={site.projects.title ?? "Projects"} intro={site.projects.intro} />
-      <IndexSection blocks={rows} mediaUrl={null} tone="light" />
+      {rows.length > 0 ? (
+        <IndexSection blocks={rows} mediaUrl={null} tone="light" />
+      ) : (
+        <p className="mx-auto max-w-5xl px-5 pb-24 text-ink-soft sm:px-8">Nothing here yet.</p>
+      )}
     </>
   );
 }

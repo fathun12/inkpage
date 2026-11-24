@@ -1,6 +1,72 @@
 /* site.css: layout and motion of the public website. Colors come from the theme.
    Motion is set on the page wrapper: data-motion = full, subtle or off (Customize studio). */
 
+/* Header: a normal bar. On Home, at the very top, it is transparent over the hero and the brand is big. */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  height: 3.75rem;
+  background: var(--c-bg);
+  color: var(--c-ink);
+  border-bottom: 1px solid var(--c-line);
+  transition:
+    background-color 700ms var(--ease-out),
+    border-color 700ms var(--ease-out),
+    color 700ms var(--ease-out);
+}
+.site-header[data-overlay] {
+  margin-bottom: -3.75rem;
+}
+.site-header[data-overlay][data-top] {
+  background: transparent;
+  border-bottom-color: transparent;
+  color: #fff;
+}
+.site-brand {
+  position: absolute;
+  left: 1.25rem;
+  top: 1.125rem;
+  font-size: 1.5rem;
+  line-height: 1;
+  white-space: nowrap;
+  transition:
+    font-size 800ms var(--ease-out),
+    top 800ms var(--ease-out);
+}
+.site-header[data-overlay][data-top] .site-brand {
+  top: 3.5rem;
+  font-size: clamp(2.75rem, 9vw, 7rem);
+}
+.site-nav {
+  position: absolute;
+  top: 0;
+  right: 1.25rem;
+  display: flex;
+  height: 100%;
+  align-items: center;
+  gap: 1.25rem;
+  font-size: 0.875rem;
+}
+@media (min-width: 40rem) {
+  .site-brand {
+    left: 2rem;
+  }
+  .site-nav {
+    right: 2rem;
+    gap: 1.5rem;
+  }
+  .site-header[data-overlay][data-top] .site-brand {
+    top: 0.75rem;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-header,
+  .site-brand {
+    transition-duration: 0.01ms;
+  }
+}
+
 .site-hero {
   color: #fff;
 }

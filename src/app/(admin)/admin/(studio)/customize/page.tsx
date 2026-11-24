@@ -3,11 +3,10 @@ import { redirect } from "next/navigation";
 import { CustomizeStudio } from "@/components/admin/CustomizeStudio";
 import { FlashNotice } from "@/components/ui/FlashNotice";
 import { readBackground } from "@/config/background";
-import { readCustomTheme } from "@/config/custom-theme";
 import { readFonts } from "@/config/font-choices";
 import { readSite } from "@/config/site-content";
 import { readSiteStyle } from "@/config/site-style";
-import { resolveTheme, routes, themeLabels, themeNames } from "@/config/site";
+import { routes } from "@/config/site";
 import { updateAppearanceAction } from "@/features/appearance/actions";
 import { requireUser } from "@/features/auth/queries";
 import { getPublicBlocks } from "@/features/blocks/queries";
@@ -18,8 +17,6 @@ import { buildNav, listBlocks, resolveHomeMedia, socialsOf } from "@/lib/site-vi
 export const metadata: Metadata = { title: "Customize" };
 
 type Props = { searchParams: Promise<{ error?: string; saved?: string; t?: string }> };
-
-const themes = themeNames.map((name) => ({ name, label: themeLabels[name] }));
 
 export default async function CustomizePage({ searchParams }: Props) {
   const { error, saved, t } = await searchParams;
@@ -43,16 +40,13 @@ export default async function CustomizePage({ searchParams }: Props) {
       key={t ?? "initial"}
       action={updateAppearanceAction}
       profile={{ username: profile.username, displayName: profile.display_name, bio: profile.bio }}
-      theme={resolveTheme(profile.theme)}
-      customTheme={readCustomTheme(profile)}
       fonts={readFonts(profile)}
       style={readSiteStyle(profile.site_style)}
       site={site}
       media={resolveHomeMedia(site, readBackground(profile), blocks)}
       rows={listBlocks(blocks, "home").slice(0, 6)}
       socials={socialsOf(blocks)}
-      nav={buildNav(base, site, blocks)}
-      themes={themes}
+      nav={buildNav(base, site)}
       notice={notice}
     />
   );

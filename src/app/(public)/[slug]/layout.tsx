@@ -5,11 +5,10 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteFrame } from "@/components/site/SiteFrame";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { ViewBeacon } from "@/components/ui/ViewBeacon";
-import { readCustomTheme } from "@/config/custom-theme";
 import { readFonts } from "@/config/font-choices";
 import { readSite } from "@/config/site-content";
 import { readSiteStyle } from "@/config/site-style";
-import { resolveTheme, routes } from "@/config/site";
+import { routes } from "@/config/site";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
 import { buildNav, socialsOf } from "@/lib/site-view";
@@ -28,14 +27,9 @@ export default async function SiteLayout({ children, params }: Props) {
   const base = routes.profile(profile.username);
 
   return (
-    <SiteFrame
-      theme={resolveTheme(profile.theme)}
-      customTheme={readCustomTheme(profile)}
-      fonts={readFonts(profile)}
-      style={style}
-    >
+    <SiteFrame fonts={readFonts(profile)} style={style}>
       <NewsBar items={site.news} seconds={style.heroSeconds} autoplay={style.motion !== "off"} />
-      <SiteHeader brand={profile.username} home={base} items={buildNav(base, site, blocks)} />
+      <SiteHeader brand={profile.username} home={base} items={buildNav(base, site)} />
       {children}
       <SiteFooter brand={profile.username} note={site.footerNote} socials={socialsOf(blocks)} />
       <ViewBeacon endpoint={routes.track} username={profile.username} />

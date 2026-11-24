@@ -15,6 +15,7 @@ export function AdminShell({ username, logoutAction, children }: Props) {
           <nav className="flex flex-wrap gap-1" aria-label="Admin">
             <NavLink href={routes.admin} exact>Overview</NavLink>
             <NavLink href={routes.links}>Links</NavLink>
+            <NavLink href={routes.pages}>Pages</NavLink>
             <NavLink href={routes.profileEdit}>Profile</NavLink>
             <NavLink href={routes.analytics}>Analytics</NavLink>
           </nav>

@@ -18,6 +18,7 @@ export const blockSchema = z
   .object({
     type: z.enum(blockTypes, { error: "Pick a block type." }),
     page: z.enum(blockPages, { error: "Pick a page." }),
+    home: z.boolean(),
     title: z
       .string({ error: "Title is required." })
       .trim()
@@ -95,6 +96,7 @@ export function parseBlockForm(formData: FormData) {
   return blockSchema.safeParse({
     type: field(formData, "type"),
     page: field(formData, "page") ?? "home",
+    home: formData.get("home") === "on",
     title: field(formData, "title"),
     url: field(formData, "url"),
     body: field(formData, "body"),

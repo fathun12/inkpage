@@ -14,7 +14,9 @@ export function mediaKind(url: string): MediaKind {
 // Links, projects and headers shown on one page.
 export function listBlocks(blocks: Block[], page: BlockPage): Block[] {
   return blocks.filter(
-    (b) => (b.type === "link" || b.type === "project" || b.type === "header") && resolvePage(b.page) === page,
+    (b) =>
+      (b.type === "link" || b.type === "project" || b.type === "header") &&
+      (resolvePage(b.page) === page || (page === "home" && b.data.home === true)),
   );
 }
 
@@ -23,15 +25,11 @@ export function socialsOf(blocks: Block[]): SocialItem[] {
 }
 
 // The menu: a page shows up once it has content.
-export function buildNav(base: string, site: SiteSettings, blocks: Block[]) {
+export function buildNav(base: string, site: SiteSettings) {
   return [
     { label: "Home", href: base },
-    ...(listBlocks(blocks, "projects").length > 0
-      ? [{ label: site.projects.title ?? "Projects", href: `${base}/projects` }]
-      : []),
-    ...(listBlocks(blocks, "writing").length > 0
-      ? [{ label: site.writing.title ?? "Writing", href: `${base}/writing` }]
-      : []),
+    { label: site.projects.title ?? "Projects", href: `${base}/projects` },
+    { label: site.writing.title ?? "Writing", href: `${base}/writing` },
     ...(hasAbout(site) ? [{ label: site.about.title ?? "About", href: `${base}/about` }] : []),
   ];
 }

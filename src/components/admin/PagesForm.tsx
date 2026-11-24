@@ -43,7 +43,7 @@ function PageTextFields({ prefix, name, value }: { prefix: "projects" | "writing
         <Textarea id={`${prefix}_intro`} name={`${prefix}_intro`} defaultValue={value.intro ?? ""} rows={3} maxLength={siteLimits.intro} />
       </Field>
       <p className="text-xs text-ink-soft">
-        What shows on this page is set under Links, with &quot;Show on page&quot;. The page appears in the menu once it has an item.
+        The items of this page are added in the &quot;Projects items&quot; and &quot;Writing items&quot; sections at the top of this screen.
       </p>
     </>
   );

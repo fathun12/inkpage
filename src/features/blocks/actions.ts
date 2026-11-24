@@ -17,6 +17,11 @@ import type { Block, BlockData, CardMedia } from "@/types/block";
 import { parseBlockForm, parseMediaSettings, type BlockInput } from "./schema";
 
 const back = routes.links;
+
+// Forms on the Pages screen send return_to=pages, so they come back there and not to Links.
+function backOf(formData: FormData): string {
+  return formData.get("return_to") === "pages" ? routes.pages : back;
+}
 const galleryEmpty = "A gallery needs at least one image.";
 const galleryFull = `A gallery can hold up to ${mediaConfig.maxGallery} images.`;
 
@@ -82,6 +87,8 @@ function toRow(v: BlockInput, imageUrl: string | null, images: string[], media: 
   if (v.type === "countdown") data.target = localInputToIso(v.target) ?? undefined;
   // The media comes from planMedia, so saving a block never drops it.
   if (hasImage && media) data.media = media;
+  // "Also show on Home": used by the items of Projects and Writing.
+  if (hasImage && v.home) data.home = true;
 
   return {
     type: v.type,
@@ -98,6 +105,7 @@ function toRow(v: BlockInput, imageUrl: string | null, images: string[], media: 
 
 export async function createBlockAction(formData: FormData): Promise<void> {
   const user = await requireUser();
+  const back = backOf(formData);
   const parsed = parseBlockForm(formData);
   if (!parsed.success) return redirectWithError(back, firstError(parsed.error));
   const v = parsed.data;
@@ -142,6 +150,7 @@ export async function createBlockAction(formData: FormData): Promise<void> {
 
 export async function updateBlockAction(formData: FormData): Promise<void> {
   const user = await requireUser();
+  const back = backOf(formData);
   const id = field(formData, "id");
   if (!id) return redirectWithError(back, "Missing block.");
   const parsed = parseBlockForm(formData);
@@ -211,6 +220,7 @@ export async function updateBlockAction(formData: FormData): Promise<void> {
 
 export async function deleteBlockAction(formData: FormData): Promise<void> {
   const user = await requireUser();
+  const back = backOf(formData);
   const id = field(formData, "id");
   if (!id) return redirectWithError(back, "Missing block.");
 
@@ -238,6 +248,7 @@ export async function deleteBlockAction(formData: FormData): Promise<void> {
 
 export async function reorderBlocksAction(formData: FormData): Promise<void> {
   const user = await requireUser();
+  const back = backOf(formData);
   const order = (field(formData, "order") ?? "").split(",").filter(Boolean);
 
   const supabase = await createClient();
@@ -305,6 +316,7 @@ const flagSchema = z.object({
 
 export async function setBlockFlagAction(formData: FormData): Promise<void> {
   const user = await requireUser();
+  const back = backOf(formData);
   const parsed = flagSchema.safeParse({
     id: field(formData, "id"),
     flag: field(formData, "flag"),

@@ -11,7 +11,6 @@ import { SiteFrame } from "@/components/site/SiteFrame";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import { Field } from "@/components/ui/Field";
 import { SubmitButton } from "@/components/ui/SubmitButton";
-import { customThemeDefaults, type CustomTheme } from "@/config/custom-theme";
 import {
   defaultFont,
   fontChoices,
@@ -30,18 +29,15 @@ import {
   type MotionMode,
   type SiteStyle,
 } from "@/config/site-style";
-import { resolveTheme, routes, siteConfig, type ThemeName } from "@/config/site";
+import { routes } from "@/config/site";
 import type { HomeMedia } from "@/lib/site-view";
 import { cn } from "@/lib/utils";
 import type { Block, SocialItem } from "@/types/block";
 import type { FormAction } from "@/types/form";
-import { ThemePicker } from "./ThemePicker";
 
 type Props = {
   action: FormAction;
   profile: { username: string; displayName: string; bio: string | null };
-  theme: ThemeName;
-  customTheme: CustomTheme;
   fonts: FontPair;
   style: SiteStyle;
   site: SiteSettings;
@@ -49,14 +45,10 @@ type Props = {
   rows: Block[];
   socials: SocialItem[];
   nav: { label: string; href: string }[];
-  themes: { name: string; label: string }[];
   notice?: ReactNode;
 };
 
 type Draft = {
-  theme: ThemeName;
-  themeBg: string;
-  themeAccent: string;
   fontHeading: FontId;
   fontBody: FontId;
   style: SiteStyle;
@@ -207,8 +199,6 @@ function FontPicker({
 export function CustomizeStudio({
   action,
   profile,
-  theme,
-  customTheme,
   fonts,
   style,
   site,
@@ -216,13 +206,9 @@ export function CustomizeStudio({
   rows,
   socials,
   nav,
-  themes,
   notice,
 }: Props) {
   const [initial] = useState<Draft>(() => ({
-    theme,
-    themeBg: customTheme.bg,
-    themeAccent: customTheme.accent,
     fontHeading: fonts.heading,
     fontBody: fonts.body,
     style,
@@ -250,9 +236,9 @@ export function CustomizeStudio({
   return (
     <form action={action} className="fixed inset-0 z-40 flex flex-col overflow-hidden bg-bg">
       {/* The sidebar controls have no name. These hidden inputs are what the server receives. */}
-      <input type="hidden" name="theme" value={draft.theme} />
-      <input type="hidden" name="theme_bg" value={draft.themeBg} />
-      <input type="hidden" name="theme_accent" value={draft.themeAccent} />
+      <input type="hidden" name="site_color_bg" value={draft.style.colorBg} />
+      <input type="hidden" name="site_color_ink" value={draft.style.colorInk} />
+      <input type="hidden" name="site_color_accent" value={draft.style.colorAccent} />
       <input type="hidden" name="font_heading" value={draft.fontHeading} />
       <input type="hidden" name="font_body" value={draft.fontBody} />
       <input type="hidden" name="site_motion" value={draft.style.motion} />
@@ -313,42 +299,42 @@ export function CustomizeStudio({
             title="Colors"
             open
             onReset={() =>
-              setDraft((d) => ({
-                ...d,
-                theme: siteConfig.defaultTheme,
-                themeBg: customThemeDefaults.bg,
-                themeAccent: customThemeDefaults.accent,
-              }))
+              setStyle({
+                colorBg: siteStyleDefaults.colorBg,
+                colorInk: siteStyleDefaults.colorInk,
+                colorAccent: siteStyleDefaults.colorAccent,
+              })
             }
           >
-            <ThemePicker
-              value={draft.theme}
-              options={themes}
-              onChange={(v) => set("theme", resolveTheme(v))}
-              custom={{ bg: draft.themeBg, accent: draft.themeAccent }}
-            />
-            {draft.theme === "custom" && (
-              <div className="grid grid-cols-2 gap-4">
-                <Field label="Page color" htmlFor="ui_theme_bg" hint="White or black. Text and lines adapt to it.">
-                  <input
-                    id="ui_theme_bg"
-                    type="color"
-                    value={draft.themeBg}
-                    onChange={(e) => set("themeBg", e.target.value)}
-                    className={colorInput}
-                  />
-                </Field>
-                <Field label="Accent color" htmlFor="ui_theme_accent" hint="Numbers, lines and the active menu item.">
-                  <input
-                    id="ui_theme_accent"
-                    type="color"
-                    value={draft.themeAccent}
-                    onChange={(e) => set("themeAccent", e.target.value)}
-                    className={colorInput}
-                  />
-                </Field>
-              </div>
-            )}
+            <div className="grid grid-cols-3 gap-4">
+              <Field label="Page" htmlFor="ui_color_bg" hint="Background of every page.">
+                <input
+                  id="ui_color_bg"
+                  type="color"
+                  value={draft.style.colorBg}
+                  onChange={(e) => setStyle({ colorBg: e.target.value })}
+                  className={colorInput}
+                />
+              </Field>
+              <Field label="Text" htmlFor="ui_color_ink" hint="Text and thin lines.">
+                <input
+                  id="ui_color_ink"
+                  type="color"
+                  value={draft.style.colorInk}
+                  onChange={(e) => setStyle({ colorInk: e.target.value })}
+                  className={colorInput}
+                />
+              </Field>
+              <Field label="Accent" htmlFor="ui_color_accent" hint="Numbers and the active menu item.">
+                <input
+                  id="ui_color_accent"
+                  type="color"
+                  value={draft.style.colorAccent}
+                  onChange={(e) => setStyle({ colorAccent: e.target.value })}
+                  className={colorInput}
+                />
+              </Field>
+            </div>
           </Section>
 
           <Section
@@ -469,14 +455,12 @@ export function CustomizeStudio({
           >
             <div className="absolute inset-0 overflow-y-auto" onClickCapture={stopLinks}>
               <SiteFrame
-                theme={draft.theme}
-                customTheme={{ bg: draft.themeBg, accent: draft.themeAccent }}
                 fonts={{ heading: draft.fontHeading, body: draft.fontBody }}
                 style={draft.style}
                 viewportHeight={device === "phone" ? "620px" : "560px"}
               >
                 <NewsBar items={site.news} seconds={draft.style.heroSeconds} autoplay={autoplay} />
-                <SiteHeader brand={profile.username} home={base} items={nav} />
+                <SiteHeader brand={profile.username} home={base} items={nav} overlay />
                 <Hero
                   slides={media.hero}
                   name={profile.displayName}
