@@ -38,8 +38,8 @@ export function SiteFooter({ brand, name, bio, note, socials, nav = [], modeCont
               {hasNote && (
                 <div className="flex flex-col gap-3">
                   <p className={heading}>{pad(noteNo)} / Note</p>
-                  {name && <p className="font-display text-xl leading-tight">{name}</p>}
-                  {bio && <p className="max-w-xs whitespace-pre-line text-sm opacity-70">{bio}</p>}
+                  {name && <p className="font-display text-base font-normal leading-tight">{name}</p>}
+                  {bio && <p className="max-w-xs whitespace-pre-line text-xs opacity-70">{bio}</p>}
                   {note && <p className="max-w-xs whitespace-pre-line text-sm opacity-70">{note}</p>}
                 </div>
               )}
