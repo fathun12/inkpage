@@ -57,7 +57,6 @@ export default async function HomePage({ params }: Props) {
         gray={style.heroGray}
         credits={site.credits}
       />
-      <HomeProjects items={projects} title={site.projects.title ?? "Projects"} />
       {writing.length > 0 && (
         <CardSlider
           items={writing}
@@ -66,6 +65,7 @@ export default async function HomePage({ params }: Props) {
           autoplay={autoplay}
         />
       )}
+      <HomeProjects items={projects} title={site.projects.title ?? "Projects"} />
       {rows.length > 0 && (
         <IndexSection blocks={rows} mediaUrl={media.indexMedia} credit={creditOf(site.credits, media.indexMedia)} />
       )}

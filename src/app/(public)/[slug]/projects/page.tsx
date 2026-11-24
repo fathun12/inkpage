@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ItemGrid } from "@/components/site/ItemGrid";
 import { PageIntro } from "@/components/site/PageIntro";
+import { ProjectList } from "@/components/site/ProjectList";
 import { readSite } from "@/config/site-content";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
@@ -28,7 +28,7 @@ export default async function ProjectsPage({ params }: Props) {
     <>
       <PageIntro title={site.projects.title ?? "Projects"} intro={site.projects.intro} />
       {rows.length > 0 ? (
-        <ItemGrid blocks={rows} />
+        <ProjectList blocks={rows} mode="page" />
       ) : (
         <p className="mx-auto max-w-5xl px-5 pb-24 text-ink-soft sm:px-8">Nothing here yet.</p>
       )}

@@ -52,3 +52,8 @@ export function resolveTab(value: string | null | undefined): PagesTab {
 export function tabHref(tab: PagesTab): string {
   return `${routes.pages}?tab=${tab}`;
 }
+
+// Width of the media column of a Project card (about 4/12). Change the numbers to tune it.
+export const projectLayout = {
+  grid: "md:grid-cols-[minmax(0,4fr)_minmax(0,8fr)]",
+} as const;
