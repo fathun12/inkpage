@@ -81,6 +81,12 @@ export type SiteSettings = {
   bibliaUrl: string | null;
   bibliaTitle: string | null;
   bibliaIntro: string | null;
+  // Address of the House Showcase website (empty = no design section) and its label.
+  designsUrl: string | null;
+  designsTitle: string | null;
+  // GitHub username (empty = no GitHub section) and its label.
+  githubUser: string | null;
+  githubTitle: string | null;
   highlights: Highlight[];
   // Credit (source) text of a media, by the file name of the media.
   credits: Record<string, string>;
@@ -123,6 +129,11 @@ function creditMap(v: unknown): Record<string, string> {
     if (t && /^[\w.-]+$/.test(key)) out[key] = t;
   }
   return out;
+}
+
+// A GitHub username: letters, numbers and single hyphens, 1 to 39 characters.
+export function githubName(v: unknown): string | null {
+  return typeof v === "string" && /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$/.test(v) ? v : null;
 }
 
 function readHighlights(v: unknown): Highlight[] {
@@ -186,6 +197,10 @@ export function readSite(raw: unknown): SiteSettings {
     bibliaUrl: link(r.bibliaUrl),
     bibliaTitle: text(r.bibliaTitle, siteLimits.title),
     bibliaIntro: text(r.bibliaIntro, siteLimits.intro),
+    designsUrl: link(r.designsUrl),
+    designsTitle: text(r.designsTitle, siteLimits.title),
+    githubUser: githubName(r.githubUser),
+    githubTitle: text(r.githubTitle, siteLimits.title),
     highlights: readHighlights(r.highlights),
     credits: creditMap(r.credits),
     projects: { title: text(projects.title, siteLimits.title), intro: text(projects.intro, siteLimits.intro) },

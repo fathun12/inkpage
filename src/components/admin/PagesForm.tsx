@@ -130,6 +130,28 @@ export function HomeForm({ action, sign, site }: WithMedia) {
         </Field>
       </Section>
 
+      <Section title="Design projects" hint="Random cards from your House Showcase website, shown below Showcase.">
+        <Field
+          label="House Showcase address"
+          htmlFor="designs_url"
+          hint="For example https://house-showcase-six.vercel.app . Empty = no design section."
+        >
+          <Input id="designs_url" name="designs_url" type="url" placeholder="https://" defaultValue={site.designsUrl ?? ""} />
+        </Field>
+        <Field label="Label" htmlFor="designs_title" hint="Optional. Default: Design.">
+          <Input id="designs_title" name="designs_title" defaultValue={site.designsTitle ?? ""} maxLength={siteLimits.title} />
+        </Field>
+      </Section>
+
+      <Section title="GitHub" hint="Your profile, newest repositories and activity, shown below Biblia.">
+        <Field label="GitHub username" htmlFor="github_user" hint="For example fathun12 . Empty = no GitHub section.">
+          <Input id="github_user" name="github_user" defaultValue={site.githubUser ?? ""} maxLength={80} />
+        </Field>
+        <Field label="Label" htmlFor="github_title" hint="Optional. Default: GitHub.">
+          <Input id="github_title" name="github_title" defaultValue={site.githubTitle ?? ""} maxLength={siteLimits.title} />
+        </Field>
+      </Section>
+
       <Section title="Link list" hint="The list of links over a big media.">
         <Field label="Media behind the list" htmlFor="site-index" hint={`One item. ${mediaHint}`}>
           <SiteMediaInput slot="index" current={site.indexMedia ? [site.indexMedia] : []} max={1} sign={sign} credits={site.credits} />

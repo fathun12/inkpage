@@ -6,6 +6,8 @@ import { Hero } from "@/components/site/Hero";
 import { Intro } from "@/components/site/Intro";
 import { resolveGreetings } from "@/config/intro";
 import { HomeBiblia } from "@/components/site/HomeBiblia";
+import { HomeDesigns } from "@/components/site/HomeDesigns";
+import { HomeGithub } from "@/components/site/HomeGithub";
 import { HomeProjects } from "@/components/site/HomeProjects";
 import { HomeShowcase } from "@/components/site/HomeShowcase";
 import { IndexSection } from "@/components/site/IndexSection";
@@ -16,6 +18,8 @@ import { siteConfig } from "@/config/site";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
 import { fetchBiblia } from "@/features/site/biblia";
+import { fetchDesigns } from "@/features/site/designs";
+import { fetchGithub } from "@/features/site/github";
 import { getSiteUrl } from "@/lib/site-url";
 import { creditOf, homeProjects, homeShowcase, homeWriting, listBlocks, resolveHomeMedia } from "@/lib/site-view";
 
@@ -50,7 +54,11 @@ export default async function HomePage({ params }: Props) {
   const writing = homeWriting(blocks);
   const showcase = homeShowcase(blocks);
   const autoplay = style.motion !== "off";
-  const biblia = await fetchBiblia(site.bibliaUrl, 6);
+  const [biblia, designs, github] = await Promise.all([
+    fetchBiblia(site.bibliaUrl, 6),
+    fetchDesigns(site.designsUrl, 3),
+    fetchGithub(site.githubUser),
+  ]);
 
   return (
     <>
@@ -85,10 +93,12 @@ export default async function HomePage({ params }: Props) {
       {biblia && (
         <HomeBiblia data={biblia} title={site.bibliaTitle ?? "Biblia"} seeAll={`/${profile.username}/biblia`} />
       )}
+      {github && <HomeGithub data={github} title={site.githubTitle ?? "GitHub"} />}
       {rows.length > 0 && (
         <IndexSection blocks={rows} mediaUrl={media.indexMedia} credit={creditOf(site.credits, media.indexMedia)} />
       )}
       <HomeShowcase items={showcase} title={site.showcaseTitle ?? "Showcase"} />
+      {designs && <HomeDesigns data={designs} title={site.designsTitle ?? "Design"} />}
       <FadeGallery images={media.gallery} seconds={style.gallerySeconds} autoplay={autoplay} credits={site.credits} />
     </>
   );

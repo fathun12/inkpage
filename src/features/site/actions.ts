@@ -4,6 +4,7 @@ import { z } from "zod";
 import { resolveTab, tabHref, type PagesTab } from "@/config/item-data";
 import {
   fileKey,
+  githubName,
   readSite,
   siteLimits,
   siteMediaUrls,
@@ -54,6 +55,8 @@ const textSchema = z.object({
   showcase_title: text("The Showcase label", siteLimits.title),
   biblia_title: text("The Biblia label", siteLimits.title),
   biblia_intro: text("The Biblia text", siteLimits.intro),
+  designs_title: text("The design projects label", siteLimits.title),
+  github_title: text("The GitHub label", siteLimits.title),
   projects_title: text("The Projects title", siteLimits.title),
   projects_intro: text("The Projects text", siteLimits.intro),
   writing_title: text("The Writing title", siteLimits.title),
@@ -132,6 +135,8 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     showcase_title: field(formData, "showcase_title"),
     biblia_title: field(formData, "biblia_title"),
     biblia_intro: field(formData, "biblia_intro"),
+    designs_title: field(formData, "designs_title"),
+    github_title: field(formData, "github_title"),
     projects_title: field(formData, "projects_title"),
     projects_intro: field(formData, "projects_intro"),
     writing_title: field(formData, "writing_title"),
@@ -173,6 +178,20 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     next.bibliaUrl = biblia ? biblia.replace(/\/+$/, "") : null;
     next.bibliaTitle = v.biblia_title ?? null;
     next.bibliaIntro = v.biblia_intro ?? null;
+    const designs = field(formData, "designs_url");
+    if (designs && !isHttpUrl(designs)) return abort("The House Showcase address must start with http:// or https://");
+    next.designsUrl = designs ? designs.replace(/\/+$/, "") : null;
+    next.designsTitle = v.designs_title ?? null;
+    // A pasted address or an @ is accepted: only the username is kept.
+    const gh = field(formData, "github_user")
+      ?.replace(/^https?:\/\/(www\.)?github\.com\//i, "")
+      .replace(/^@/, "")
+      .replace(/[/?#].*$/, "");
+    if (gh && !githubName(gh)) {
+      return abort("The GitHub username can only use letters, numbers and hyphens, up to 39 characters.");
+    }
+    next.githubUser = gh ? gh : null;
+    next.githubTitle = v.github_title ?? null;
     next.hero = got("hero");
     next.indexMedia = got("index")[0] ?? null;
     next.gallery = got("gallery");
