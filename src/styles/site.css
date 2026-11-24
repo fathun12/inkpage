@@ -235,7 +235,7 @@
 @keyframes site-intro-away {
   to {
     opacity: 0;
-    transform: translateY(-14svh);
+    transform: translateX(-40vw);
   }
 }
 @supports (animation-timeline: scroll()) {
