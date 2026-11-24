@@ -32,7 +32,7 @@ export default async function PagesPage({ searchParams }: Props) {
       {error && <FlashNotice key={t} tone="error">{error}</FlashNotice>}
       {saved && <FlashNotice key={t} tone="ok">{savedText(saved)}</FlashNotice>}
       <PagesForm
-        key={t ?? "initial"}
+        key={`form-${t ?? "initial"}`}
         action={saveSiteAction}
         sign={signSiteUploadAction}
         site={readSite(profile.site)}
