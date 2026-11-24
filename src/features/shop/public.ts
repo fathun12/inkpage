@@ -5,6 +5,7 @@ import { getProfileByUsername } from "@/features/profile/queries";
 import { createClient } from "@/lib/supabase/server";
 import type { Product, ShopSettings } from "@/types/shop";
 import { emptySettings } from "./queries";
+import { expireHolds } from "./stock";
 
 function cleanProduct(row: Product): Product {
   return {
@@ -19,6 +20,8 @@ function cleanProduct(row: Product): Product {
 // What a visitor may read: the settings and the ACTIVE products. Never throws: a broken shop must not break the website.
 export const getPublicShop = cache(
   async (userId: string): Promise<{ settings: ShopSettings; products: Product[] }> => {
+    // Stock of orders whose hold ran out comes back before the shop is read.
+    await expireHolds();
     const supabase = await createClient();
     const [settings, products] = await Promise.all([
       supabase

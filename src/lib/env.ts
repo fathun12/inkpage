@@ -15,4 +15,8 @@ export const env = {
       process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
     );
   },
+  // Server only. Never give it a NEXT_PUBLIC_ name.
+  get serviceRoleKey() {
+    return need("SUPABASE_SERVICE_ROLE_KEY", process.env.SUPABASE_SERVICE_ROLE_KEY);
+  },
 };
