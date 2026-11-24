@@ -23,6 +23,8 @@ export const appearanceSchema = z.object({
   site_color_bg: color,
   site_color_ink: color,
   site_color_accent: color,
+  site_color_band: color,
+  site_color_tertiary: color,
   site_motion: z.enum(motionModes, { error: "Pick a motion style." }),
   site_hero_seconds: whole("Hero slide time", styleRanges.seconds),
   site_gallery_seconds: whole("Gallery fade time", styleRanges.seconds),

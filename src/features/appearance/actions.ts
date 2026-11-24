@@ -19,6 +19,8 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
     site_color_bg: field(formData, "site_color_bg"),
     site_color_ink: field(formData, "site_color_ink"),
     site_color_accent: field(formData, "site_color_accent"),
+    site_color_band: field(formData, "site_color_band"),
+    site_color_tertiary: field(formData, "site_color_tertiary"),
     site_motion: field(formData, "site_motion"),
     site_hero_seconds: field(formData, "site_hero_seconds"),
     site_gallery_seconds: field(formData, "site_gallery_seconds"),
@@ -47,6 +49,8 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
         colorBg: v.site_color_bg,
         colorInk: v.site_color_ink,
         colorAccent: v.site_color_accent,
+        colorBand: v.site_color_band,
+        colorTertiary: v.site_color_tertiary,
       },
     })
     .eq("id", user.id);

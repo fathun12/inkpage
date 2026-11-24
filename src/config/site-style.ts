@@ -39,9 +39,13 @@ export type SiteStyle = {
   colorBg: string;
   colorInk: string;
   colorAccent: string;
+  // Secondary: the full-width bands (news bar, GitHub, bottom of the footer).
+  colorBand: string;
+  // Tertiary: reserved. Saved and available as bg-tertiary / text-tertiary-ink, not used yet.
+  colorTertiary: string;
 };
 
-// The three colors of the website: pure white page, pure black text, one accent.
+// Primary white, secondary black, one accent, and a spare tertiary.
 export const siteStyleDefaults: SiteStyle = {
   motion: "full",
   heroSeconds: 7,
@@ -53,6 +57,8 @@ export const siteStyleDefaults: SiteStyle = {
   colorBg: "#ffffff",
   colorInk: "#000000",
   colorAccent: "#b5532f",
+  colorBand: "#000000",
+  colorTertiary: "#f2f2f2",
 };
 
 function num(v: unknown, range: Range, fallback: number): number {
@@ -79,21 +85,77 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     colorBg: color(r.colorBg, d.colorBg),
     colorInk: color(r.colorInk, d.colorInk),
     colorAccent: color(r.colorAccent, d.colorAccent),
+    colorBand: color(r.colorBand, d.colorBand),
+    colorTertiary: color(r.colorTertiary, d.colorTertiary),
   };
 }
 
-// The theme variables of the website, made from its three colors. Soft text, lines and highlights are
-// mixes of the text color and the page color. Nothing is warm or tinted unless you pick it.
-export function sitePalette(style: Pick<SiteStyle, "colorBg" | "colorInk" | "colorAccent">): CSSProperties {
+function channels(hex: string): [number, number, number] {
+  const n = parseInt(hex.slice(1), 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+// "pct" percent of a, the rest of b. Returns a hex color.
+function mix(a: string, b: string, pct: number): string {
+  const x = channels(a);
+  const y = channels(b);
+  const out = x.map((v, i) => Math.round((v * pct) / 100 + y[i] * (1 - pct / 100)));
+  return `#${out.map((v) => v.toString(16).padStart(2, "0")).join("")}`;
+}
+
+// White text on a dark color, black text on a light one.
+function onColor(hex: string): string {
+  return luminance(hex) < 0.179 ? "#ffffff" : "#000000";
+}
+
+type PaletteInput = Pick<SiteStyle, "colorBg" | "colorInk" | "colorAccent"> &
+  Partial<Pick<SiteStyle, "colorBand" | "colorTertiary">>;
+
+// Light mode: the theme variables of the website, made from its colors.
+export function sitePalette(style: PaletteInput): CSSProperties {
   const { colorBg: bg, colorInk: ink, colorAccent: accent } = style;
+  const band = style.colorBand ?? siteStyleDefaults.colorBand;
+  const tertiary = style.colorTertiary ?? siteStyleDefaults.colorTertiary;
+  const bandInk = onColor(band);
   return {
     "--c-bg": bg,
     "--c-surface": bg,
     "--c-ink": ink,
-    "--c-ink-soft": `color-mix(in srgb, ${ink} 62%, ${bg})`,
-    "--c-line": `color-mix(in srgb, ${ink} 18%, ${bg})`,
-    "--c-highlight": `color-mix(in srgb, ${ink} 8%, ${bg})`,
+    "--c-ink-soft": mix(ink, bg, 62),
+    "--c-line": mix(ink, bg, 18),
+    "--c-highlight": mix(ink, bg, 8),
     "--c-accent": accent,
-    "--c-accent-ink": luminance(accent) < 0.179 ? "#ffffff" : "#000000",
+    "--c-accent-ink": onColor(accent),
+    "--c-band": band,
+    "--c-band-ink": bandInk,
+    "--c-band-line": mix(bandInk, band, 22),
+    "--c-tertiary": tertiary,
+    "--c-tertiary-ink": onColor(tertiary),
+  } as CSSProperties;
+}
+
+// Dark mode, made from the same colors. The page turns near-black, the text takes the page color, and the
+// bands become a slightly lighter gray so they stay visible (styles/site-mode.css picks these).
+export function siteDarkPalette(style: PaletteInput): CSSProperties {
+  const { colorBg: bg, colorInk: ink, colorAccent: accent } = style;
+  const tertiary = style.colorTertiary ?? siteStyleDefaults.colorTertiary;
+  const dBg = luminance(ink) < 0.25 ? ink : "#0b0b0b";
+  const dInk = luminance(bg) > 0.5 ? bg : "#f5f5f5";
+  const dBand = mix("#ffffff", dBg, 9);
+  const dTertiary = mix(tertiary, dBg, 22);
+  return {
+    "--d-bg": dBg,
+    "--d-surface": dBg,
+    "--d-ink": dInk,
+    "--d-ink-soft": mix(dInk, dBg, 62),
+    "--d-line": mix(dInk, dBg, 18),
+    "--d-highlight": mix(dInk, dBg, 8),
+    "--d-accent": accent,
+    "--d-accent-ink": onColor(accent),
+    "--d-band": dBand,
+    "--d-band-ink": dInk,
+    "--d-band-line": mix(dInk, dBand, 20),
+    "--d-tertiary": dTertiary,
+    "--d-tertiary-ink": onColor(dTertiary),
   } as CSSProperties;
 }

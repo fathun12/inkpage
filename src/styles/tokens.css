@@ -29,6 +29,11 @@
   --color-accent: var(--c-accent);
   --color-accent-ink: var(--c-accent-ink);
   --color-highlight: var(--c-highlight);
+  --color-band: var(--c-band);
+  --color-band-ink: var(--c-band-ink);
+  --color-band-line: var(--c-band-line);
+  --color-tertiary: var(--c-tertiary);
+  --color-tertiary-ink: var(--c-tertiary-ink);
 
   /* --nf-display and --nf-body are set per public page (config/font-choices.ts).
      Without them the admin falls back to Instrument Sans. */

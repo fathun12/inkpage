@@ -46,7 +46,7 @@ export function NewsBar({ items, seconds, autoplay, showClock = false }: Props) 
   const go = (step: number) => setIndex((i) => (i + step + count) % count);
 
   return (
-    <div role="region" aria-label="News" className="bg-ink text-xs text-bg">
+    <div role="region" aria-label="News" className="border-b border-band-line bg-band text-xs text-band-ink">
       <div className="mx-auto flex h-9 max-w-6xl items-center gap-3 px-3">
         {showClock && <Clock />}
         {count > 1 ? (

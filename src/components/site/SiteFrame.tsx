@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import { defaultFonts, fontStyle, type FontPair } from "@/config/font-choices";
-import { sitePalette, siteStyleDefaults, type SiteStyle } from "@/config/site-style";
+import { sitePalette, siteDarkPalette, siteStyleDefaults, type SiteStyle } from "@/config/site-style";
 
 type Props = {
   fonts?: FontPair;
@@ -10,7 +10,7 @@ type Props = {
   children: ReactNode;
 };
 
-// Colors, fonts and motion of the public website. No width limit: sections go edge to edge.
+// Colors (light and dark), fonts and motion of the public website. No width limit: sections go edge to edge.
 export function SiteFrame({
   fonts = defaultFonts,
   style = siteStyleDefaults,
@@ -19,6 +19,7 @@ export function SiteFrame({
 }: Props) {
   const vars = {
     ...sitePalette(style),
+    ...siteDarkPalette(style),
     "--site-hero-overlay": String(style.heroOverlay / 100),
     "--site-hero-zoom": String(style.heroZoom / 100),
     "--site-veil": `${style.indexVeil}%`,
@@ -29,7 +30,7 @@ export function SiteFrame({
     <div
       data-motion={style.motion}
       style={{ ...fontStyle(fonts), ...vars }}
-      className="min-h-screen bg-bg font-body text-ink [font-synthesis-weight:none]"
+      className="site-root min-h-screen bg-bg font-body text-ink [font-synthesis-weight:none]"
     >
       {children}
     </div>

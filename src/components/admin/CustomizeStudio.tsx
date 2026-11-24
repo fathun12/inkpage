@@ -250,6 +250,8 @@ export function CustomizeStudio({
       <input type="hidden" name="site_color_bg" value={draft.style.colorBg} />
       <input type="hidden" name="site_color_ink" value={draft.style.colorInk} />
       <input type="hidden" name="site_color_accent" value={draft.style.colorAccent} />
+      <input type="hidden" name="site_color_band" value={draft.style.colorBand} />
+      <input type="hidden" name="site_color_tertiary" value={draft.style.colorTertiary} />
       <input type="hidden" name="font_heading" value={draft.fontHeading} />
       <input type="hidden" name="font_body" value={draft.fontBody} />
       <input type="hidden" name="site_motion" value={draft.style.motion} />
@@ -315,6 +317,8 @@ export function CustomizeStudio({
                 colorBg: siteStyleDefaults.colorBg,
                 colorInk: siteStyleDefaults.colorInk,
                 colorAccent: siteStyleDefaults.colorAccent,
+                colorBand: siteStyleDefaults.colorBand,
+                colorTertiary: siteStyleDefaults.colorTertiary,
               })
             }
           >
@@ -343,6 +347,24 @@ export function CustomizeStudio({
                   type="color"
                   value={draft.style.colorAccent}
                   onChange={(e) => setStyle({ colorAccent: e.target.value })}
+                  className={colorInput}
+                />
+              </Field>
+              <Field label="Secondary" htmlFor="ui_color_band" hint="Full-width bands: news bar, GitHub, footer bottom.">
+                <input
+                  id="ui_color_band"
+                  type="color"
+                  value={draft.style.colorBand}
+                  onChange={(e) => setStyle({ colorBand: e.target.value })}
+                  className={colorInput}
+                />
+              </Field>
+              <Field label="Tertiary" htmlFor="ui_color_tertiary" hint="Reserved. Not used yet.">
+                <input
+                  id="ui_color_tertiary"
+                  type="color"
+                  value={draft.style.colorTertiary}
+                  onChange={(e) => setStyle({ colorTertiary: e.target.value })}
                   className={colorInput}
                 />
               </Field>

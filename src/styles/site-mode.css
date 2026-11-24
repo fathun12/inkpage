@@ -1,0 +1,39 @@
+/* site-mode.css: dark mode of the public website.
+   The light colors come inline from SiteFrame (--c-*). The dark set arrives as --d-*.
+   "System" = no attribute on <html>, so the OS decides. */
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-site-mode="light"]) .site-root {
+    color-scheme: dark;
+    --c-bg: var(--d-bg) !important;
+    --c-surface: var(--d-surface) !important;
+    --c-ink: var(--d-ink) !important;
+    --c-ink-soft: var(--d-ink-soft) !important;
+    --c-line: var(--d-line) !important;
+    --c-highlight: var(--d-highlight) !important;
+    --c-accent: var(--d-accent) !important;
+    --c-accent-ink: var(--d-accent-ink) !important;
+    --c-band: var(--d-band) !important;
+    --c-band-ink: var(--d-band-ink) !important;
+    --c-band-line: var(--d-band-line) !important;
+    --c-tertiary: var(--d-tertiary) !important;
+    --c-tertiary-ink: var(--d-tertiary-ink) !important;
+  }
+}
+
+html[data-site-mode="dark"] .site-root {
+  color-scheme: dark;
+  --c-bg: var(--d-bg) !important;
+  --c-surface: var(--d-surface) !important;
+  --c-ink: var(--d-ink) !important;
+  --c-ink-soft: var(--d-ink-soft) !important;
+  --c-line: var(--d-line) !important;
+  --c-highlight: var(--d-highlight) !important;
+  --c-accent: var(--d-accent) !important;
+  --c-accent-ink: var(--d-accent-ink) !important;
+  --c-band: var(--d-band) !important;
+  --c-band-ink: var(--d-band-ink) !important;
+  --c-band-line: var(--d-band-line) !important;
+  --c-tertiary: var(--d-tertiary) !important;
+  --c-tertiary-ink: var(--d-tertiary-ink) !important;
+}
