@@ -2,8 +2,8 @@
 
 import { useCallback, useEffect, useRef } from "react";
 import type { Block } from "@/types/block";
-import { ItemCard } from "./ItemCard";
 import { Reveal } from "./Reveal";
+import { WritingCard } from "./WritingCard";
 
 type Props = { items: Block[]; title: string | null; seconds: number; autoplay: boolean };
 
@@ -76,7 +76,7 @@ export function CardSlider({ items, title, seconds, autoplay }: Props) {
       >
         {items.map((block) => (
           <li key={block.id} className="shrink-0 basis-[78%] snap-start sm:basis-[24rem]">
-            <ItemCard block={block} />
+            <WritingCard block={block} />
           </li>
         ))}
       </ul>

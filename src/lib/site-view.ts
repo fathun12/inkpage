@@ -38,7 +38,7 @@ export function homeProjects(blocks: Block[]): Block[] {
 
 // Writing cards on Home. These are the ones that slide.
 export function homeWriting(blocks: Block[]): Block[] {
-  return homeItems(blocks, "writing");
+  return newestFirst(homeItems(blocks, "writing"));
 }
 
 export function socialsOf(blocks: Block[]): SocialItem[] {
@@ -97,4 +97,14 @@ export function homeShowcase(blocks: Block[]): Block[] {
         resolvePage(b.page) === "projects",
     )
     .slice(0, itemLimits.homeShowcase);
+}
+
+// Newest first (by the day the item was added).
+export function newestFirst(blocks: Block[]): Block[] {
+  return [...blocks].sort((a, b) => b.created_at.localeCompare(a.created_at));
+}
+
+// "Recently added" on the Writing page: the 5 newest.
+export function recentWriting(newest: Block[]): Block[] {
+  return newest.slice(0, 5);
 }

@@ -21,6 +21,7 @@ import {
   type ItemLink,
   type ItemRatio,
 } from "@/types/block";
+import { fetchOgImage } from "./og";
 import { sweepKeeping } from "./sweep";
 
 // The description limit matches the block forms. Raising it needs a look at the database first.
@@ -207,6 +208,19 @@ export async function saveWritingAction(formData: FormData): Promise<void> {
   if (formData.get("home") === "on") data.home = true;
   else delete data.home;
 
+  // No uploaded image: read the image of the link (og:image). An uploaded image always wins.
+  let note = "";
+  if (imageUrl) {
+    delete data.og;
+  } else if (formData.get("refresh_og") === "on" || !data.og || current?.url !== url) {
+    const og = await fetchOgImage(url);
+    if (og) data.og = og;
+    else {
+      delete data.og;
+      note = " No image found on the link: upload one yourself.";
+    }
+  }
+
   const row = {
     page: "writing",
     title,
@@ -230,5 +244,5 @@ export async function saveWritingAction(formData: FormData): Promise<void> {
 
   if (oldImage && oldImage !== imageUrl) await removeImages(user.id, [oldImage]);
   await sweepKeeping(user.id, siteMediaUrls(readSite(profile?.site)));
-  redirectWithSaved(back, current ? "Writing item saved." : "Writing item added.");
+  redirectWithSaved(back, `${current ? "Writing item saved." : "Writing item added."}${note}`);
 }

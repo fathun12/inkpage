@@ -41,12 +41,23 @@ function WritingForm({ item, visible, save, sign }: FormProps) {
         <SiteMediaInput
           slot="wimg"
           inputId={`w-image-${uid}`}
-          current={item?.image ? [item.image] : []}
+          current={item?.uploaded ? [item.uploaded] : []}
           max={1}
           sign={sign}
           credits={{}}
         />
       </Field>
+      {item && (
+        <label className="flex flex-col gap-0.5 text-sm">
+          <span className="flex items-center gap-2">
+            <input type="checkbox" name="refresh_og" className="accent-accent" />
+            Refresh image from the link
+          </span>
+          <span className="pl-6 text-xs text-ink-soft">
+            Used only when no image is uploaded. Medium often blocks this: then upload an image yourself.
+          </span>
+        </label>
+      )}
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" name="home" defaultChecked={item?.home ?? false} className="accent-accent" />
         Also show on Home (the sliding cards)

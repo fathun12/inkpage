@@ -117,7 +117,10 @@ export type WritingItem = {
   title: string;
   url: string | null;
   body: string | null;
+  // The image to show: the uploaded one, or else the one read from the link.
   image: string | null;
+  // Only the uploaded image (the admin form edits this one).
+  uploaded: string | null;
   // Name of the site the link goes to (Medium, skrib.my.id, ...).
   source: string | null;
   home: boolean;
@@ -130,7 +133,8 @@ export function readWritingItem(block: Block): WritingItem {
     title: block.title,
     url: block.url,
     body: block.body,
-    image: block.image_url,
+    image: block.image_url ?? link(d.og),
+    uploaded: block.image_url,
     source: block.url ? socialLabel(block.url) : null,
     home: d.home === true,
   };

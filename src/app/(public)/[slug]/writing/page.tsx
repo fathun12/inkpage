@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ItemGrid } from "@/components/site/ItemGrid";
+import { CardSlider } from "@/components/site/CardSlider";
 import { PageIntro } from "@/components/site/PageIntro";
+import { WritingList } from "@/components/site/WritingList";
 import { readSite } from "@/config/site-content";
+import { readSiteStyle } from "@/config/site-style";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
-import { listBlocks } from "@/lib/site-view";
+import { listBlocks, newestFirst, recentWriting } from "@/lib/site-view";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -22,13 +24,18 @@ export default async function WritingPage({ params }: Props) {
   if (!profile) notFound();
 
   const site = readSite(profile.site);
-  const rows = listBlocks(await getPublicBlocks(profile.id), "writing");
+  const style = readSiteStyle(profile.site_style);
+  const rows = newestFirst(listBlocks(await getPublicBlocks(profile.id), "writing").filter((b) => b.type !== "header"));
+  const recent = recentWriting(rows);
 
   return (
     <>
       <PageIntro title={site.writing.title ?? "Writing"} intro={site.writing.intro} />
       {rows.length > 0 ? (
-        <ItemGrid blocks={rows} />
+        <>
+          <CardSlider items={recent} title="Recently added" seconds={style.heroSeconds} autoplay={style.motion !== "off"} />
+          <WritingList blocks={rows} />
+        </>
       ) : (
         <p className="mx-auto max-w-5xl px-5 pb-24 text-ink-soft sm:px-8">Nothing here yet.</p>
       )}
