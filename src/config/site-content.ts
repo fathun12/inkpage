@@ -42,6 +42,9 @@ export const siteLimits = {
   introHeadlines: 3,
   greeting: 60,
   introNote: 160,
+  visits: 6,
+  visitName: 60,
+  visitBody: 300,
 } as const;
 
 export type IntroSettings = {
@@ -53,6 +56,7 @@ export type IntroSettings = {
 };
 
 export type NewsItem = { text: string; url: string | null };
+export type VisitItem = { name: string; body: string | null; url: string };
 export type PageText = { title: string | null; intro: string | null };
 export type AboutText = { title: string | null; body: string | null; photo: string | null };
 export type Highlight = {
@@ -89,6 +93,9 @@ export type SiteSettings = {
   githubTitle: string | null;
   // YouTube or Spotify link of the music player (empty = no player).
   musicUrl: string | null;
+  // The "Visit website" cards of Home and the label above them.
+  visitTitle: string | null;
+  visits: VisitItem[];
   highlights: Highlight[];
   // Credit (source) text of a media, by the file name of the media.
   credits: Record<string, string>;
@@ -160,6 +167,16 @@ function readHighlights(v: unknown): Highlight[] {
   });
 }
 
+function readVisits(v: unknown): VisitItem[] {
+  if (!Array.isArray(v)) return [];
+  return v.slice(0, siteLimits.visits).flatMap((item): VisitItem[] => {
+    const r = obj(item);
+    const name = text(r.name, siteLimits.visitName);
+    const url = link(r.url);
+    return name && url ? [{ name, body: text(r.body, siteLimits.visitBody), url }] : [];
+  });
+}
+
 function readIntro(v: unknown): IntroSettings {
   const r = obj(v);
   const g = obj(r.greetings);
@@ -204,6 +221,8 @@ export function readSite(raw: unknown): SiteSettings {
     githubUser: githubName(r.githubUser),
     githubTitle: text(r.githubTitle, siteLimits.title),
     musicUrl: link(r.musicUrl),
+    visitTitle: text(r.visitTitle, siteLimits.title),
+    visits: readVisits(r.visits),
     highlights: readHighlights(r.highlights),
     credits: creditMap(r.credits),
     projects: { title: text(projects.title, siteLimits.title), intro: text(projects.intro, siteLimits.intro) },

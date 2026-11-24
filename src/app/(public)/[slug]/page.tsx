@@ -12,6 +12,7 @@ import { HomeGithub } from "@/components/site/HomeGithub";
 import { HomeProjects } from "@/components/site/HomeProjects";
 import { HomeShowcase } from "@/components/site/HomeShowcase";
 import { IndexSection } from "@/components/site/IndexSection";
+import { VisitCards } from "@/components/site/VisitCards";
 import { readBackground } from "@/config/background";
 import { readSite } from "@/config/site-content";
 import { readSiteStyle } from "@/config/site-style";
@@ -69,6 +70,7 @@ export default async function HomePage({ params }: Props) {
     rows.length > 0 && { id: "links", label: "Links" },
     showcase.length > 0 && { id: "showcase", label: site.showcaseTitle ?? "Showcase" },
     designs && designs.projects.length > 0 && { id: "designs", label: site.designsTitle ?? "Design" },
+    site.visits.length > 0 && { id: "visit", label: site.visitTitle ?? "Visit website" },
     media.gallery.length > 0 && { id: "gallery", label: "Gallery" },
   ].filter((item): item is ContentsItem => Boolean(item));
 
@@ -123,6 +125,7 @@ export default async function HomePage({ params }: Props) {
           autoplay={autoplay}
         />
       )}
+      <VisitCards items={site.visits} title={site.visitTitle ?? "Visit website"} />
       {media.gallery.length > 0 && <span id="gallery" className="block" />}
       <FadeGallery images={media.gallery} seconds={style.gallerySeconds} autoplay={autoplay} credits={site.credits} />
     </>

@@ -10,6 +10,7 @@ import {
   siteMediaUrls,
   type NewsItem,
   type SiteSettings,
+  type VisitItem,
 } from "@/config/site-content";
 import { requireUser } from "@/features/auth/queries";
 import { findSitePaths, signSiteUpload } from "@/features/media/upload";
@@ -58,6 +59,7 @@ const textSchema = z.object({
   biblia_intro: text("The Biblia text", siteLimits.intro),
   designs_title: text("The design projects label", siteLimits.title),
   github_title: text("The GitHub label", siteLimits.title),
+  visit_title: text("The Visit website label", siteLimits.title),
   projects_title: text("The Projects title", siteLimits.title),
   projects_intro: text("The Projects text", siteLimits.intro),
   writing_title: text("The Writing title", siteLimits.title),
@@ -84,6 +86,30 @@ function readNews(formData: FormData): { items: NewsItem[] } | { error: string }
       return { error: `The link of news line ${i + 1} must start with http:// or https://` };
     }
     items.push({ text: line, url: url ?? null });
+  }
+  return { items };
+}
+
+function readVisitForm(formData: FormData): { items: VisitItem[] } | { error: string } {
+  const items: VisitItem[] = [];
+  for (let i = 0; i < siteLimits.visits; i++) {
+    const name = field(formData, `visit_name_${i}`);
+    const url = field(formData, `visit_url_${i}`);
+    const body = field(formData, `visit_body_${i}`);
+    if (!name && !url) {
+      if (body) return { error: `Site ${i + 1} has a description but no name and no address.` };
+      continue;
+    }
+    if (!name) return { error: `Site ${i + 1} has an address but no name.` };
+    if (!url) return { error: `Site ${i + 1} has a name but no address.` };
+    if (name.length > siteLimits.visitName) {
+      return { error: `The name of site ${i + 1} can be at most ${siteLimits.visitName} characters.` };
+    }
+    if (!isHttpUrl(url)) return { error: `The address of site ${i + 1} must start with http:// or https://` };
+    if (body && body.length > siteLimits.visitBody) {
+      return { error: `The description of site ${i + 1} can be at most ${siteLimits.visitBody} characters.` };
+    }
+    items.push({ name, body: body ?? null, url });
   }
   return { items };
 }
@@ -138,6 +164,7 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     biblia_intro: field(formData, "biblia_intro"),
     designs_title: field(formData, "designs_title"),
     github_title: field(formData, "github_title"),
+    visit_title: field(formData, "visit_title"),
     projects_title: field(formData, "projects_title"),
     projects_intro: field(formData, "projects_intro"),
     writing_title: field(formData, "writing_title"),
@@ -193,6 +220,10 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     }
     next.githubUser = gh ? gh : null;
     next.githubTitle = v.github_title ?? null;
+    const visits = readVisitForm(formData);
+    if ("error" in visits) return abort(visits.error);
+    next.visits = visits.items;
+    next.visitTitle = v.visit_title ?? null;
     const music = field(formData, "music_url");
     if (music && !musicEmbed(music)) {
       return abort("The music link must be a YouTube or Spotify link (a video, a song or a playlist).");

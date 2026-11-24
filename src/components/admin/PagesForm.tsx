@@ -152,6 +152,35 @@ export function HomeForm({ action, sign, site }: WithMedia) {
         </Field>
       </Section>
 
+      <Section
+        title="Visit website"
+        hint="Cards that point to your other websites (itch.io, Patreon, pixiv), shown below the design projects."
+      >
+        <Field label="Label" htmlFor="visit_title" hint="Optional. Default: Visit website.">
+          <Input id="visit_title" name="visit_title" defaultValue={site.visitTitle ?? ""} maxLength={siteLimits.title} />
+        </Field>
+        {Array.from({ length: siteLimits.visits }, (_, i) => site.visits[i]).map((item, i) => (
+          <div key={i} className="flex flex-col gap-3 border border-line p-3">
+            <p className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">Site {i + 1}</p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field
+                label="Name"
+                htmlFor={`visit_name_${i}`}
+                hint={i === 0 ? "For example itch.io. Leave a site empty to skip it." : undefined}
+              >
+                <Input id={`visit_name_${i}`} name={`visit_name_${i}`} defaultValue={item?.name ?? ""} maxLength={siteLimits.visitName} />
+              </Field>
+              <Field label="Address" htmlFor={`visit_url_${i}`} hint={i === 0 ? "Must start with https://" : undefined}>
+                <Input id={`visit_url_${i}`} name={`visit_url_${i}`} type="url" placeholder="https://" defaultValue={item?.url ?? ""} />
+              </Field>
+            </div>
+            <Field label="Description" htmlFor={`visit_body_${i}`} hint={i === 0 ? "Optional. Up to 300 characters." : undefined}>
+              <Textarea id={`visit_body_${i}`} name={`visit_body_${i}`} defaultValue={item?.body ?? ""} rows={2} maxLength={siteLimits.visitBody} />
+            </Field>
+          </div>
+        ))}
+      </Section>
+
       <Section title="Music" hint="A small player in the bottom left corner of every page.">
         <Field
           label="YouTube or Spotify link"
