@@ -42,6 +42,7 @@ export default async function SiteLayout({ children, params }: Props) {
       {children}
       <SiteFooter
         brand={profile.username}
+        bio={profile.bio}
         note={site.footerNote}
         socials={socialsOf(blocks)}
         nav={buildNav(base, site, { label: shop.settings.home_title ?? "Shop" })}

@@ -1,12 +1,18 @@
-/* cream: warm cream, ink black, burnt orange. Default theme. */
+/* cream: white, black, light gray, terracotta. Default theme (admin and old pages).
+   Same color system as the website: Primary white, Secondary black (band), Tertiary light gray. */
 :root,
 [data-theme="cream"] {
-  --c-bg: #f3eee3;
-  --c-surface: #fbf8f1;
-  --c-ink: #111111;
-  --c-ink-soft: #5c574d;
-  --c-line: #d9d1be;
-  --c-accent: #d9541e;
+  --c-bg: #ffffff;
+  --c-surface: #ffffff;
+  --c-ink: #000000;
+  --c-ink-soft: #5c5c5c;
+  --c-line: #e2e2e2;
+  --c-accent: #b5532f;
   --c-accent-ink: #ffffff;
-  --c-highlight: #e9dfc9;
+  --c-highlight: #f2f2f2;
+  --c-band: #000000;
+  --c-band-ink: #ffffff;
+  --c-band-line: #2e2e2e;
+  --c-tertiary: #f2f2f2;
+  --c-tertiary-ink: #000000;
 }

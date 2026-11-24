@@ -6,6 +6,7 @@ import { ThemeSwitch, type Mode } from "./ThemeSwitch";
 type NavItem = { label: string; href: string };
 type Props = {
   brand: string;
+  bio?: string | null;
   note: string | null;
   socials: SocialItem[];
   nav?: NavItem[];
@@ -18,24 +19,26 @@ const link = "text-sm transition-opacity duration-(--dur-base) hover:opacity-60"
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
-export function SiteFooter({ brand, note, socials, nav = [], modeControl }: Props) {
+export function SiteFooter({ brand, bio, note, socials, nav = [], modeControl }: Props) {
+  const hasNote = Boolean(bio || note);
   const hasNav = nav.length > 0;
   const hasSocials = socials.length > 0;
   const noteNo = 0;
-  const navNo = note ? 1 : 0;
-  const socialNo = (note ? 1 : 0) + (hasNav ? 1 : 0);
+  const navNo = hasNote ? 1 : 0;
+  const socialNo = (hasNote ? 1 : 0) + (hasNav ? 1 : 0);
 
   return (
     <footer>
       {/* Upper part: the Tertiary color. */}
       <div className="bg-tertiary px-5 pt-14 text-tertiary-ink sm:px-8 sm:pt-20">
         <div className="mx-auto max-w-5xl">
-          {(note || hasNav || hasSocials) && (
+          {(hasNote || hasNav || hasSocials) && (
             <div className="grid gap-12 sm:grid-cols-[repeat(auto-fit,minmax(12rem,1fr))]">
-              {note && (
+              {hasNote && (
                 <div className="flex flex-col gap-3">
                   <p className={heading}>{pad(noteNo)} / Note</p>
-                  <p className="max-w-xs whitespace-pre-line text-sm opacity-70">{note}</p>
+                  {bio && <p className="max-w-xs whitespace-pre-line text-sm opacity-70">{bio}</p>}
+                  {note && <p className="max-w-xs whitespace-pre-line text-sm opacity-70">{note}</p>}
                 </div>
               )}
 
