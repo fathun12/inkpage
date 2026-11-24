@@ -2,9 +2,10 @@ import { Img } from "@/components/ui/Img";
 import { routes } from "@/config/site";
 import { mediaKind } from "@/lib/site-view";
 import type { Block } from "@/types/block";
+import { Credit } from "./Credit";
 import { Reveal } from "./Reveal";
 
-type Props = { blocks: Block[]; mediaUrl: string | null; tone?: "dark" | "light" };
+type Props = { blocks: Block[]; mediaUrl: string | null; tone?: "dark" | "light"; credit?: string | null };
 
 function hostOf(url: string | null): string {
   try {
@@ -31,7 +32,7 @@ function isDownload(url: string | null): boolean {
 const rowClass = "group grid grid-cols-[2.5rem_minmax(0,1fr)_auto] items-baseline gap-4 py-6";
 
 // The list of links: thin lines and big titles, no panels. Dark = over a media. Light = on its own page.
-export function IndexSection({ blocks, mediaUrl, tone = "dark" }: Props) {
+export function IndexSection({ blocks, mediaUrl, tone = "dark", credit }: Props) {
   const dark = tone === "dark";
   const items = blocks.reduce<{ block: Block; number: number | null }[]>((list, block) => {
     const counted = list.filter((item) => item.number !== null).length;
@@ -60,6 +61,7 @@ export function IndexSection({ blocks, mediaUrl, tone = "dark" }: Props) {
             )}
           </Reveal>
           <div aria-hidden className="site-index-veil absolute inset-0" />
+          <Credit text={credit} />
         </>
       )}
       <ul

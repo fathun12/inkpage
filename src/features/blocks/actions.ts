@@ -76,7 +76,13 @@ async function planMedia(
   return { media: null, fresh: [], removed: [] };
 }
 
-function toRow(v: BlockInput, imageUrl: string | null, images: string[], media: CardMedia | null) {
+function toRow(
+  v: BlockInput,
+  imageUrl: string | null,
+  images: string[],
+  media: CardMedia | null,
+  current: BlockData | null,
+) {
   const hasUrl = v.type === "link" || v.type === "project" || v.type === "embed";
   const hasBody = v.type === "link" || v.type === "project" || v.type === "text";
   const hasImage = v.type === "link" || v.type === "project";
@@ -87,8 +93,17 @@ function toRow(v: BlockInput, imageUrl: string | null, images: string[], media: 
   if (v.type === "countdown") data.target = localInputToIso(v.target) ?? undefined;
   // The media comes from planMedia, so saving a block never drops it.
   if (hasImage && media) data.media = media;
-  // "Also show on Home": used by the items of Projects and Writing.
-  if (hasImage && v.home) data.home = true;
+  // Home flag, shape and download links are set on the Pages screen (item_fields=1).
+  // Any other screen keeps what is saved.
+  if (hasImage) {
+    const src = v.items
+      ? { home: v.home, shape: v.shape, nexus: v.nexus, github: v.github }
+      : { home: current?.home, shape: current?.shape, nexus: current?.nexus, github: current?.github };
+    if (src.home) data.home = true;
+    if (src.shape && src.shape !== "card") data.shape = src.shape;
+    if (src.nexus) data.nexus = src.nexus;
+    if (src.github) data.github = src.github;
+  }
 
   return {
     type: v.type,
@@ -139,7 +154,7 @@ export async function createBlockAction(formData: FormData): Promise<void> {
   const position = ((last?.position as number | undefined) ?? -1) + 1;
   const { error } = await supabase
     .from("blocks")
-    .insert({ user_id: user.id, position, ...toRow(v, imageUrl, images, plan.media) });
+    .insert({ user_id: user.id, position, ...toRow(v, imageUrl, images, plan.media, null) });
   if (error) {
     await removeImages(user.id, [...uploaded.urls, ...plan.fresh]);
     return redirectWithError(back, `Could not add the block: ${error.message}`);
@@ -206,7 +221,7 @@ export async function updateBlockAction(formData: FormData): Promise<void> {
 
   const { error } = await supabase
     .from("blocks")
-    .update(toRow(v, imageUrl, images, plan.media))
+    .update(toRow(v, imageUrl, images, plan.media, current.data))
     .eq("id", id)
     .eq("user_id", user.id);
   if (error) {

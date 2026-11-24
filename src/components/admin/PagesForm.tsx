@@ -9,7 +9,7 @@ import { SiteMediaInput } from "./SiteMediaInput";
 
 type Props = { action: FormAction; sign: VideoSignAction; site: SiteSettings };
 
-const mediaHint = `JPG, PNG, WebP, GIF, MP4 or WebM, up to ${mediaConfig.siteMedia.maxMb} MB each, kept in original quality. A file uploads as soon as you pick it, then press Save changes.`;
+const mediaHint = `JPG, PNG, WebP, GIF, MP4 or WebM, up to ${mediaConfig.siteMedia.maxMb} MB each, kept in original quality. A file uploads as soon as you pick it, then press Save changes. Under each file you can write a credit or source: it shows small at the bottom right of the media.`;
 
 function Section({
   title,
@@ -70,19 +70,48 @@ export function PagesForm({ action, sign, site }: Props) {
           <Input id="hero_caption" name="hero_caption" defaultValue={site.heroCaption ?? ""} maxLength={siteLimits.caption} />
         </Field>
         <Field label={`Slides (up to ${siteLimits.hero})`} htmlFor="site-hero" hint={`Several items slide one after another. ${mediaHint}`}>
-          <SiteMediaInput slot="hero" current={site.hero} max={siteLimits.hero} sign={sign} />
+          <SiteMediaInput slot="hero" current={site.hero} max={siteLimits.hero} sign={sign} credits={site.credits} />
         </Field>
       </Section>
 
-      <Section title="List background" hint="Media behind the list of projects, articles and downloads on Home.">
-        <Field label="Media" htmlFor="site-index" hint={`One item. Add the list items under Links. ${mediaHint}`}>
-          <SiteMediaInput slot="index" current={site.indexMedia ? [site.indexMedia] : []} max={1} sign={sign} />
+      <Section title="Home section titles" hint="Small labels above the sliding cards and above the highlights. Empty = no label.">
+        <Field label="Cards title" htmlFor="cards_title" hint="Above the sliding cards (the items you tick as Also show on Home).">
+          <Input id="cards_title" name="cards_title" defaultValue={site.cardsTitle ?? ""} maxLength={siteLimits.title} />
         </Field>
+        <Field label="Highlights title" htmlFor="highlights_title">
+          <Input id="highlights_title" name="highlights_title" defaultValue={site.highlightsTitle ?? ""} maxLength={siteLimits.title} />
+        </Field>
+      </Section>
+
+      <Section title="List background" hint="Media behind the list of links on Home.">
+        <Field label="Media" htmlFor="site-index" hint={`One item. The list itself is made of the links on the Links screen with page Home. ${mediaHint}`}>
+          <SiteMediaInput slot="index" current={site.indexMedia ? [site.indexMedia] : []} max={1} sign={sign} credits={site.credits} />
+        </Field>
+      </Section>
+
+      <Section title="Highlights" hint={`Up to ${siteLimits.highlights} projects on Home, just before the gallery. Media, title and text.`}>
+        {Array.from({ length: siteLimits.highlights }, (_, i) => {
+          const item = site.highlights[i];
+          return (
+            <div key={i} className="flex flex-col gap-3 border-t border-line pt-4 first:border-t-0 first:pt-0">
+              <p className="font-mono text-xs uppercase tracking-widest text-ink-soft">Highlight {i + 1}</p>
+              <Field label="Title" htmlFor={`hl_title_${i}`}>
+                <Input id={`hl_title_${i}`} name={`hl_title_${i}`} defaultValue={item?.title ?? ""} maxLength={siteLimits.title} />
+              </Field>
+              <Field label="Text" htmlFor={`hl_body_${i}`}>
+                <Textarea id={`hl_body_${i}`} name={`hl_body_${i}`} defaultValue={item?.body ?? ""} rows={4} maxLength={siteLimits.highlightBody} />
+              </Field>
+              <Field label="Media" htmlFor={`site-hl${i}`} hint={`One item: photo, GIF or video. ${mediaHint}`}>
+                <SiteMediaInput slot={`hl${i}`} current={item?.media ? [item.media] : []} max={1} sign={sign} credits={site.credits} />
+              </Field>
+            </div>
+          );
+        })}
       </Section>
 
       <Section title="Gallery" hint="Full width above the footer. Photos fade in and out. No title.">
         <Field label={`Media (up to ${siteLimits.gallery})`} htmlFor="site-gallery" hint={mediaHint}>
-          <SiteMediaInput slot="gallery" current={site.gallery} max={siteLimits.gallery} sign={sign} />
+          <SiteMediaInput slot="gallery" current={site.gallery} max={siteLimits.gallery} sign={sign} credits={site.credits} />
         </Field>
       </Section>
 
@@ -102,7 +131,7 @@ export function PagesForm({ action, sign, site }: Props) {
           <Textarea id="about_body" name="about_body" defaultValue={site.about.body ?? ""} rows={8} maxLength={siteLimits.aboutBody} />
         </Field>
         <Field label="Photo" htmlFor="site-about" hint={`Optional. ${mediaHint}`}>
-          <SiteMediaInput slot="about" current={site.about.photo ? [site.about.photo] : []} max={1} sign={sign} />
+          <SiteMediaInput slot="about" current={site.about.photo ? [site.about.photo] : []} max={1} sign={sign} credits={site.credits} />
         </Field>
       </Section>
 

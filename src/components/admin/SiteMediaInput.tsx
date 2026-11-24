@@ -4,17 +4,25 @@ import { useRef, useState, type ChangeEvent } from "react";
 import { Input } from "@/components/ui/Field";
 import { Img } from "@/components/ui/Img";
 import { mediaConfig } from "@/config/media";
+import { fileKey } from "@/config/site-content";
 import { uploadToSignedPath } from "@/lib/direct-upload";
 import { mediaKind, type MediaKind } from "@/lib/site-view";
 import type { VideoSignAction } from "@/types/media";
 
-type Props = { slot: string; current: string[]; max: number; sign: VideoSignAction };
+type Props = {
+  slot: string;
+  current: string[];
+  max: number;
+  sign: VideoSignAction;
+  credits: Record<string, string>;
+};
 type Added = { path: string; preview: string; kind: MediaKind };
 type Note = { tone: "info" | "error"; text: string } | null;
 
 const MB = 1024 * 1024;
 const rules = mediaConfig.siteMedia;
 const accept = rules.types.map((t) => t.mime).join(",");
+const creditHint = "Credit or source (shown small, bottom right)";
 
 function Thumb({ src, kind }: { src: string; kind: MediaKind }) {
   const box = "ink-border aspect-video w-full bg-surface object-cover";
@@ -22,10 +30,10 @@ function Thumb({ src, kind }: { src: string; kind: MediaKind }) {
   return <Img src={src} className={box} />;
 }
 
-// Picks files for one slot of the website (hero, list background, gallery, About photo).
+// Picks files for one slot of the website (hero, list background, gallery, About photo, a highlight).
 // A file uploads straight to Storage as soon as it is picked. Only its storage path travels with the form,
-// and "Remove" boxes tell the server which saved files to drop.
-export function SiteMediaInput({ slot, current, max, sign }: Props) {
+// and "Remove" boxes tell the server which saved files to drop. Each file has a credit (source) line.
+export function SiteMediaInput({ slot, current, max, sign, credits }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const [removed, setRemoved] = useState<string[]>([]);
   const [added, setAdded] = useState<Added[]>([]);
@@ -94,7 +102,7 @@ export function SiteMediaInput({ slot, current, max, sign }: Props) {
   return (
     <div ref={wrapRef} className="flex flex-col gap-3">
       {current.length > 0 && (
-        <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {current.map((url) => (
             <li key={url} className="flex flex-col gap-1">
               <Thumb src={url} kind={mediaKind(url)} />
@@ -111,13 +119,21 @@ export function SiteMediaInput({ slot, current, max, sign }: Props) {
                 />
                 Remove
               </label>
+              <Input
+                name={`credit__${fileKey(url)}`}
+                defaultValue={credits[fileKey(url)] ?? ""}
+                placeholder={creditHint}
+                maxLength={120}
+                aria-label="Credit"
+                className="px-2 py-1.5 text-xs"
+              />
             </li>
           ))}
         </ul>
       )}
 
       {added.length > 0 && (
-        <ul className="grid grid-cols-3 gap-3 sm:grid-cols-4">
+        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {added.map((a) => (
             <li key={a.path} className="flex flex-col gap-1">
               <Thumb src={a.preview} kind={a.kind} />
@@ -128,6 +144,13 @@ export function SiteMediaInput({ slot, current, max, sign }: Props) {
               >
                 Discard (uploaded, not saved)
               </button>
+              <Input
+                name={`credit__${fileKey(a.path)}`}
+                placeholder={creditHint}
+                maxLength={120}
+                aria-label="Credit"
+                className="px-2 py-1.5 text-xs"
+              />
             </li>
           ))}
         </ul>

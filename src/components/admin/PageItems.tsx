@@ -7,6 +7,7 @@ import { mediaConfig } from "@/config/media";
 import { resolvePage, type BlockPage } from "@/config/site-content";
 import type { BlockView } from "@/types/block";
 import type { FormAction } from "@/types/form";
+import { ItemExtras } from "./ItemExtras";
 import { PageSelect } from "./PageSelect";
 
 type Actions = {
@@ -107,6 +108,7 @@ export function PageItems({ page, title, hint, all, actions }: Props) {
               <ImageInput id={`${page}-new-image`} name="image" kind="cover" accept={mediaConfig.accept} />
             </Field>
           </Wide>
+          <ItemExtras id={`${page}-new`} />
           <Wide>
             <label className="flex items-center gap-2 text-sm">
               <input type="checkbox" name="home" className="accent-accent" />
@@ -212,6 +214,7 @@ export function PageItems({ page, title, hint, all, actions }: Props) {
                             </label>
                           )}
                         </Wide>
+                        <ItemExtras id={`edit-${block.id}`} data={block.data} />
                         <Wide>
                           <label className="flex items-center gap-2 text-sm">
                             <input

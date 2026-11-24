@@ -132,13 +132,6 @@ function BlockCard({ block, index, total, actions, gifCount }: CardProps) {
               </div>
             )}
 
-            {(type === "link" || type === "project") && (
-              <label className="flex items-center gap-2 text-sm sm:col-span-2">
-                <input type="checkbox" name="home" defaultChecked={block.data.home === true} className="accent-accent" />
-                Also show on Home
-              </label>
-            )}
-
             {hasUrl && (
               <div className="sm:col-span-2">
                 <Field

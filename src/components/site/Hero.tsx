@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Img } from "@/components/ui/Img";
-import { mediaKind } from "@/lib/site-view";
+import { creditOf, mediaKind } from "@/lib/site-view";
+import { Credit } from "./Credit";
 
 type Props = {
   slides: string[];
@@ -11,10 +12,11 @@ type Props = {
   seconds: number;
   autoplay: boolean;
   gray: boolean;
+  credits?: Record<string, string>;
 };
 
 // Full width media (video, GIF or photo) that can slide, with one small caption.
-export function Hero({ slides, name, caption, seconds, autoplay, gray }: Props) {
+export function Hero({ slides, name, caption, seconds, autoplay, gray, credits = {} }: Props) {
   const [index, setIndex] = useState(0);
   const count = slides.length;
 
@@ -50,6 +52,7 @@ export function Hero({ slides, name, caption, seconds, autoplay, gray }: Props) 
               ) : (
                 <Img src={src} loading={i === 0 ? "eager" : "lazy"} className={media} />
               )}
+              <Credit text={creditOf(credits, src)} />
             </div>
           ))}
         </div>
@@ -60,7 +63,7 @@ export function Hero({ slides, name, caption, seconds, autoplay, gray }: Props) 
         {caption && <p className="max-w-md whitespace-pre-line text-sm opacity-80">{caption}</p>}
       </div>
       {count > 1 && (
-        <div className="absolute bottom-5 right-5 z-10 flex">
+        <div className="absolute bottom-9 right-5 z-10 flex">
           {slides.map((src, i) => (
             <button
               key={src}

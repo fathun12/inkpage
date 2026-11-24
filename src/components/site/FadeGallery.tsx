@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { Img } from "@/components/ui/Img";
+import { creditOf } from "@/lib/site-view";
+import { Credit } from "./Credit";
 
-type Props = { images: string[]; seconds?: number; autoplay?: boolean };
+type Props = { images: string[]; seconds?: number; autoplay?: boolean; credits?: Record<string, string> };
 
 // One full width frame above the footer. The photos change with a fade, not a slide.
-export function FadeGallery({ images, seconds = 6, autoplay = true }: Props) {
+export function FadeGallery({ images, seconds = 6, autoplay = true, credits = {} }: Props) {
   const [active, setActive] = useState(0);
   const count = images.length;
 
@@ -36,8 +38,9 @@ export function FadeGallery({ images, seconds = 6, autoplay = true }: Props) {
           }`}
         />
       ))}
+      <Credit text={creditOf(credits, images[at])} />
       {count > 1 && (
-        <div aria-hidden className="absolute bottom-6 right-6 z-10 flex gap-1.5">
+        <div aria-hidden className="absolute bottom-9 right-6 z-10 flex gap-1.5">
           {images.map((src, i) => (
             <span key={`${src}-${i}`} data-active={i === at ? "" : undefined} className="site-dot" />
           ))}

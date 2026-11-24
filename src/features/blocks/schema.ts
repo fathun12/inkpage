@@ -8,6 +8,7 @@ import { splitLines } from "@/lib/social";
 import { isHttpUrl } from "@/lib/validation";
 import {
   blockTypes,
+  itemShapes,
   mediaFits,
   mediaHeights,
   mediaPlacements,
@@ -19,6 +20,10 @@ export const blockSchema = z
     type: z.enum(blockTypes, { error: "Pick a block type." }),
     page: z.enum(blockPages, { error: "Pick a page." }),
     home: z.boolean(),
+    items: z.boolean(),
+    shape: z.enum(itemShapes, { error: "Pick a shape." }),
+    nexus: z.string().trim().max(500, "The Nexus link is too long.").optional(),
+    github: z.string().trim().max(500, "The GitHub link is too long.").optional(),
     title: z
       .string({ error: "Title is required." })
       .trim()
@@ -81,6 +86,20 @@ export const blockSchema = z
         message: "Pick the date and time to count down to.",
       });
     }
+    if (v.nexus && !isHttpUrl(v.nexus)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["nexus"],
+        message: "The Nexus link must start with http:// or https://",
+      });
+    }
+    if (v.github && !isHttpUrl(v.github)) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["github"],
+        message: "The GitHub link must start with http:// or https://",
+      });
+    }
     if (v.publish_at && v.expire_at && v.expire_at <= v.publish_at) {
       ctx.addIssue({
         code: "custom",
@@ -97,6 +116,10 @@ export function parseBlockForm(formData: FormData) {
     type: field(formData, "type"),
     page: field(formData, "page") ?? "home",
     home: formData.get("home") === "on",
+    items: formData.get("item_fields") === "1",
+    shape: field(formData, "shape") ?? "card",
+    nexus: field(formData, "nexus"),
+    github: field(formData, "github"),
     title: field(formData, "title"),
     url: field(formData, "url"),
     body: field(formData, "body"),

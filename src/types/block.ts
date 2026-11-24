@@ -11,6 +11,10 @@ export const blockTypes = [
 export type BlockType = (typeof blockTypes)[number];
 export type BlockStatus = "live" | "hidden" | "scheduled" | "expired";
 
+// How an item of Projects or Writing looks (the Home slider and its own page).
+export const itemShapes = ["card", "button", "text"] as const;
+export type ItemShape = (typeof itemShapes)[number];
+
 export type SocialItem = { label: string; url: string };
 
 // Image or GIF inside a link or project card (blocks.data.media).
@@ -41,6 +45,9 @@ export type BlockData = {
   target?: string; // countdown, ISO date
   media?: CardMedia; // link and project cards
   home?: boolean; // item of Projects or Writing that is also shown on Home
+  shape?: ItemShape; // missing = card
+  nexus?: string; // Nexus Mods download link
+  github?: string; // GitHub release link
 };
 
 export type Block = {

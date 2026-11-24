@@ -1,6 +1,8 @@
 // Content settings of the public website. Plain data: no database and no React here.
 // The Pages menu writes them to profiles.site. readSite reads them and never throws.
 
+import type { ItemShape } from "@/types/block";
+
 export const blockPages = ["home", "projects", "writing"] as const;
 export type BlockPage = (typeof blockPages)[number];
 
@@ -8,6 +10,12 @@ export const blockPageLabels: Record<BlockPage, string> = {
   home: "Home",
   projects: "Projects",
   writing: "Writing",
+};
+
+export const itemShapeLabels: Record<ItemShape, string> = {
+  card: "Card (image, title, text)",
+  button: "Button (title only)",
+  text: "Text link (big title)",
 };
 
 export function resolvePage(value: string | null | undefined): BlockPage {
@@ -24,11 +32,16 @@ export const siteLimits = {
   intro: 400,
   aboutBody: 4000,
   footerNote: 200,
+  highlights: 5,
+  highlightBody: 1500,
+  credit: 120,
+  creditCount: 80,
 } as const;
 
 export type NewsItem = { text: string; url: string | null };
 export type PageText = { title: string | null; intro: string | null };
 export type AboutText = { title: string | null; body: string | null; photo: string | null };
+export type Highlight = { title: string | null; body: string | null; media: string | null };
 
 export type SiteSettings = {
   news: NewsItem[];
@@ -36,6 +49,11 @@ export type SiteSettings = {
   hero: string[];
   indexMedia: string | null;
   gallery: string[];
+  cardsTitle: string | null;
+  highlightsTitle: string | null;
+  highlights: Highlight[];
+  // Credit (source) text of a media, by the file name of the media.
+  credits: Record<string, string>;
   projects: PageText;
   writing: PageText;
   about: AboutText;
@@ -61,6 +79,33 @@ function links(v: unknown, max: number): string[] {
   return v.map(link).filter((x): x is string => x !== null).slice(0, max);
 }
 
+// The file name at the end of a media address. It is the key of a credit.
+export function fileKey(url: string): string {
+  return url.split("?")[0].split("#")[0].split("/").pop() ?? url;
+}
+
+function creditMap(v: unknown): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [key, value] of Object.entries(obj(v)).slice(0, siteLimits.creditCount)) {
+    const t = text(value, siteLimits.credit);
+    if (t && /^[\w.-]+$/.test(key)) out[key] = t;
+  }
+  return out;
+}
+
+function readHighlights(v: unknown): Highlight[] {
+  if (!Array.isArray(v)) return [];
+  return v.slice(0, siteLimits.highlights).flatMap((item): Highlight[] => {
+    const h = obj(item);
+    const entry = {
+      title: text(h.title, siteLimits.title),
+      body: text(h.body, siteLimits.highlightBody),
+      media: link(h.media),
+    };
+    return entry.title || entry.body || entry.media ? [entry] : [];
+  });
+}
+
 export function readSite(raw: unknown): SiteSettings {
   const r = obj(raw);
   const projects = obj(r.projects);
@@ -79,6 +124,10 @@ export function readSite(raw: unknown): SiteSettings {
     hero: links(r.hero, siteLimits.hero),
     indexMedia: link(r.indexMedia),
     gallery: links(r.gallery, siteLimits.gallery),
+    cardsTitle: text(r.cardsTitle, siteLimits.title),
+    highlightsTitle: text(r.highlightsTitle, siteLimits.title),
+    highlights: readHighlights(r.highlights),
+    credits: creditMap(r.credits),
     projects: { title: text(projects.title, siteLimits.title), intro: text(projects.intro, siteLimits.intro) },
     writing: { title: text(writing.title, siteLimits.title), intro: text(writing.intro, siteLimits.intro) },
     about: {
@@ -97,6 +146,7 @@ export function siteMediaUrls(site: SiteSettings): string[] {
     ...site.gallery,
     ...(site.indexMedia ? [site.indexMedia] : []),
     ...(site.about.photo ? [site.about.photo] : []),
+    ...site.highlights.flatMap((h) => (h.media ? [h.media] : [])),
   ];
 }
 

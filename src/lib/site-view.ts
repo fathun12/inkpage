@@ -1,5 +1,5 @@
 import type { BackgroundView } from "@/config/background";
-import { hasAbout, resolvePage, type BlockPage, type SiteSettings } from "@/config/site-content";
+import { fileKey, hasAbout, resolvePage, type BlockPage, type SiteSettings } from "@/config/site-content";
 import type { Block, SocialItem } from "@/types/block";
 
 export type MediaKind = "video" | "gif" | "image";
@@ -11,12 +11,23 @@ export function mediaKind(url: string): MediaKind {
   return "image";
 }
 
+// The credit (source) text written for a media, or null.
+export function creditOf(credits: Record<string, string>, url: string | null | undefined): string | null {
+  return url ? (credits[fileKey(url)] ?? null) : null;
+}
+
 // Links, projects and headers shown on one page.
 export function listBlocks(blocks: Block[], page: BlockPage): Block[] {
   return blocks.filter(
+    (b) => (b.type === "link" || b.type === "project" || b.type === "header") && resolvePage(b.page) === page,
+  );
+}
+
+// Items of Projects and Writing that were marked "Also show on Home": the sliding cards on Home.
+export function homeCards(blocks: Block[]): Block[] {
+  return blocks.filter(
     (b) =>
-      (b.type === "link" || b.type === "project" || b.type === "header") &&
-      (resolvePage(b.page) === page || (page === "home" && b.data.home === true)),
+      (b.type === "link" || b.type === "project") && b.data.home === true && resolvePage(b.page) !== "home",
   );
 }
 
@@ -24,7 +35,7 @@ export function socialsOf(blocks: Block[]): SocialItem[] {
   return blocks.flatMap((b) => (b.type === "socials" ? (b.data.items ?? []) : []));
 }
 
-// The menu: a page shows up once it has content.
+// The menu: Home, Projects and Writing are always there. About shows up once it has content.
 export function buildNav(base: string, site: SiteSettings) {
   return [
     { label: "Home", href: base },
