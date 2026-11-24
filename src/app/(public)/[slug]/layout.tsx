@@ -37,7 +37,7 @@ export default async function SiteLayout({ children, params }: Props) {
       <SiteHeader
         brand={profile.username}
         home={base}
-        items={buildNav(base, site, shop.products.length > 0 ? { label: shop.settings.home_title ?? "Shop" } : null)}
+        items={buildNav(base, site, { label: shop.settings.home_title ?? "Shop" })}
       />
       {children}
       <SiteFooter brand={profile.username} note={site.footerNote} socials={socialsOf(blocks)} />
