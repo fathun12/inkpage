@@ -1,10 +1,11 @@
 import type { CSSProperties, ReactNode } from "react";
+import { Credit } from "@/components/ui/Credit";
 import { Img } from "@/components/ui/Img";
 import { customPalette, plainBackground, type BackgroundView } from "@/config/background";
 import { cardDefaults, type CardStyle } from "@/config/card";
 import { customThemeDefaults, customThemePalette, type CustomTheme } from "@/config/custom-theme";
 import { defaultFonts, fontStyle, type FontPair } from "@/config/font-choices";
-import { siteConfig, type ThemeName } from "@/config/site";
+import type { ThemeName } from "@/config/site";
 import { isGifUrl } from "@/config/video";
 import { cardVars } from "@/lib/card-style";
 import { GlassDefs } from "./GlassDefs";
@@ -125,7 +126,9 @@ export function PublicFrame({
           </div>
         )}
         {children}
-        <footer className="pt-6 text-center text-xs text-ink-soft">{siteConfig.footer}</footer>
+        <footer className="pt-6 text-center text-xs text-ink-soft">
+          <Credit />
+        </footer>
       </main>
     </div>
   );

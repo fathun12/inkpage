@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { siteConfig } from "@/config/site";
+import { Credit } from "@/components/ui/Credit";
 import type { SocialItem } from "@/types/block";
 import { ThemeSwitch, type Mode } from "./ThemeSwitch";
 
@@ -90,7 +90,7 @@ export function SiteFooter({ brand, name, bio, note, socials, nav = [], modeCont
       <div className="bg-band px-5 text-band-ink sm:px-8">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-2 py-2.5">
           <p className="text-xs opacity-70">
-            © {new Date().getFullYear()} {brand} · {siteConfig.footer}
+            © {new Date().getFullYear()} {brand} · <Credit />
           </p>
           <div className="flex items-center gap-3">
             <ThemeSwitch control={modeControl} />
