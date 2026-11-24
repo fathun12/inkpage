@@ -1,46 +1,47 @@
 "use server";
 
 import { z } from "zod";
-import { routes } from "@/config/site";
+import { resolveTab, tabHref, type PagesTab } from "@/config/item-data";
 import {
   fileKey,
   readSite,
   siteLimits,
   siteMediaUrls,
-  type Highlight,
   type NewsItem,
   type SiteSettings,
 } from "@/config/site-content";
 import { requireUser } from "@/features/auth/queries";
-import { findSitePaths, signSiteUpload, sweepSiteMedia } from "@/features/media/upload";
+import { findSitePaths, signSiteUpload } from "@/features/media/upload";
 import { getProfileById } from "@/features/profile/queries";
 import { redirectWithError, redirectWithSaved } from "@/lib/flash";
 import { field } from "@/lib/form";
 import { createClient } from "@/lib/supabase/server";
 import { firstError, isHttpUrl } from "@/lib/validation";
 import type { VideoSignInput, VideoSignResult } from "@/types/media";
-
-const back = routes.pages;
+import { sweepKeeping } from "./sweep";
 
 const slotMax = {
   hero: siteLimits.hero,
   index: 1,
   gallery: siteLimits.gallery,
   about: 1,
-  hl0: siteLimits.highlightMedia,
-  hl1: siteLimits.highlightMedia,
-  hl2: siteLimits.highlightMedia,
-  hl3: siteLimits.highlightMedia,
-  hl4: siteLimits.highlightMedia,
 } as const;
 type Slot = keyof typeof slotMax;
+
+// Which media slots each tab of the Pages screen has.
+const tabSlots: Record<PagesTab, Slot[]> = {
+  home: ["hero", "index", "gallery"],
+  projects: [],
+  writing: [],
+  about: ["about"],
+  footer: [],
+};
 
 function slotLabel(slot: Slot): string {
   if (slot === "hero") return "The hero";
   if (slot === "index") return "The list background";
   if (slot === "gallery") return "The gallery";
-  if (slot === "about") return "The About photo";
-  return "A highlight";
+  return "The About photo";
 }
 
 function text(label: string, max: number) {
@@ -49,8 +50,8 @@ function text(label: string, max: number) {
 
 const textSchema = z.object({
   hero_caption: text("The hero caption", siteLimits.caption),
-  cards_title: text("The cards title", siteLimits.title),
-  highlights_title: text("The highlights title", siteLimits.title),
+  cards_title: text("The Writing label", siteLimits.title),
+  showcase_title: text("The Showcase label", siteLimits.title),
   projects_title: text("The Projects title", siteLimits.title),
   projects_intro: text("The Projects text", siteLimits.intro),
   writing_title: text("The Writing title", siteLimits.title),
@@ -80,7 +81,7 @@ function readNews(formData: FormData): { items: NewsItem[] } | { error: string }
   return { items };
 }
 
-// Kept items + new uploads. A list of one (list background, About photo, a highlight) is replaced by a new upload.
+// Kept items + new uploads. A list of one (list background, About photo) is replaced by a new upload.
 function merge(
   slot: Slot,
   old: string[],
@@ -108,21 +109,24 @@ export async function signSiteUploadAction(input: VideoSignInput): Promise<Video
   return signSiteUpload(user.id, input);
 }
 
+// Saves ONE tab of the Pages screen (the form says which one in "tab"). The other tabs keep what they have.
 export async function saveSiteAction(formData: FormData): Promise<void> {
   const user = await requireUser();
+  const tab = resolveTab(field(formData, "tab"));
+  const back = tabHref(tab);
   const current = await getProfileById(user.id);
   const old = readSite(current?.site);
 
   // Files uploaded but not saved are lost after a redirect, so they are deleted on every failure.
   const abort = async (message: string): Promise<void> => {
-    await sweepSiteMedia(user.id, siteMediaUrls(old));
+    await sweepKeeping(user.id, siteMediaUrls(old));
     return redirectWithError(back, message);
   };
 
   const parsed = textSchema.safeParse({
     hero_caption: field(formData, "hero_caption"),
     cards_title: field(formData, "cards_title"),
-    highlights_title: field(formData, "highlights_title"),
+    showcase_title: field(formData, "showcase_title"),
     projects_title: field(formData, "projects_title"),
     projects_intro: field(formData, "projects_intro"),
     writing_title: field(formData, "writing_title"),
@@ -134,86 +138,57 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
   if (!parsed.success) return abort(firstError(parsed.error));
   const v = parsed.data;
 
-  const news = readNews(formData);
-  if ("error" in news) return abort(news.error);
-
   const oldBySlot: Record<Slot, string[]> = {
     hero: old.hero,
     index: one(old.indexMedia),
     gallery: old.gallery,
     about: one(old.about.photo),
-    hl0: old.highlights[0]?.media ?? [],
-    hl1: old.highlights[1]?.media ?? [],
-    hl2: old.highlights[2]?.media ?? [],
-    hl3: old.highlights[3]?.media ?? [],
-    hl4: old.highlights[4]?.media ?? [],
   };
-  const lists = {} as Record<Slot, string[]>;
-  for (const slot of Object.keys(slotMax) as Slot[]) {
+  const lists: Partial<Record<Slot, string[]>> = {};
+  for (const slot of tabSlots[tab]) {
     const found = await findSitePaths(user.id, strings(formData, `add_${slot}`));
     if ("error" in found) return abort(found.error);
     const merged = merge(slot, oldBySlot[slot], new Set(strings(formData, `remove_${slot}`)), found.urls);
     if ("error" in merged) return abort(merged.error);
     lists[slot] = merged.list;
   }
+  const got = (slot: Slot): string[] => lists[slot] ?? oldBySlot[slot];
 
-  const highlights: Highlight[] = [];
-  for (let i = 0; i < siteLimits.highlights; i++) {
-    const title = field(formData, `hl_title_${i}`);
-    const body = field(formData, `hl_body_${i}`);
-    if (title && title.length > siteLimits.title) {
-      return abort(`Highlight ${i + 1}: the title can be at most ${siteLimits.title} characters.`);
-    }
-    if (body && body.length > siteLimits.highlightBody) {
-      return abort(`Highlight ${i + 1}: the text can be at most ${siteLimits.highlightBody} characters.`);
-    }
-    const nexus = field(formData, `hl_nexus_${i}`);
-    const github = field(formData, `hl_github_${i}`);
-    if (nexus && !isHttpUrl(nexus)) {
-      return abort(`Highlight ${i + 1}: the Nexus link must start with http:// or https://`);
-    }
-    if (github && !isHttpUrl(github)) {
-      return abort(`Highlight ${i + 1}: the GitHub link must start with http:// or https://`);
-    }
-    const media = lists[`hl${i}` as Slot];
-    if (title || body || media.length > 0 || nexus || github) {
-      highlights.push({
-        title: title ?? null,
-        body: body ?? null,
-        media,
-        nexus: nexus ?? null,
-        github: github ?? null,
-      });
-    }
+  const next: SiteSettings = { ...old };
+  if (tab === "home") {
+    const news = readNews(formData);
+    if ("error" in news) return abort(news.error);
+    next.news = news.items;
+    next.heroCaption = v.hero_caption ?? null;
+    next.cardsTitle = v.cards_title ?? null;
+    next.showcaseTitle = v.showcase_title ?? null;
+    next.hero = got("hero");
+    next.indexMedia = got("index")[0] ?? null;
+    next.gallery = got("gallery");
   }
+  if (tab === "projects") next.projects = { title: v.projects_title ?? null, intro: v.projects_intro ?? null };
+  if (tab === "writing") next.writing = { title: v.writing_title ?? null, intro: v.writing_intro ?? null };
+  if (tab === "about") {
+    next.about = { title: v.about_title ?? null, body: v.about_body ?? null, photo: got("about")[0] ?? null };
+  }
+  if (tab === "footer") next.footerNote = v.footer_note ?? null;
 
-  // Credits come as credit__<file name>. Only the ones of files that are still in use are kept.
+  // Credits come as credit__<file name>. An empty box clears a credit. Only credits of files in use are kept.
   const typed: Record<string, string> = {};
+  const cleared = new Set<string>();
   for (const [name, value] of formData.entries()) {
     if (!name.startsWith("credit__") || typeof value !== "string") continue;
     const key = name.slice("credit__".length);
+    if (!/^[\w.-]+$/.test(key)) continue;
     const t = value.trim();
-    if (t && /^[\w.-]+$/.test(key)) typed[key] = t.slice(0, siteLimits.credit);
+    if (t) typed[key] = t.slice(0, siteLimits.credit);
+    else cleared.add(key);
   }
-
-  const draft: SiteSettings = {
-    news: news.items,
-    heroCaption: v.hero_caption ?? null,
-    hero: lists.hero,
-    indexMedia: lists.index[0] ?? null,
-    gallery: lists.gallery,
-    cardsTitle: v.cards_title ?? null,
-    highlightsTitle: v.highlights_title ?? null,
-    highlights,
-    credits: {},
-    projects: { title: v.projects_title ?? null, intro: v.projects_intro ?? null },
-    writing: { title: v.writing_title ?? null, intro: v.writing_intro ?? null },
-    about: { title: v.about_title ?? null, body: v.about_body ?? null, photo: lists.about[0] ?? null },
-    footerNote: v.footer_note ?? null,
-  };
-  const used = new Set(siteMediaUrls(draft).map(fileKey));
-  const credits = Object.fromEntries(Object.entries(typed).filter(([key]) => used.has(key)));
-  const next: SiteSettings = { ...draft, credits };
+  const merged = { ...old.credits };
+  for (const key of cleared) delete merged[key];
+  Object.assign(merged, typed);
+  const used = new Set(siteMediaUrls(next).map(fileKey));
+  next.credits = Object.fromEntries(Object.entries(merged).filter(([key]) => used.has(key)));
 
   const supabase = await createClient();
   const { error } = await supabase.from("profiles").update({ site: next }).eq("id", user.id);
@@ -226,6 +201,6 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     );
   }
 
-  await sweepSiteMedia(user.id, siteMediaUrls(next));
+  await sweepKeeping(user.id, siteMediaUrls(next));
   redirectWithSaved(back, "Saved.");
 }

@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireUser } from "@/features/auth/queries";
 import { filesFrom, removeImages, uploadCardMedia, uploadImages } from "@/features/media/upload";
+import { resolveTab, tabHref } from "@/config/item-data";
 import { mediaConfig } from "@/config/media";
 import { routes } from "@/config/site";
 import { localInputToIso } from "@/lib/datetime";
@@ -19,8 +20,14 @@ import { parseBlockForm, parseMediaSettings, type BlockInput } from "./schema";
 const back = routes.links;
 
 // Forms on the Pages screen send return_to=pages, so they come back there and not to Links.
+// return_to is "pages" or "pages:projects" (a tab of the Pages screen).
 function backOf(formData: FormData): string {
-  return formData.get("return_to") === "pages" ? routes.pages : back;
+  const to = formData.get("return_to");
+  if (typeof to === "string" && to.startsWith("pages")) {
+    const tab = to.split(":")[1];
+    return tab ? tabHref(resolveTab(tab)) : routes.pages;
+  }
+  return back;
 }
 const galleryEmpty = "A gallery needs at least one image.";
 const galleryFull = `A gallery can hold up to ${mediaConfig.maxGallery} images.`;
@@ -103,6 +110,12 @@ function toRow(
     if (src.shape && src.shape !== "card") data.shape = src.shape;
     if (src.nexus) data.nexus = src.nexus;
     if (src.github) data.github = src.github;
+    // Media list, Download buttons, text links and the Showcase flag are written by the Pages form (13b).
+    // Until then, saving a block must never drop them.
+    if (current?.files?.length) data.files = current.files;
+    if (current?.downloads?.length) data.downloads = current.downloads;
+    if (current?.links?.length) data.links = current.links;
+    if (current?.showcase) data.showcase = true;
   }
 
   return {
@@ -256,6 +269,7 @@ export async function deleteBlockAction(formData: FormData): Promise<void> {
       found.image_url as string | null,
       ...(data.images ?? []),
       data.media?.url,
+      ...(data.files ?? []).map((f) => f.url),
     ]);
   }
   redirectWithSaved(back, "Block deleted.");
@@ -287,7 +301,7 @@ export async function reorderBlocksAction(formData: FormData): Promise<void> {
   if (failed?.error) {
     return redirectWithError(back, `Could not reorder: ${failed.error.message}`);
   }
-  revalidatePath(back);
+  revalidatePath(back.split("?")[0]);
 }
 
 const moveSchema = z.object({ id: z.string().min(1), direction: z.enum(["up", "down"]) });

@@ -38,16 +38,29 @@ export type CardMedia = {
   height: MediaHeight; // only used when placement is "below"
 };
 
+// Media of a Projects item (blocks.data.files): the ratio decides its frame, the credit shows small on it.
+export const itemRatios = ["landscape", "portrait"] as const;
+export type ItemRatio = (typeof itemRatios)[number];
+export const downloadLogos = ["github", "nexus", "none"] as const;
+export type DownloadLogo = (typeof downloadLogos)[number];
+export type ItemFile = { url: string; ratio: ItemRatio; credit: string | null };
+export type ItemDownload = { url: string; logo: DownloadLogo };
+export type ItemLink = { label: string; url: string };
+
 // Extra per-type data stored in blocks.data (jsonb).
 export type BlockData = {
   images?: string[]; // gallery
   items?: SocialItem[]; // socials
   target?: string; // countdown, ISO date
-  media?: CardMedia; // link and project cards
+  media?: CardMedia; // link and project cards (older cards)
   home?: boolean; // item of Projects or Writing that is also shown on Home
-  shape?: ItemShape; // missing = card
-  nexus?: string; // Nexus Mods download link
-  github?: string; // GitHub release link
+  shape?: ItemShape; // older items: missing = card
+  nexus?: string; // older items: Nexus Mods download link
+  github?: string; // older items: GitHub release link
+  files?: ItemFile[]; // Projects item: media list
+  downloads?: ItemDownload[]; // Projects item: Download buttons
+  links?: ItemLink[]; // Projects item: text links
+  showcase?: boolean; // Projects item: also shown as Showcase on Home
 };
 
 export type Block = {

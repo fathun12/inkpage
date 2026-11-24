@@ -63,6 +63,7 @@ export type SiteSettings = {
   gallery: string[];
   cardsTitle: string | null;
   highlightsTitle: string | null;
+  showcaseTitle: string | null;
   highlights: Highlight[];
   // Credit (source) text of a media, by the file name of the media.
   credits: Record<string, string>;
@@ -147,6 +148,7 @@ export function readSite(raw: unknown): SiteSettings {
     gallery: links(r.gallery, siteLimits.gallery),
     cardsTitle: text(r.cardsTitle, siteLimits.title),
     highlightsTitle: text(r.highlightsTitle, siteLimits.title),
+    showcaseTitle: text(r.showcaseTitle, siteLimits.title),
     highlights: readHighlights(r.highlights),
     credits: creditMap(r.credits),
     projects: { title: text(projects.title, siteLimits.title), intro: text(projects.intro, siteLimits.intro) },

@@ -1,11 +1,13 @@
 import { Img } from "@/components/ui/Img";
 import { routes } from "@/config/site";
 import type { Block } from "@/types/block";
-import { Downloads, downloadLinks } from "./Downloads";
+import { readProjectItem } from "@/lib/item-data";
+import { Downloads, TextLinks } from "./Downloads";
 
 // One item of Projects or Writing. Its look follows data.shape: card, button or text link.
 // The main part goes through /go (the click is counted). Download links go straight out.
 export function ItemCard({ block }: { block: Block }) {
+  const item = readProjectItem(block);
   const shape = block.data.shape ?? "card";
   const arrow = (
     <span
@@ -49,7 +51,8 @@ export function ItemCard({ block }: { block: Block }) {
       ) : (
         <div className="block">{main}</div>
       )}
-      <Downloads links={downloadLinks(block.data.nexus, block.data.github)} className="mt-4" />
+      <Downloads links={item.downloads} className="mt-4" />
+      <TextLinks links={item.links} className="mt-3" />
     </div>
   );
 }

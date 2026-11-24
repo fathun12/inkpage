@@ -1,27 +1,66 @@
-type DownloadLink = { label: string; url: string };
+import { siGithub } from "simple-icons";
+import { downloadWord, logoLabels } from "@/config/item-data";
+import type { DownloadLogo, ItemDownload, ItemLink } from "@/types/block";
 
+export type DownloadLink = ItemDownload;
+
+// Older code passes one Nexus link and one GitHub link.
 export function downloadLinks(nexus?: string | null, github?: string | null): DownloadLink[] {
-  return [
-    nexus ? { label: "Nexus Mods", url: nexus } : null,
-    github ? { label: "GitHub", url: github } : null,
-  ].filter((d): d is DownloadLink => d !== null);
+  const list: (DownloadLink | null)[] = [
+    nexus ? { url: nexus, logo: "nexus" } : null,
+    github ? { url: github, logo: "github" } : null,
+  ];
+  return list.filter((d): d is DownloadLink => d !== null);
 }
 
-// The text "Download" followed by one text link per source. Opens in a new tab.
+// A simple mark drawn by hand: an N cut out of a square.
+const nexusPath = "M3 3h18v18H3zM7 17V7h2.4l5.2 6.4V7H17v10h-2.4L9.4 10.6V17z";
+
+function Logo({ logo }: { logo: DownloadLogo }) {
+  if (logo === "none") return null;
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden className="size-4 shrink-0 fill-current">
+      <path d={logo === "github" ? siGithub.path : nexusPath} fillRule="evenodd" />
+    </svg>
+  );
+}
+
+// One BUTTON per source: the word "Download" and the logo next to it. Sharp corners, thin line. New tab.
 export function Downloads({ links, className = "" }: { links: DownloadLink[]; className?: string }) {
   if (links.length === 0) return null;
   return (
-    <p className={`flex flex-wrap items-baseline gap-x-4 gap-y-1 font-mono text-xs uppercase tracking-widest ${className}`}>
-      <span className="opacity-60">Download</span>
+    <div className={`flex flex-wrap gap-3 ${className}`}>
       {links.map((l) => (
         <a
-          key={l.label}
+          key={l.url}
+          href={l.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={l.logo === "none" ? downloadWord : `${downloadWord} on ${logoLabels[l.logo]}`}
+          className="inline-flex items-center gap-2 border border-ink px-4 py-2.5 font-mono text-xs uppercase tracking-widest transition-colors duration-(--dur-base) hover:bg-ink hover:text-bg"
+        >
+          <span>{downloadWord}</span>
+          <Logo logo={l.logo} />
+        </a>
+      ))}
+    </div>
+  );
+}
+
+// Plain text links with an underline (for example "Visit website"). New tab.
+export function TextLinks({ links, className = "" }: { links: ItemLink[]; className?: string }) {
+  if (links.length === 0) return null;
+  return (
+    <p className={`flex flex-wrap gap-x-5 gap-y-1 text-sm ${className}`}>
+      {links.map((l) => (
+        <a
+          key={l.url}
           href={l.url}
           target="_blank"
           rel="noopener noreferrer"
           className="underline decoration-accent decoration-1 underline-offset-4 transition-colors duration-(--dur-base) hover:text-accent"
         >
-          {l.label} <span aria-hidden>↓</span>
+          {l.label}
         </a>
       ))}
     </p>

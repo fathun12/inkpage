@@ -1,15 +1,17 @@
 import type { ReactNode } from "react";
 import { Field, Input, Textarea } from "@/components/ui/Field";
 import { SubmitButton } from "@/components/ui/SubmitButton";
+import type { PagesTab } from "@/config/item-data";
 import { mediaConfig } from "@/config/media";
 import { siteLimits, type PageText, type SiteSettings } from "@/config/site-content";
 import type { FormAction } from "@/types/form";
 import type { VideoSignAction } from "@/types/media";
 import { SiteMediaInput } from "./SiteMediaInput";
 
-type Props = { action: FormAction; sign: VideoSignAction; site: SiteSettings };
+type Base = { action: FormAction };
+type WithMedia = Base & { sign: VideoSignAction; site: SiteSettings };
 
-const mediaHint = `JPG, PNG, WebP, GIF, MP4 or WebM, up to ${mediaConfig.siteMedia.maxMb} MB each, kept in original quality. A file uploads as soon as you pick it, then press Save changes. Under each file you can write a credit or source: it shows small at the bottom right of the media.`;
+const mediaHint = `JPG, PNG, WebP, GIF, MP4 or WebM, up to ${mediaConfig.siteMedia.maxMb} MB each, kept in original quality. A file uploads as soon as you pick it, then press Save. Under each file you can write a credit or source: it shows small at the bottom right of the media.`;
 
 function Section({
   title,
@@ -33,25 +35,22 @@ function Section({
   );
 }
 
-function PageTextFields({ prefix, name, value }: { prefix: "projects" | "writing"; name: string; value: PageText }) {
+// Every tab form says which tab it is, so the server saves only that tab and keeps the rest.
+function TabForm({ tab, action, label, children }: { tab: PagesTab; action: FormAction; label: string; children: ReactNode }) {
   return (
-    <>
-      <Field label="Title" htmlFor={`${prefix}_title`} hint={`Optional. Default: ${name}.`}>
-        <Input id={`${prefix}_title`} name={`${prefix}_title`} defaultValue={value.title ?? ""} maxLength={siteLimits.title} />
-      </Field>
-      <Field label="Text under the title" htmlFor={`${prefix}_intro`} hint="Optional.">
-        <Textarea id={`${prefix}_intro`} name={`${prefix}_intro`} defaultValue={value.intro ?? ""} rows={3} maxLength={siteLimits.intro} />
-      </Field>
-      <p className="text-xs text-ink-soft">
-        The items of this page are added in the &quot;Projects items&quot; and &quot;Writing items&quot; sections at the top of this screen.
-      </p>
-    </>
+    <form action={action} className="flex flex-col gap-4">
+      <input type="hidden" name="tab" value={tab} />
+      {children}
+      <div>
+        <SubmitButton variant="accent">{label}</SubmitButton>
+      </div>
+    </form>
   );
 }
 
-export function PagesForm({ action, sign, site }: Props) {
+export function HomeForm({ action, sign, site }: WithMedia) {
   return (
-    <form action={action} className="flex flex-col gap-4">
+    <TabForm tab="home" action={action} label="Save Home">
       <Section title="News bar" hint="Short lines that slide at the very top." open>
         {Array.from({ length: siteLimits.news }, (_, i) => site.news[i]).map((item, i) => (
           <div key={i} className="grid gap-3 sm:grid-cols-2">
@@ -65,7 +64,7 @@ export function PagesForm({ action, sign, site }: Props) {
         ))}
       </Section>
 
-      <Section title="Hero" hint="The big media at the top of Home." open>
+      <Section title="Hero" hint="The big media at the top of Home.">
         <Field label="Caption" htmlFor="hero_caption" hint="Optional. Empty uses your bio.">
           <Input id="hero_caption" name="hero_caption" defaultValue={site.heroCaption ?? ""} maxLength={siteLimits.caption} />
         </Field>
@@ -74,45 +73,23 @@ export function PagesForm({ action, sign, site }: Props) {
         </Field>
       </Section>
 
-      <Section title="Home section titles" hint="Small labels above the sliding cards and above the highlights. Empty = no label.">
-        <Field label="Cards title" htmlFor="cards_title" hint="Label above the sliding Writing cards on Home. Empty = the Writing page title.">
+      <Section title="Section titles" hint="Small labels above the sections of Home. Empty = no label.">
+        <Field label="Writing" htmlFor="cards_title" hint="Above the sliding Writing cards. Empty = the title of the Writing page.">
           <Input id="cards_title" name="cards_title" defaultValue={site.cardsTitle ?? ""} maxLength={siteLimits.title} />
         </Field>
-        <Field label="Highlights title" htmlFor="highlights_title">
-          <Input id="highlights_title" name="highlights_title" defaultValue={site.highlightsTitle ?? ""} maxLength={siteLimits.title} />
+        <Field label="Showcase" htmlFor="showcase_title" hint="Above the Showcase section.">
+          <Input id="showcase_title" name="showcase_title" defaultValue={site.showcaseTitle ?? ""} maxLength={siteLimits.title} />
         </Field>
+        <p className="text-xs text-ink-soft">The label of the Projects section is the title of the Projects page (Projects tab).</p>
       </Section>
 
-      <Section title="List background" hint="Media behind the list of links on Home.">
-        <Field label="Media" htmlFor="site-index" hint={`One item. The list itself is made of the links on the Links screen with page Home. ${mediaHint}`}>
+      <Section title="Link list" hint="The list of links over a big media.">
+        <Field label="Media behind the list" htmlFor="site-index" hint={`One item. ${mediaHint}`}>
           <SiteMediaInput slot="index" current={site.indexMedia ? [site.indexMedia] : []} max={1} sign={sign} credits={site.credits} />
         </Field>
-      </Section>
-
-      <Section title="Highlights" open hint={`Up to ${siteLimits.highlights} projects on Home, just before the gallery. Media, title and text.`}>
-        {Array.from({ length: siteLimits.highlights }, (_, i) => {
-          const item = site.highlights[i];
-          return (
-            <div key={i} className="flex flex-col gap-3 border-t border-line pt-4 first:border-t-0 first:pt-0">
-              <p className="font-mono text-xs uppercase tracking-widest text-ink-soft">Highlight {i + 1}</p>
-              <Field label="Title" htmlFor={`hl_title_${i}`}>
-                <Input id={`hl_title_${i}`} name={`hl_title_${i}`} defaultValue={item?.title ?? ""} maxLength={siteLimits.title} />
-              </Field>
-              <Field label="Text" htmlFor={`hl_body_${i}`}>
-                <Textarea id={`hl_body_${i}`} name={`hl_body_${i}`} defaultValue={item?.body ?? ""} rows={4} maxLength={siteLimits.highlightBody} />
-              </Field>
-              <Field label="Download" htmlFor={`hl_nexus_${i}`} hint="Optional. Shows the text Download with a link for each box you fill.">
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <Input id={`hl_nexus_${i}`} name={`hl_nexus_${i}`} type="url" placeholder="Nexus Mods link, https://" defaultValue={item?.nexus ?? ""} />
-                  <Input id={`hl_github_${i}`} name={`hl_github_${i}`} type="url" placeholder="GitHub release link, https://" defaultValue={item?.github ?? ""} />
-                </div>
-              </Field>
-              <Field label={`Media (up to ${siteLimits.highlightMedia})`} htmlFor={`site-hl${i}`} hint={`Several photos, GIFs or videos per project. ${mediaHint}`}>
-                <SiteMediaInput slot={`hl${i}`} current={item?.media ?? []} max={siteLimits.highlightMedia} sign={sign} credits={site.credits} />
-              </Field>
-            </div>
-          );
-        })}
+        <p className="text-xs text-ink-soft">
+          The links themselves are added on the Links screen, with &quot;Show on page&quot; set to Home.
+        </p>
       </Section>
 
       <Section title="Gallery" hint="Full width above the footer. Photos fade in and out. No title.">
@@ -120,16 +97,35 @@ export function PagesForm({ action, sign, site }: Props) {
           <SiteMediaInput slot="gallery" current={site.gallery} max={siteLimits.gallery} sign={sign} credits={site.credits} />
         </Field>
       </Section>
+    </TabForm>
+  );
+}
 
-      <Section title="Projects page">
-        <PageTextFields prefix="projects" name="Projects" value={site.projects} />
+// Title and text of the Projects page or the Writing page. The items are right below this form.
+export function PageTextForm({
+  tab,
+  name,
+  value,
+  action,
+}: Base & { tab: "projects" | "writing"; name: string; value: PageText }) {
+  return (
+    <TabForm tab={tab} action={action} label={`Save ${name} page text`}>
+      <Section title={`${name} page`} hint="Title and text at the top of the page." open>
+        <Field label="Title" htmlFor={`${tab}_title`} hint={`Optional. Default: ${name}.`}>
+          <Input id={`${tab}_title`} name={`${tab}_title`} defaultValue={value.title ?? ""} maxLength={siteLimits.title} />
+        </Field>
+        <Field label="Text under the title" htmlFor={`${tab}_intro`} hint="Optional.">
+          <Textarea id={`${tab}_intro`} name={`${tab}_intro`} defaultValue={value.intro ?? ""} rows={3} maxLength={siteLimits.intro} />
+        </Field>
       </Section>
+    </TabForm>
+  );
+}
 
-      <Section title="Writing page">
-        <PageTextFields prefix="writing" name="Writing" value={site.writing} />
-      </Section>
-
-      <Section title="About page" hint="Appears in the menu once it has text or a photo.">
+export function AboutForm({ action, sign, site }: WithMedia) {
+  return (
+    <TabForm tab="about" action={action} label="Save About">
+      <Section title="About page" hint="Appears in the menu once it has text or a photo." open>
         <Field label="Title" htmlFor="about_title" hint="Optional. Default: About.">
           <Input id="about_title" name="about_title" defaultValue={site.about.title ?? ""} maxLength={siteLimits.title} />
         </Field>
@@ -140,16 +136,18 @@ export function PagesForm({ action, sign, site }: Props) {
           <SiteMediaInput slot="about" current={site.about.photo ? [site.about.photo] : []} max={1} sign={sign} credits={site.credits} />
         </Field>
       </Section>
+    </TabForm>
+  );
+}
 
-      <Section title="Footer" hint="Social links come from your Social links block under Links.">
+export function FooterForm({ action, site }: Base & { site: SiteSettings }) {
+  return (
+    <TabForm tab="footer" action={action} label="Save Footer">
+      <Section title="Footer" hint="Social links come from your Social links block under Links." open>
         <Field label="Note" htmlFor="footer_note" hint="Optional. For example an email address or a short line.">
           <Textarea id="footer_note" name="footer_note" defaultValue={site.footerNote ?? ""} rows={2} maxLength={siteLimits.footerNote} />
         </Field>
       </Section>
-
-      <div>
-        <SubmitButton variant="accent">Save changes</SubmitButton>
-      </div>
-    </form>
+    </TabForm>
   );
 }
