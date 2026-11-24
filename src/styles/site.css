@@ -208,6 +208,49 @@
     transform: translateY(6svh) scale(var(--site-hero-zoom, 1.4));
   }
 }
+
+/* Home intro: the lines rise in one after another, then it drifts away while you scroll down. */
+.site-intro-line {
+  animation: site-intro-rise 1.2s var(--ease-out) both;
+}
+.site-intro-line[data-n="1"] {
+  animation-delay: 300ms;
+}
+.site-intro-line[data-n="2"] {
+  animation-delay: 480ms;
+}
+.site-intro-line[data-n="3"] {
+  animation-delay: 680ms;
+}
+@keyframes site-intro-rise {
+  from {
+    opacity: 0;
+    transform: translateY(32px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes site-intro-away {
+  to {
+    opacity: 0;
+    transform: translateY(-14svh);
+  }
+}
+@supports (animation-timeline: scroll()) {
+  [data-motion="full"] .site-intro {
+    animation: site-intro-away linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 80svh;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-intro,
+  .site-intro-line {
+    animation: none !important;
+  }
+}
 @keyframes site-caption {
   from {
     opacity: 0;
