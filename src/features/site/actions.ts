@@ -52,6 +52,7 @@ const textSchema = z.object({
   hero_caption: text("The hero caption", siteLimits.caption),
   cards_title: text("The Writing label", siteLimits.title),
   showcase_title: text("The Showcase label", siteLimits.title),
+  biblia_title: text("The Biblia label", siteLimits.title),
   projects_title: text("The Projects title", siteLimits.title),
   projects_intro: text("The Projects text", siteLimits.intro),
   writing_title: text("The Writing title", siteLimits.title),
@@ -127,6 +128,7 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     hero_caption: field(formData, "hero_caption"),
     cards_title: field(formData, "cards_title"),
     showcase_title: field(formData, "showcase_title"),
+    biblia_title: field(formData, "biblia_title"),
     projects_title: field(formData, "projects_title"),
     projects_intro: field(formData, "projects_intro"),
     writing_title: field(formData, "writing_title"),
@@ -162,6 +164,10 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     next.heroCaption = v.hero_caption ?? null;
     next.cardsTitle = v.cards_title ?? null;
     next.showcaseTitle = v.showcase_title ?? null;
+    const biblia = field(formData, "biblia_url");
+    if (biblia && !isHttpUrl(biblia)) return abort("The Biblia address must start with http:// or https://");
+    next.bibliaUrl = biblia ? biblia.replace(/\/+$/, "") : null;
+    next.bibliaTitle = v.biblia_title ?? null;
     next.hero = got("hero");
     next.indexMedia = got("index")[0] ?? null;
     next.gallery = got("gallery");

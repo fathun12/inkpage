@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { CardSlider } from "@/components/site/CardSlider";
 import { FadeGallery } from "@/components/site/FadeGallery";
 import { Hero } from "@/components/site/Hero";
+import { HomeBiblia } from "@/components/site/HomeBiblia";
 import { HomeProjects } from "@/components/site/HomeProjects";
 import { HomeShowcase } from "@/components/site/HomeShowcase";
 import { IndexSection } from "@/components/site/IndexSection";
@@ -12,6 +13,7 @@ import { readSiteStyle } from "@/config/site-style";
 import { siteConfig } from "@/config/site";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
+import { fetchBiblia } from "@/features/site/biblia";
 import { getSiteUrl } from "@/lib/site-url";
 import { creditOf, homeProjects, homeShowcase, homeWriting, listBlocks, resolveHomeMedia } from "@/lib/site-view";
 
@@ -31,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-// Home, top to bottom: hero, writing cards (slide), projects (no slide), list over a media, showcase, gallery.
+// Home, top to bottom: hero, writing cards (slide), projects (no slide), Biblia covers, list over a media, showcase, gallery.
 export default async function HomePage({ params }: Props) {
   const { slug } = await params;
   const profile = await getProfileByUsername(slug.toLowerCase());
@@ -46,6 +48,7 @@ export default async function HomePage({ params }: Props) {
   const writing = homeWriting(blocks);
   const showcase = homeShowcase(blocks);
   const autoplay = style.motion !== "off";
+  const biblia = await fetchBiblia(site.bibliaUrl, 6);
 
   return (
     <>
@@ -67,6 +70,9 @@ export default async function HomePage({ params }: Props) {
         />
       )}
       <HomeProjects items={projects} title={site.projects.title ?? "Projects"} />
+      {biblia && (
+        <HomeBiblia data={biblia} title={site.bibliaTitle ?? "Biblia"} seeAll={`/${profile.username}/biblia`} />
+      )}
       {rows.length > 0 && (
         <IndexSection blocks={rows} mediaUrl={media.indexMedia} credit={creditOf(site.credits, media.indexMedia)} />
       )}

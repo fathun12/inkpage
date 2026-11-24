@@ -37,7 +37,7 @@ function privateIp(ip: string): boolean {
   return true;
 }
 
-async function safeUrl(raw: string): Promise<URL | null> {
+export async function safeUrl(raw: string): Promise<URL | null> {
   let u: URL;
   try {
     u = new URL(raw);

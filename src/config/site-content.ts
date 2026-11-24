@@ -64,6 +64,9 @@ export type SiteSettings = {
   cardsTitle: string | null;
   highlightsTitle: string | null;
   showcaseTitle: string | null;
+  // Address of the Biblia library (empty = no Biblia section) and its label.
+  bibliaUrl: string | null;
+  bibliaTitle: string | null;
   highlights: Highlight[];
   // Credit (source) text of a media, by the file name of the media.
   credits: Record<string, string>;
@@ -149,6 +152,8 @@ export function readSite(raw: unknown): SiteSettings {
     cardsTitle: text(r.cardsTitle, siteLimits.title),
     highlightsTitle: text(r.highlightsTitle, siteLimits.title),
     showcaseTitle: text(r.showcaseTitle, siteLimits.title),
+    bibliaUrl: link(r.bibliaUrl),
+    bibliaTitle: text(r.bibliaTitle, siteLimits.title),
     highlights: readHighlights(r.highlights),
     credits: creditMap(r.credits),
     projects: { title: text(projects.title, siteLimits.title), intro: text(projects.intro, siteLimits.intro) },

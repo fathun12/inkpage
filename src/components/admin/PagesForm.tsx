@@ -83,6 +83,19 @@ export function HomeForm({ action, sign, site }: WithMedia) {
         <p className="text-xs text-ink-soft">The label of the Projects section is the title of the Projects page (Projects tab).</p>
       </Section>
 
+      <Section title="Biblia" hint="Book covers from your Biblia library, shown below Projects.">
+        <Field
+          label="Biblia address"
+          htmlFor="biblia_url"
+          hint="For example https://biblia-gilt-eight.vercel.app . Empty = no Biblia section and no menu item."
+        >
+          <Input id="biblia_url" name="biblia_url" type="url" placeholder="https://" defaultValue={site.bibliaUrl ?? ""} />
+        </Field>
+        <Field label="Label" htmlFor="biblia_title" hint="Optional. Default: Biblia. Also the name in the menu.">
+          <Input id="biblia_title" name="biblia_title" defaultValue={site.bibliaTitle ?? ""} maxLength={siteLimits.title} />
+        </Field>
+      </Section>
+
       <Section title="Link list" hint="The list of links over a big media.">
         <Field label="Media behind the list" htmlFor="site-index" hint={`One item. ${mediaHint}`}>
           <SiteMediaInput slot="index" current={site.indexMedia ? [site.indexMedia] : []} max={1} sign={sign} credits={site.credits} />
