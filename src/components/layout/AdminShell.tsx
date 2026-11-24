@@ -16,6 +16,7 @@ export function AdminShell({ username, logoutAction, children }: Props) {
             <NavLink href={routes.admin} exact>Overview</NavLink>
             <NavLink href={routes.links}>Links</NavLink>
             <NavLink href={routes.pages}>Pages</NavLink>
+            <NavLink href={routes.write}>Write</NavLink>
             <NavLink href={routes.shop}>Shop</NavLink>
             <NavLink href={routes.profileEdit}>Profile</NavLink>
             <NavLink href={routes.analytics}>Analytics</NavLink>
