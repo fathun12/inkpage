@@ -44,14 +44,17 @@ export function Intro({ greetings, note, headlines, seconds, autoplay }: Props) 
   const at = rotate ? index % count : 0;
 
   return (
-    <section aria-label="Introduction" className="w-full px-5 py-14 sm:px-8 md:py-20">
+    <section
+      aria-label="Introduction"
+      className="pointer-events-none absolute inset-0 z-10 flex flex-col justify-center px-5 pb-36 pt-40 sm:px-8"
+    >
       <p className="min-h-[1.5em] font-display text-2xl font-bold tracking-tight text-accent md:text-3xl">
         {now ? greetings[dayPartFor(now.getHours())] : "\u00a0"}
       </p>
-      <p className="mt-1 min-h-[1.5em] text-ink-soft">
+      <p className="mt-1 min-h-[1.5em] text-white/80">
         {now ? `Today is ${dateFormat.format(now)}.${note ? ` ${note}` : ""}` : "\u00a0"}
       </p>
-      <h2 className="mt-8 grid max-w-5xl text-5xl leading-none tracking-tight md:text-7xl lg:text-8xl">
+      <h2 className="mt-6 grid max-w-5xl text-4xl leading-none tracking-tight md:text-6xl lg:text-7xl">
         {headlines.map((text, i) => (
           <span
             key={`${text}-${i}`}

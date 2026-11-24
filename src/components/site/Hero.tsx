@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { Img } from "@/components/ui/Img";
 import { creditOf, mediaKind } from "@/lib/site-view";
 import { Credit } from "./Credit";
@@ -13,10 +13,12 @@ type Props = {
   autoplay: boolean;
   gray: boolean;
   credits?: Record<string, string>;
+  // Drawn over the media (the Home intro).
+  children?: ReactNode;
 };
 
 // Full width media (video, GIF or photo) that can slide, with one small caption.
-export function Hero({ slides, name, caption, seconds, autoplay, gray, credits = {} }: Props) {
+export function Hero({ slides, name, caption, seconds, autoplay, gray, credits = {}, children }: Props) {
   const [index, setIndex] = useState(0);
   const count = slides.length;
 
@@ -58,6 +60,7 @@ export function Hero({ slides, name, caption, seconds, autoplay, gray, credits =
         </div>
       )}
       <div aria-hidden className="site-hero-shade" />
+      {children}
       <div className="site-hero-caption absolute inset-x-0 bottom-0 flex flex-col items-center gap-1 px-5 pb-8 text-center">
         <h1 className="font-display text-base font-medium">{name}</h1>
         {caption && <p className="max-w-md whitespace-pre-line text-sm opacity-80">{caption}</p>}
