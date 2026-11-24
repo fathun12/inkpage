@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { ProductGrid } from "@/components/shop/ProductGrid";
 import { ShopLinks } from "@/components/shop/ShopLinks";
 import { PageIntro } from "@/components/site/PageIntro";
+import { VisitCards } from "@/components/site/VisitCards";
+import { readSite } from "@/config/site-content";
 import { routes } from "@/config/site";
 import { getProfileByUsername } from "@/features/profile/queries";
 import { getPublicShop, legalLinks } from "@/features/shop/public";
@@ -23,6 +25,7 @@ export default async function ShopPage({ params }: Props) {
   if (!profile) notFound();
 
   const { settings, products } = await getPublicShop(profile.id);
+  const site = readSite(profile.site);
 
   return (
     <>
@@ -35,6 +38,7 @@ export default async function ShopPage({ params }: Props) {
       ) : (
         <p className="mx-auto max-w-5xl px-5 pb-24 text-ink-soft sm:px-8">Nothing here yet.</p>
       )}
+      <VisitCards items={site.visits} title={site.visitTitle ?? "Visit website"} />
       <div className="mx-auto max-w-5xl px-5 pb-24 sm:px-8">
         <ShopLinks links={legalLinks(settings, routes.profile(profile.username))} email={settings.contact_email} />
       </div>
