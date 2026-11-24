@@ -25,7 +25,12 @@ export default async function AboutPage({ params }: Props) {
   return (
     <>
       <PageIntro title={site.about.title ?? "About"} intro={null} />
-      <AboutSection body={site.about.body} photo={site.about.photo} />
+      <AboutSection
+        name={profile.display_name}
+        bio={profile.bio}
+        body={site.about.body}
+        photo={site.about.photo}
+      />
     </>
   );
 }
