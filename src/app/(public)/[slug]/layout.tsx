@@ -40,7 +40,12 @@ export default async function SiteLayout({ children, params }: Props) {
         items={buildNav(base, site, { label: shop.settings.home_title ?? "Shop" })}
       />
       {children}
-      <SiteFooter brand={profile.username} note={site.footerNote} socials={socialsOf(blocks)} />
+      <SiteFooter
+        brand={profile.username}
+        note={site.footerNote}
+        socials={socialsOf(blocks)}
+        nav={buildNav(base, site, { label: shop.settings.home_title ?? "Shop" })}
+      />
       {music && <MusicPlayer embed={music} />}
       <ViewBeacon endpoint={routes.track} username={profile.username} />
     </SiteFrame>
