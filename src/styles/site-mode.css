@@ -1,9 +1,11 @@
 /* site-mode.css: dark mode of the public website.
    The light colors come inline from SiteFrame (--c-*). The dark set arrives as --d-*.
-   "System" = no attribute on <html>, so the OS decides. */
+   Public site: "System" = no attribute on <html>, so the OS decides.
+   Customize preview: .site-root has data-mode, so only that box follows it (not <html>). */
 
 @media (prefers-color-scheme: dark) {
-  html:not([data-site-mode="light"]) .site-root {
+  html:not([data-site-mode="light"]) .site-root:not([data-mode]),
+  .site-root[data-mode="system"] {
     color-scheme: dark;
     --c-bg: var(--d-bg) !important;
     --c-surface: var(--d-surface) !important;
@@ -21,7 +23,8 @@
   }
 }
 
-html[data-site-mode="dark"] .site-root {
+html[data-site-mode="dark"] .site-root:not([data-mode]),
+.site-root[data-mode="dark"] {
   color-scheme: dark;
   --c-bg: var(--d-bg) !important;
   --c-surface: var(--d-surface) !important;

@@ -1,17 +1,24 @@
 import Link from "next/link";
 import { siteConfig } from "@/config/site";
 import type { SocialItem } from "@/types/block";
-import { ThemeSwitch } from "./ThemeSwitch";
+import { ThemeSwitch, type Mode } from "./ThemeSwitch";
 
 type NavItem = { label: string; href: string };
-type Props = { brand: string; note: string | null; socials: SocialItem[]; nav?: NavItem[] };
+type Props = {
+  brand: string;
+  note: string | null;
+  socials: SocialItem[];
+  nav?: NavItem[];
+  // Only the Customize preview sets this, so the buttons change the preview box and not the whole page.
+  modeControl?: { value: Mode; onChange: (mode: Mode) => void };
+};
 
-const heading = "font-mono text-xs uppercase tracking-widest text-ink-soft";
-const link = "text-sm transition-colors duration-(--dur-base) hover:text-ink-soft";
+const heading = "font-mono text-xs uppercase tracking-widest opacity-60";
+const link = "text-sm transition-opacity duration-(--dur-base) hover:opacity-60";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
-export function SiteFooter({ brand, note, socials, nav = [] }: Props) {
+export function SiteFooter({ brand, note, socials, nav = [], modeControl }: Props) {
   const hasNav = nav.length > 0;
   const hasSocials = socials.length > 0;
   const noteNo = 0;
@@ -19,15 +26,16 @@ export function SiteFooter({ brand, note, socials, nav = [] }: Props) {
   const socialNo = (note ? 1 : 0) + (hasNav ? 1 : 0);
 
   return (
-    <footer className="border-t border-line">
-      <div className="px-5 pt-14 sm:px-8 sm:pt-20">
+    <footer className="mt-16 sm:mt-24">
+      {/* Upper part: the Tertiary color. */}
+      <div className="bg-tertiary px-5 pt-14 text-tertiary-ink sm:px-8 sm:pt-20">
         <div className="mx-auto max-w-5xl">
           {(note || hasNav || hasSocials) && (
             <div className="grid gap-12 sm:grid-cols-[repeat(auto-fit,minmax(12rem,1fr))]">
               {note && (
                 <div className="flex flex-col gap-3">
                   <p className={heading}>{pad(noteNo)} / Note</p>
-                  <p className="max-w-xs whitespace-pre-line text-sm text-ink-soft">{note}</p>
+                  <p className="max-w-xs whitespace-pre-line text-sm opacity-70">{note}</p>
                 </div>
               )}
 
@@ -73,18 +81,18 @@ export function SiteFooter({ brand, note, socials, nav = [] }: Props) {
         </div>
       </div>
 
-      {/* Full-width band: copyright, color mode, back to top. */}
-      <div className="border-t border-band-line bg-band px-5 text-band-ink sm:px-8">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-4 py-5">
+      {/* Full-width band, now thin: copyright, color mode, back to top. */}
+      <div className="bg-band px-5 text-band-ink sm:px-8">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-2 py-2.5">
           <p className="text-xs opacity-70">
             © {new Date().getFullYear()} {brand} · {siteConfig.footer}
           </p>
-          <div className="flex items-center gap-4">
-            <ThemeSwitch />
+          <div className="flex items-center gap-3">
+            <ThemeSwitch control={modeControl} />
             <a
               href="#"
               aria-label="Back to top"
-              className="inline-flex size-9 shrink-0 items-center justify-center border border-band-ink font-mono text-sm transition-colors duration-(--dur-base) hover:bg-band-ink hover:text-band"
+              className="inline-flex size-7 shrink-0 items-center justify-center border border-band-ink font-mono text-xs transition-colors duration-(--dur-base) hover:bg-band-ink hover:text-band"
             >
               <span aria-hidden>↑</span>
             </a>

@@ -1,16 +1,22 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { CustomizeStudio } from "@/components/admin/CustomizeStudio";
+import type { ContentsItem } from "@/components/site/HeroContents";
 import { FlashNotice } from "@/components/ui/FlashNotice";
 import { readBackground } from "@/config/background";
 import { readFonts } from "@/config/font-choices";
 import { readSite } from "@/config/site-content";
 import { readSiteStyle } from "@/config/site-style";
 import { routes } from "@/config/site";
+import { shopConfig } from "@/config/shop";
 import { updateAppearanceAction } from "@/features/appearance/actions";
 import { requireUser } from "@/features/auth/queries";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileById } from "@/features/profile/queries";
+import { getPublicShop } from "@/features/shop/public";
+import { fetchBiblia } from "@/features/site/biblia";
+import { fetchDesigns } from "@/features/site/designs";
+import { fetchGithub } from "@/features/site/github";
 import { savedText } from "@/lib/flash";
 import {
   buildNav,
@@ -36,6 +42,35 @@ export default async function CustomizePage({ searchParams }: Props) {
   const site = readSite(profile.site);
   const base = routes.profile(profile.username);
 
+  // The same data as Home, so the preview shows the same sections.
+  const [biblia, designs, github, shop] = await Promise.all([
+    fetchBiblia(site.bibliaUrl, 6),
+    fetchDesigns(site.designsUrl, 3),
+    fetchGithub(site.githubUser),
+    getPublicShop(profile.id),
+  ]);
+  const shopItems = shop.products.filter((p) => p.show_on_home).slice(0, shopConfig.homeMax);
+  const shopTitle = shop.settings.home_title ?? "Shop";
+
+  const rows = listBlocks(blocks, "home");
+  const projects = homeProjects(blocks);
+  const writing = homeWriting(blocks);
+  const showcase = homeShowcase(blocks);
+  const media = resolveHomeMedia(site, readBackground(profile), blocks);
+
+  const contents = [
+    writing.length > 0 && { id: "writing", label: site.cardsTitle ?? site.writing.title ?? "Writing" },
+    projects.length > 0 && { id: "projects", label: site.projects.title ?? "Projects" },
+    biblia && biblia.books.length > 0 && { id: "biblia", label: site.bibliaTitle ?? "Biblia" },
+    github && { id: "github", label: site.githubTitle ?? "GitHub" },
+    shopItems.length > 0 && { id: "shop", label: shopTitle },
+    rows.length > 0 && { id: "links", label: "Links" },
+    showcase.length > 0 && { id: "showcase", label: site.showcaseTitle ?? "Showcase" },
+    designs && designs.projects.length > 0 && { id: "designs", label: site.designsTitle ?? "Design" },
+    site.visits.length > 0 && { id: "visit", label: site.visitTitle ?? "Visit website" },
+    media.gallery.length > 0 && { id: "gallery", label: "Gallery" },
+  ].filter((item): item is ContentsItem => Boolean(item));
+
   const notice = error ? (
     <FlashNotice tone="error">{error}</FlashNotice>
   ) : saved ? (
@@ -51,13 +86,21 @@ export default async function CustomizePage({ searchParams }: Props) {
       fonts={readFonts(profile)}
       style={readSiteStyle(profile.site_style)}
       site={site}
-      media={resolveHomeMedia(site, readBackground(profile), blocks)}
-      rows={listBlocks(blocks, "home").slice(0, 6)}
-      projects={homeProjects(blocks).slice(0, 6)}
-      showcase={homeShowcase(blocks)}
-      cards={homeWriting(blocks).slice(0, 6)}
+      media={media}
+      rows={rows.slice(0, 6)}
+      projects={projects.slice(0, 6)}
+      showcase={showcase}
+      cards={writing.slice(0, 6)}
       socials={socialsOf(blocks)}
       nav={buildNav(base, site)}
+      biblia={biblia}
+      designs={designs}
+      github={github}
+      shopItems={shopItems}
+      shopOpen={shop.settings.is_open}
+      shopTitle={shopTitle}
+      shopBase={routes.section(profile.username, "shop")}
+      contents={contents}
       notice={notice}
     />
   );

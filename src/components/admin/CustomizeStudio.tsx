@@ -1,13 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type MouseEvent, type ReactNode } from "react";
+import { useState, type ComponentProps, type MouseEvent, type ReactNode } from "react";
 import { CardSlider } from "@/components/site/CardSlider";
 import { FadeGallery } from "@/components/site/FadeGallery";
 import { Hero } from "@/components/site/Hero";
 import { Intro } from "@/components/site/Intro";
 import { resolveGreetings } from "@/config/intro";
+import { HeroContents, type ContentsItem } from "@/components/site/HeroContents";
+import { HomeBiblia } from "@/components/site/HomeBiblia";
+import { HomeDesigns } from "@/components/site/HomeDesigns";
+import { HomeGithub } from "@/components/site/HomeGithub";
 import { HomeProjects } from "@/components/site/HomeProjects";
+import { VisitCards } from "@/components/site/VisitCards";
+import { HomeShop } from "@/components/shop/HomeShop";
+import type { Mode } from "@/components/site/ThemeSwitch";
 import { HomeShowcase } from "@/components/site/HomeShowcase";
 import { IndexSection } from "@/components/site/IndexSection";
 import { NewsBar } from "@/components/site/NewsBar";
@@ -53,6 +60,14 @@ type Props = {
   cards: Block[];
   socials: SocialItem[];
   nav: { label: string; href: string }[];
+  biblia: ComponentProps<typeof HomeBiblia>["data"] | null;
+  designs: ComponentProps<typeof HomeDesigns>["data"] | null;
+  github: ComponentProps<typeof HomeGithub>["data"] | null;
+  shopItems: ComponentProps<typeof HomeShop>["products"];
+  shopOpen: boolean;
+  shopTitle: string;
+  shopBase: string;
+  contents: ContentsItem[];
   notice?: ReactNode;
 };
 
@@ -217,6 +232,14 @@ export function CustomizeStudio({
   cards,
   socials,
   nav,
+  biblia,
+  designs,
+  github,
+  shopItems,
+  shopOpen,
+  shopTitle,
+  shopBase,
+  contents,
   notice,
 }: Props) {
   const [initial] = useState<Draft>(() => ({
@@ -226,6 +249,8 @@ export function CustomizeStudio({
   }));
   const [draft, setDraft] = useState<Draft>(initial);
   const [device, setDevice] = useState<"phone" | "desktop">("phone");
+  // System / Light / Dark inside the preview box only. Not saved.
+  const [previewMode, setPreviewMode] = useState<Mode>("system");
 
   function set<K extends keyof Draft>(key: K, value: Draft[K]) {
     setDraft((d) => ({ ...d, [key]: value }));
@@ -359,7 +384,7 @@ export function CustomizeStudio({
                   className={colorInput}
                 />
               </Field>
-              <Field label="Tertiary" htmlFor="ui_color_tertiary" hint="Reserved. Not used yet.">
+              <Field label="Tertiary" htmlFor="ui_color_tertiary" hint="Top part of the footer.">
                 <input
                   id="ui_color_tertiary"
                   type="color"
@@ -498,10 +523,11 @@ export function CustomizeStudio({
             style={{ maxWidth: device === "phone" ? phoneWidth : undefined }}
           >
             <div className="absolute inset-0 overflow-y-auto" onClickCapture={stopLinks}>
-              <SiteFrame
+                            <SiteFrame
                 fonts={{ heading: draft.fontHeading, body: draft.fontBody }}
                 style={draft.style}
                 viewportHeight={device === "phone" ? "620px" : "560px"}
+                mode={previewMode}
               >
                 <NewsBar items={site.news} seconds={draft.style.heroSeconds} autoplay={autoplay} showClock={site.showClock} />
                 <SiteHeader brand={profile.username} home={base} items={nav} overlay />
@@ -523,6 +549,7 @@ export function CustomizeStudio({
                       autoplay={autoplay}
                     />
                   )}
+                  <HeroContents items={contents} />
                 </Hero>
                 {cards.length > 0 && (
                   <CardSlider
@@ -533,19 +560,40 @@ export function CustomizeStudio({
                   />
                 )}
                 <HomeProjects items={projects} title={site.projects.title ?? "Projects"} />
+                {biblia && (
+                  <HomeBiblia data={biblia} title={site.bibliaTitle ?? "Biblia"} seeAll={`${base}/biblia`} />
+                )}
+                {github && <HomeGithub data={github} title={site.githubTitle ?? "GitHub"} />}
+                <HomeShop products={shopItems} open={shopOpen} title={shopTitle} base={shopBase} />
                 <IndexSection
                   blocks={previewRows}
                   mediaUrl={media.indexMedia}
                   credit={creditOf(site.credits, media.indexMedia)}
                 />
                 <HomeShowcase items={showcase} title={site.showcaseTitle ?? "Showcase"} />
+                {designs && (
+                  <HomeDesigns
+                    data={designs}
+                    title={site.designsTitle ?? "Design"}
+                    href={site.designsUrl}
+                    seconds={draft.style.gallerySeconds}
+                    autoplay={autoplay}
+                  />
+                )}
+                <VisitCards items={site.visits} title={site.visitTitle ?? "Visit website"} />
                 <FadeGallery
                   images={media.gallery}
                   seconds={draft.style.gallerySeconds}
                   autoplay={autoplay}
                   credits={site.credits}
                 />
-                <SiteFooter brand={profile.username} note={site.footerNote} socials={socials} />
+                <SiteFooter
+                  brand={profile.username}
+                  note={site.footerNote}
+                  socials={socials}
+                  nav={nav}
+                  modeControl={{ value: previewMode, onChange: setPreviewMode }}
+                />
               </SiteFrame>
             </div>
           </div>

@@ -2,7 +2,7 @@
 
 import { useSyncExternalStore } from "react";
 
-type Mode = "system" | "light" | "dark";
+export type Mode = "system" | "light" | "dark";
 
 const KEY = "site-mode";
 const EVENT = "site-mode";
@@ -42,9 +42,14 @@ function apply(mode: Mode) {
   window.dispatchEvent(new Event(EVENT));
 }
 
+type Props = { control?: { value: Mode; onChange: (mode: Mode) => void } };
+
 // System / Light / Dark. The choice is kept in this visitor's browser only.
-export function ThemeSwitch() {
-  const mode = useSyncExternalStore(subscribe, read, () => "system" as Mode);
+// With "control" (Customize preview) it touches neither <html> nor the browser storage.
+export function ThemeSwitch({ control }: Props) {
+  const stored = useSyncExternalStore(subscribe, read, () => "system" as Mode);
+  const mode = control ? control.value : stored;
+  const choose = control ? control.onChange : apply;
   return (
     <div role="group" aria-label="Color mode" className="flex">
       {modes.map((m) => (
@@ -52,8 +57,8 @@ export function ThemeSwitch() {
           key={m.id}
           type="button"
           aria-pressed={mode === m.id}
-          onClick={() => apply(m.id)}
-          className={`-ml-px border border-band-ink px-3 py-2 font-mono text-[10px] uppercase tracking-widest transition-colors duration-(--dur-base) first:ml-0 ${
+          onClick={() => choose(m.id)}
+          className={`-ml-px border border-band-ink px-2.5 py-1 font-mono text-[10px] uppercase tracking-widest transition-colors duration-(--dur-base) first:ml-0 ${
             mode === m.id ? "bg-band-ink text-band" : "hover:bg-band-ink/15"
           }`}
         >
