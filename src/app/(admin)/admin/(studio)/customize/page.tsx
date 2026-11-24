@@ -12,7 +12,15 @@ import { requireUser } from "@/features/auth/queries";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileById } from "@/features/profile/queries";
 import { savedText } from "@/lib/flash";
-import { buildNav, homeProjects, homeWriting, listBlocks, resolveHomeMedia, socialsOf } from "@/lib/site-view";
+import {
+  buildNav,
+  homeProjects,
+  homeShowcase,
+  homeWriting,
+  listBlocks,
+  resolveHomeMedia,
+  socialsOf,
+} from "@/lib/site-view";
 
 export const metadata: Metadata = { title: "Customize" };
 
@@ -46,6 +54,7 @@ export default async function CustomizePage({ searchParams }: Props) {
       media={resolveHomeMedia(site, readBackground(profile), blocks)}
       rows={listBlocks(blocks, "home").slice(0, 6)}
       projects={homeProjects(blocks).slice(0, 6)}
+      showcase={homeShowcase(blocks)}
       cards={homeWriting(blocks).slice(0, 6)}
       socials={socialsOf(blocks)}
       nav={buildNav(base, site)}

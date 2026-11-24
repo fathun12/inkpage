@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-// Home, top to bottom: hero, projects (no slide), writing cards (slide), list over a media, highlights, gallery.
+// Home, top to bottom: hero, writing cards (slide), projects (no slide), list over a media, showcase, gallery.
 export default async function HomePage({ params }: Props) {
   const { slug } = await params;
   const profile = await getProfileByUsername(slug.toLowerCase());

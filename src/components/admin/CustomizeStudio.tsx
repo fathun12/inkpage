@@ -5,8 +5,8 @@ import { useState, type MouseEvent, type ReactNode } from "react";
 import { CardSlider } from "@/components/site/CardSlider";
 import { FadeGallery } from "@/components/site/FadeGallery";
 import { Hero } from "@/components/site/Hero";
-import { Highlights } from "@/components/site/Highlights";
 import { HomeProjects } from "@/components/site/HomeProjects";
+import { HomeShowcase } from "@/components/site/HomeShowcase";
 import { IndexSection } from "@/components/site/IndexSection";
 import { NewsBar } from "@/components/site/NewsBar";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -47,6 +47,7 @@ type Props = {
   media: HomeMedia;
   rows: Block[];
   projects: Block[];
+  showcase: Block[];
   cards: Block[];
   socials: SocialItem[];
   nav: { label: string; href: string }[];
@@ -210,6 +211,7 @@ export function CustomizeStudio({
   media,
   rows,
   projects,
+  showcase,
   cards,
   socials,
   nav,
@@ -477,7 +479,6 @@ export function CustomizeStudio({
                   gray={draft.style.heroGray}
                   credits={site.credits}
                 />
-                <HomeProjects items={projects} title={site.projects.title ?? "Projects"} />
                 {cards.length > 0 && (
                   <CardSlider
                     items={cards}
@@ -486,12 +487,13 @@ export function CustomizeStudio({
                     autoplay={autoplay}
                   />
                 )}
+                <HomeProjects items={projects} title={site.projects.title ?? "Projects"} />
                 <IndexSection
                   blocks={previewRows}
                   mediaUrl={media.indexMedia}
                   credit={creditOf(site.credits, media.indexMedia)}
                 />
-                <Highlights items={site.highlights} title={site.highlightsTitle} credits={site.credits} />
+                <HomeShowcase items={showcase} title={site.showcaseTitle ?? "Showcase"} />
                 <FadeGallery
                   images={media.gallery}
                   seconds={draft.style.gallerySeconds}
