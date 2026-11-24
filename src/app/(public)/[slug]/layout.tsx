@@ -42,6 +42,7 @@ export default async function SiteLayout({ children, params }: Props) {
       {children}
       <SiteFooter
         brand={profile.username}
+        name={profile.display_name}
         bio={profile.bio}
         note={site.footerNote}
         socials={socialsOf(blocks)}

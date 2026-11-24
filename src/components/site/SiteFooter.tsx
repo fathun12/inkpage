@@ -6,6 +6,7 @@ import { ThemeSwitch, type Mode } from "./ThemeSwitch";
 type NavItem = { label: string; href: string };
 type Props = {
   brand: string;
+  name?: string | null;
   bio?: string | null;
   note: string | null;
   socials: SocialItem[];
@@ -19,8 +20,8 @@ const link = "text-sm transition-opacity duration-(--dur-base) hover:opacity-60"
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
-export function SiteFooter({ brand, bio, note, socials, nav = [], modeControl }: Props) {
-  const hasNote = Boolean(bio || note);
+export function SiteFooter({ brand, name, bio, note, socials, nav = [], modeControl }: Props) {
+  const hasNote = Boolean(name || bio || note);
   const hasNav = nav.length > 0;
   const hasSocials = socials.length > 0;
   const noteNo = 0;
@@ -37,6 +38,7 @@ export function SiteFooter({ brand, bio, note, socials, nav = [], modeControl }:
               {hasNote && (
                 <div className="flex flex-col gap-3">
                   <p className={heading}>{pad(noteNo)} / Note</p>
+                  {name && <p className="font-display text-xl leading-tight">{name}</p>}
                   {bio && <p className="max-w-xs whitespace-pre-line text-sm opacity-70">{bio}</p>}
                   {note && <p className="max-w-xs whitespace-pre-line text-sm opacity-70">{note}</p>}
                 </div>
