@@ -29,4 +29,8 @@ export const env = {
   get brevoSenderName() {
     return process.env.BREVO_SENDER_NAME || undefined;
   },
+  // Secret of the daily cron call. Vercel sends it as "Authorization: Bearer ...".
+  get cronSecret() {
+    return process.env.CRON_SECRET || undefined;
+  },
 };

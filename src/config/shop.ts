@@ -10,6 +10,7 @@ export const shopConfig = {
   grantDays: 30,
   signedUrlSeconds: 300,
   mail: { timeoutMs: 8000, fallbackSenderName: "inkpage" },
+  ordersListMax: 100,
   // Frame of a product card (media is cropped to it). A product page shows media in full.
   cardAspect: "4 / 5",
   limits: {
@@ -49,11 +50,12 @@ export const legalTitles: Record<LegalKind, string> = {
   refund: "Refund Policy",
 };
 
-export const shopTabs = ["products", "settings"] as const;
+export const shopTabs = ["products", "orders", "settings"] as const;
 export type ShopTab = (typeof shopTabs)[number];
 
 export const shopTabLabels: Record<ShopTab, string> = {
   products: "Products",
+  orders: "Orders",
   settings: "Settings",
 };
 
@@ -64,4 +66,22 @@ export function resolveShopTab(value: string | null | undefined): ShopTab {
 // Address of a tab of the shop admin. "edit" keeps one product open.
 export function shopHref(tab: ShopTab, edit?: string): string {
   return `${routes.shop}?tab=${tab}${edit ? `&edit=${edit}` : ""}`;
+}
+
+export const orderStatuses = ["pending", "paid", "needs_review", "failed", "expired", "canceled", "refunded"] as const;
+export type OrderStatus = (typeof orderStatuses)[number];
+
+export const orderStatusLabels: Record<OrderStatus, string> = {
+  pending: "Pending",
+  paid: "Paid",
+  needs_review: "Needs review",
+  failed: "Failed",
+  expired: "Expired",
+  canceled: "Canceled",
+  refunded: "Refunded",
+};
+
+// Address of the Orders tab. "status" filters the list.
+export function ordersHref(status?: OrderStatus | null): string {
+  return `${routes.shop}?tab=orders${status ? `&status=${status}` : ""}`;
 }

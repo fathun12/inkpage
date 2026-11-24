@@ -1,4 +1,4 @@
-import type { ProductStatus } from "@/config/shop";
+import type { OrderStatus, ProductStatus } from "@/config/shop";
 
 export type Product = {
   id: string;
@@ -60,3 +60,16 @@ export type AddedShopFile = { path: string; name: string; size: number };
 export type ShopSignInput = { productId: string; name: string; type: string; size: number };
 export type ShopSignResult = { path: string; token: string } | { error: string };
 export type ShopSignAction = (input: ShopSignInput) => Promise<ShopSignResult>;
+
+// One line of the Orders tab.
+export type OrderRow = {
+  id: string;
+  email: string;
+  status: OrderStatus;
+  provider: string;
+  amount_cents: number;
+  currency: string;
+  created_at: string;
+  paid_at: string | null;
+  product_title: string;
+};
