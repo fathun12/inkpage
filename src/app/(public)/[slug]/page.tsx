@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { CardSlider } from "@/components/site/CardSlider";
 import { FadeGallery } from "@/components/site/FadeGallery";
 import { Hero } from "@/components/site/Hero";
+import { HeroContents, type ContentsItem } from "@/components/site/HeroContents";
 import { Intro } from "@/components/site/Intro";
 import { resolveGreetings } from "@/config/intro";
 import { HomeBiblia } from "@/components/site/HomeBiblia";
@@ -59,6 +60,17 @@ export default async function HomePage({ params }: Props) {
     fetchDesigns(site.designsUrl, 3),
     fetchGithub(site.githubUser),
   ]);
+  // The table of contents over the hero: the sections that really show up on Home, in page order.
+  const contents = [
+    writing.length > 0 && { id: "writing", label: site.cardsTitle ?? site.writing.title ?? "Writing" },
+    projects.length > 0 && { id: "projects", label: site.projects.title ?? "Projects" },
+    biblia && biblia.books.length > 0 && { id: "biblia", label: site.bibliaTitle ?? "Biblia" },
+    github && { id: "github", label: site.githubTitle ?? "GitHub" },
+    rows.length > 0 && { id: "links", label: "Links" },
+    showcase.length > 0 && { id: "showcase", label: site.showcaseTitle ?? "Showcase" },
+    designs && designs.projects.length > 0 && { id: "designs", label: site.designsTitle ?? "Design" },
+    media.gallery.length > 0 && { id: "gallery", label: "Gallery" },
+  ].filter((item): item is ContentsItem => Boolean(item));
 
   return (
     <>
@@ -80,7 +92,9 @@ export default async function HomePage({ params }: Props) {
             autoplay={autoplay}
           />
         )}
+        <HeroContents items={contents} />
       </Hero>
+      {writing.length > 0 && <span id="writing" className="block" />}
       {writing.length > 0 && (
         <CardSlider
           items={writing}
@@ -94,9 +108,11 @@ export default async function HomePage({ params }: Props) {
         <HomeBiblia data={biblia} title={site.bibliaTitle ?? "Biblia"} seeAll={`/${profile.username}/biblia`} />
       )}
       {github && <HomeGithub data={github} title={site.githubTitle ?? "GitHub"} />}
+      {rows.length > 0 && <span id="links" className="block" />}
       {rows.length > 0 && (
         <IndexSection blocks={rows} mediaUrl={media.indexMedia} credit={creditOf(site.credits, media.indexMedia)} />
       )}
+      {showcase.length > 0 && <span id="showcase" className="block" />}
       <HomeShowcase items={showcase} title={site.showcaseTitle ?? "Showcase"} />
       {designs && (
         <HomeDesigns
@@ -107,6 +123,7 @@ export default async function HomePage({ params }: Props) {
           autoplay={autoplay}
         />
       )}
+      {media.gallery.length > 0 && <span id="gallery" className="block" />}
       <FadeGallery images={media.gallery} seconds={style.gallerySeconds} autoplay={autoplay} credits={site.credits} />
     </>
   );

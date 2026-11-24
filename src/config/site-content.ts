@@ -87,6 +87,8 @@ export type SiteSettings = {
   // GitHub username (empty = no GitHub section) and its label.
   githubUser: string | null;
   githubTitle: string | null;
+  // YouTube or Spotify link of the music player (empty = no player).
+  musicUrl: string | null;
   highlights: Highlight[];
   // Credit (source) text of a media, by the file name of the media.
   credits: Record<string, string>;
@@ -201,6 +203,7 @@ export function readSite(raw: unknown): SiteSettings {
     designsTitle: text(r.designsTitle, siteLimits.title),
     githubUser: githubName(r.githubUser),
     githubTitle: text(r.githubTitle, siteLimits.title),
+    musicUrl: link(r.musicUrl),
     highlights: readHighlights(r.highlights),
     credits: creditMap(r.credits),
     projects: { title: text(projects.title, siteLimits.title), intro: text(projects.intro, siteLimits.intro) },

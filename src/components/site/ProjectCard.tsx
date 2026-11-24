@@ -7,7 +7,7 @@ import { Credit } from "./Credit";
 import { Downloads, TextLinks } from "./Downloads";
 import { Reveal } from "./Reveal";
 
-type Props = { block: Block; mode: "home" | "page"; first?: boolean };
+type Props = { block: Block; mode: "home" | "page"; first?: boolean; index?: number; total?: number };
 
 // One media: the frame follows the Ratio of the file. No border, no shadow, sharp corners.
 export function ItemMedia({ file, eager }: { file: ProjectFile; eager: boolean }) {
@@ -35,7 +35,7 @@ export function ItemMedia({ file, eager }: { file: ProjectFile; eager: boolean }
 
 // A project: media on the left (B under A), text and buttons on the right. On a phone the media is on top.
 // Home shows two media at most. The Projects page shows all of them.
-export function ProjectCard({ block, mode, first = false }: Props) {
+export function ProjectCard({ block, mode, first = false, index = 0, total = 1 }: Props) {
   const item = readProjectItem(block);
   const shown: ProjectFile[] =
     mode === "home" ? Object.values(pickHomeMedia(item.files)).filter((f): f is ProjectFile => f !== null) : item.files;
@@ -53,6 +53,14 @@ export function ProjectCard({ block, mode, first = false }: Props) {
         </Reveal>
       )}
       <Reveal delay={100} className="flex flex-col justify-center">
+        {total > 1 && (
+          <>
+            <span aria-hidden className="site-tick mb-4 block h-px w-6 bg-accent" />
+            <p className="mb-4 font-mono text-[11px] uppercase tracking-widest text-ink-soft">
+              {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
+            </p>
+          </>
+        )}
         {item.url ? (
           <a href={routes.go(block.id)} className="underline-offset-4 hover:underline">
             {title}

@@ -16,6 +16,7 @@ import { findSitePaths, signSiteUpload } from "@/features/media/upload";
 import { getProfileById } from "@/features/profile/queries";
 import { redirectWithError, redirectWithSaved } from "@/lib/flash";
 import { field } from "@/lib/form";
+import { musicEmbed } from "@/lib/music";
 import { createClient } from "@/lib/supabase/server";
 import { firstError, isHttpUrl } from "@/lib/validation";
 import type { VideoSignInput, VideoSignResult } from "@/types/media";
@@ -192,6 +193,11 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     }
     next.githubUser = gh ? gh : null;
     next.githubTitle = v.github_title ?? null;
+    const music = field(formData, "music_url");
+    if (music && !musicEmbed(music)) {
+      return abort("The music link must be a YouTube or Spotify link (a video, a song or a playlist).");
+    }
+    next.musicUrl = music ?? null;
     next.hero = got("hero");
     next.indexMedia = got("index")[0] ?? null;
     next.gallery = got("gallery");

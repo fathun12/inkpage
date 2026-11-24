@@ -282,3 +282,87 @@
     transition-duration: 0.01ms;
   }
 }
+/* Table of contents over the hero (Phase 17): a thin line at the right edge; a list of links fades in. */
+.site-contents {
+  pointer-events: none;
+}
+.site-contents-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  pointer-events: auto;
+}
+.site-contents-tick {
+  display: block;
+  width: 1px;
+  height: 6rem;
+  margin-right: 0.75rem;
+  background: rgb(255 255 255 / 0.7);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
+  transition: opacity var(--dur-slow) var(--ease-out);
+}
+.site-contents-list {
+  position: absolute;
+  top: 0;
+  right: 0.75rem;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  border-right: 1px solid rgb(255 255 255 / 0.7);
+  opacity: 0;
+  transform: translateX(1.5rem);
+  pointer-events: none;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 22%, #000 78%, transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 22%, #000 78%, transparent);
+  transition:
+    opacity var(--dur-slow) var(--ease-out),
+    transform var(--dur-slow) var(--ease-out);
+}
+.site-contents[data-open] .site-contents-list {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.site-contents[data-open] .site-contents-tick {
+  opacity: 0;
+}
+.site-contents-link {
+  text-shadow: 0 0 6px rgb(0 0 0 / 0.55);
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-contents-list {
+    transform: none;
+  }
+}
+
+/* Museum label of a project: a short accent tick that draws in when the project scrolls into view. */
+.site-tick {
+  transform-origin: left center;
+  transition: transform calc(var(--dur-slow) * 2) var(--ease-out) var(--reveal-delay, 0ms);
+}
+@media (scripting: enabled) {
+  [data-motion="full"] [data-reveal]:not([data-in]) .site-tick {
+    transform: scaleX(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  [data-motion] [data-reveal]:not([data-in]) .site-tick {
+    transform: none !important;
+  }
+}

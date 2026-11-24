@@ -152,6 +152,20 @@ export function HomeForm({ action, sign, site }: WithMedia) {
         </Field>
       </Section>
 
+      <Section title="Music" hint="A small player in the bottom left corner of every page.">
+        <Field
+          label="YouTube or Spotify link"
+          htmlFor="music_url"
+          hint="A video, a song or a playlist. Empty = no player. A playlist plays one song after another."
+        >
+          <Input id="music_url" name="music_url" type="url" placeholder="https://" defaultValue={site.musicUrl ?? ""} />
+        </Field>
+        <p className="text-xs text-ink-soft">
+          Visitors press play themselves: browsers block sound that starts alone. YouTube plays in full for everyone.
+          Spotify plays full songs only for visitors logged in to Spotify. Others hear a 30 second preview.
+        </p>
+      </Section>
+
       <Section title="Link list" hint="The list of links over a big media.">
         <Field label="Media behind the list" htmlFor="site-index" hint={`One item. ${mediaHint}`}>
           <SiteMediaInput slot="index" current={site.indexMedia ? [site.indexMedia] : []} max={1} sign={sign} credits={site.credits} />
