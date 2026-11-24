@@ -3,9 +3,12 @@ import { Field, Input, Select, Textarea } from "@/components/ui/Field";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { productStatuses, productStatusLabels, shopConfig } from "@/config/shop";
 import { dollarsFromCents, formatUsd } from "@/lib/shop-money";
+import { mediaConfig } from "@/config/media";
 import type { FormAction } from "@/types/form";
+import type { VideoSignAction } from "@/types/media";
 import type { ProductWithFiles, ShopSignAction } from "@/types/shop";
 import { ShopFileInput } from "./ShopFileInput";
+import { SiteMediaInput } from "./SiteMediaInput";
 
 type Actions = {
   create: FormAction;
@@ -14,6 +17,7 @@ type Actions = {
   move: FormAction;
   setStock: FormAction;
   sign: ShopSignAction;
+  signMedia: VideoSignAction;
 };
 
 type Props = { products: ProductWithFiles[]; openId: string | null; actions: Actions; formKey: string };
@@ -41,8 +45,38 @@ function Badge({ children }: { children: ReactNode }) {
 
 const L = shopConfig.limits;
 
+// The media (photos, GIFs, videos) shown in the shop. They go to the public site folder.
+function MediaField({ id, current, sign }: { id: string; current: string[]; sign: VideoSignAction }) {
+  return (
+    <>
+      <p className="text-xs text-ink-soft">
+        JPG, PNG, WebP, GIF, MP4 or WebM, up to {mediaConfig.siteMedia.maxMb} MB each, up to {L.media} files. The first
+        one is the cover. To change the cover, remove files and add them again in the order you want. A file uploads as
+        soon as you pick it, then press Save.
+      </p>
+      <SiteMediaInput
+        slot="product"
+        current={current}
+        max={L.media}
+        sign={sign}
+        credits={{}}
+        noCredit
+        inputId={`product-media-${id}`}
+      />
+    </>
+  );
+}
+
 // The fields of a product. The same for a new product and for an existing one.
-function ProductFields({ product, files }: { product?: ProductWithFiles; files: ReactNode }) {
+function ProductFields({
+  product,
+  files,
+  media,
+}: {
+  product?: ProductWithFiles;
+  files: ReactNode;
+  media: ReactNode;
+}) {
   const key = product?.id ?? "new";
   return (
     <>
@@ -59,6 +93,10 @@ function ProductFields({ product, files }: { product?: ProductWithFiles; files: 
             defaultValue={product?.description ?? ""}
           />
         </Field>
+      </Part>
+
+      <Part title="Media" hint="Photos shown in the shop.">
+        {media}
       </Part>
 
       <Part title="Price" hint="In US dollars.">
@@ -164,6 +202,7 @@ function ProductRow({
             <ProductFields
               product={product}
               files={<ShopFileInput productId={product.id} current={product.files} sign={actions.sign} />}
+              media={<MediaField id={product.id} current={product.media} sign={actions.signMedia} />}
             />
             <div>
               <SubmitButton variant="accent">Save product</SubmitButton>
@@ -224,6 +263,7 @@ export function ShopProducts({ products, openId, actions, formKey }: Props) {
         <form key={`new-${formKey}`} action={actions.create} className="flex flex-col gap-4 border-t border-line p-4">
           <ProductFields
             files={<p className="text-sm text-ink-soft">Save the product first. Then open it and add its files.</p>}
+            media={<MediaField id="new" current={[]} sign={actions.signMedia} />}
           />
           <div>
             <SubmitButton variant="accent">Add product</SubmitButton>

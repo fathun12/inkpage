@@ -16,7 +16,10 @@ import { VisitCards } from "@/components/site/VisitCards";
 import { readBackground } from "@/config/background";
 import { readSite } from "@/config/site-content";
 import { readSiteStyle } from "@/config/site-style";
-import { siteConfig } from "@/config/site";
+import { routes, siteConfig } from "@/config/site";
+import { shopConfig } from "@/config/shop";
+import { HomeShop } from "@/components/shop/HomeShop";
+import { getPublicShop } from "@/features/shop/public";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
 import { fetchBiblia } from "@/features/site/biblia";
@@ -56,17 +59,21 @@ export default async function HomePage({ params }: Props) {
   const writing = homeWriting(blocks);
   const showcase = homeShowcase(blocks);
   const autoplay = style.motion !== "off";
-  const [biblia, designs, github] = await Promise.all([
+  const [biblia, designs, github, shop] = await Promise.all([
     fetchBiblia(site.bibliaUrl, 6),
     fetchDesigns(site.designsUrl, 3),
     fetchGithub(site.githubUser),
+    getPublicShop(profile.id),
   ]);
+  const shopItems = shop.products.filter((p) => p.show_on_home).slice(0, shopConfig.homeMax);
+  const shopTitle = shop.settings.home_title ?? "Shop";
   // The table of contents over the hero: the sections that really show up on Home, in page order.
   const contents = [
     writing.length > 0 && { id: "writing", label: site.cardsTitle ?? site.writing.title ?? "Writing" },
     projects.length > 0 && { id: "projects", label: site.projects.title ?? "Projects" },
     biblia && biblia.books.length > 0 && { id: "biblia", label: site.bibliaTitle ?? "Biblia" },
     github && { id: "github", label: site.githubTitle ?? "GitHub" },
+    shopItems.length > 0 && { id: "shop", label: shopTitle },
     rows.length > 0 && { id: "links", label: "Links" },
     showcase.length > 0 && { id: "showcase", label: site.showcaseTitle ?? "Showcase" },
     designs && designs.projects.length > 0 && { id: "designs", label: site.designsTitle ?? "Design" },
@@ -110,6 +117,12 @@ export default async function HomePage({ params }: Props) {
         <HomeBiblia data={biblia} title={site.bibliaTitle ?? "Biblia"} seeAll={`/${profile.username}/biblia`} />
       )}
       {github && <HomeGithub data={github} title={site.githubTitle ?? "GitHub"} />}
+      <HomeShop
+        products={shopItems}
+        open={shop.settings.is_open}
+        title={shopTitle}
+        base={routes.section(profile.username, "shop")}
+      />
       {rows.length > 0 && <span id="links" className="block" />}
       {rows.length > 0 && (
         <IndexSection blocks={rows} mediaUrl={media.indexMedia} credit={creditOf(site.credits, media.indexMedia)} />

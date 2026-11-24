@@ -22,6 +22,8 @@ type Props = {
   // order buttons, a Ratio and a Credit per file, and a label that says where each file is used.
   files?: ItemFile[];
   inputId?: string;
+  // Hides the credit boxes (shop products keep no credits).
+  noCredit?: boolean;
 };
 type Added = { path: string; preview: string; kind: MediaKind };
 type Entry = { token: string; preview: string; kind: MediaKind; fresh: boolean; ratio: ItemRatio; credit: string };
@@ -43,7 +45,7 @@ function Thumb({ src, kind }: { src: string; kind: MediaKind }) {
 // Picks files for one slot of the website (hero, list background, gallery, About photo, a Projects item, a Writing image).
 // A file uploads straight to Storage as soon as it is picked. Only its storage path travels with the form,
 // and "Remove" boxes tell the server which saved files to drop.
-export function SiteMediaInput({ slot, current, max, sign, credits, files, inputId }: Props) {
+export function SiteMediaInput({ slot, current, max, sign, credits, files, inputId, noCredit }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const item = files !== undefined;
   const [removed, setRemoved] = useState<string[]>([]);
@@ -260,14 +262,16 @@ export function SiteMediaInput({ slot, current, max, sign, credits, files, input
                 />
                 Remove
               </label>
-              <Input
-                name={`credit__${fileKey(url)}`}
-                defaultValue={credits[fileKey(url)] ?? ""}
-                placeholder={creditHint}
-                maxLength={120}
-                aria-label="Credit"
-                className="px-2 py-1.5 text-xs"
-              />
+              {!noCredit && (
+                <Input
+                  name={`credit__${fileKey(url)}`}
+                  defaultValue={credits[fileKey(url)] ?? ""}
+                  placeholder={creditHint}
+                  maxLength={120}
+                  aria-label="Credit"
+                  className="px-2 py-1.5 text-xs"
+                />
+              )}
             </li>
           ))}
         </ul>
@@ -285,13 +289,15 @@ export function SiteMediaInput({ slot, current, max, sign, credits, files, input
               >
                 Discard (uploaded, not saved)
               </button>
-              <Input
-                name={`credit__${fileKey(a.path)}`}
-                placeholder={creditHint}
-                maxLength={120}
-                aria-label="Credit"
-                className="px-2 py-1.5 text-xs"
-              />
+              {!noCredit && (
+                <Input
+                  name={`credit__${fileKey(a.path)}`}
+                  placeholder={creditHint}
+                  maxLength={120}
+                  aria-label="Credit"
+                  className="px-2 py-1.5 text-xs"
+                />
+              )}
             </li>
           ))}
         </ul>

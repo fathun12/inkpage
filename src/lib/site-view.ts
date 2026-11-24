@@ -46,12 +46,13 @@ export function socialsOf(blocks: Block[]): SocialItem[] {
 }
 
 // The menu: Home, Projects and Writing are always there. About shows up once it has content.
-export function buildNav(base: string, site: SiteSettings) {
+export function buildNav(base: string, site: SiteSettings, shop: { label: string } | null = null) {
   return [
     { label: "Home", href: base },
     { label: site.projects.title ?? "Projects", href: `${base}/projects` },
     { label: site.writing.title ?? "Writing", href: `${base}/writing` },
     ...(site.bibliaUrl ? [{ label: site.bibliaTitle ?? "Biblia", href: `${base}/biblia` }] : []),
+    ...(shop ? [{ label: shop.label, href: `${base}/shop` }] : []),
     ...(hasAbout(site) ? [{ label: site.about.title ?? "About", href: `${base}/about` }] : []),
   ];
 }

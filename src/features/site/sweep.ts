@@ -17,5 +17,14 @@ export async function sweepKeeping(userId: string, keep: string[]): Promise<void
     const urls = files.map((f) => f?.url).filter((u): u is string => typeof u === "string");
     return row.image_url ? [...urls, row.image_url] : urls;
   });
-  await sweepSiteMedia(userId, [...keep, ...used]);
+  // Shop product media lives in the same folder too.
+  const shop = await supabase.from("products").select("media").eq("user_id", userId);
+  if (shop.error) {
+    console.error("sweepKeeping: could not read the products, nothing was swept", shop.error.message);
+    return;
+  }
+  const productMedia = ((shop.data ?? []) as { media: unknown }[]).flatMap((row) =>
+    Array.isArray(row.media) ? row.media.filter((u): u is string => typeof u === "string") : [],
+  );
+  await sweepSiteMedia(userId, [...keep, ...used, ...productMedia]);
 }

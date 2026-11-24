@@ -12,6 +12,7 @@ import { readSiteStyle } from "@/config/site-style";
 import { routes } from "@/config/site";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
+import { getPublicShop } from "@/features/shop/public";
 import { musicEmbed } from "@/lib/music";
 import { buildNav, socialsOf } from "@/lib/site-view";
 
@@ -28,11 +29,16 @@ export default async function SiteLayout({ children, params }: Props) {
   const style = readSiteStyle(profile.site_style);
   const base = routes.profile(profile.username);
   const music = musicEmbed(site.musicUrl);
+  const shop = await getPublicShop(profile.id);
 
   return (
     <SiteFrame fonts={readFonts(profile)} style={style}>
       <NewsBar items={site.news} seconds={style.heroSeconds} autoplay={style.motion !== "off"} showClock={site.showClock} />
-      <SiteHeader brand={profile.username} home={base} items={buildNav(base, site)} />
+      <SiteHeader
+        brand={profile.username}
+        home={base}
+        items={buildNav(base, site, shop.products.length > 0 ? { label: shop.settings.home_title ?? "Shop" } : null)}
+      />
       {children}
       <SiteFooter brand={profile.username} note={site.footerNote} socials={socialsOf(blocks)} />
       {music && <MusicPlayer embed={music} />}

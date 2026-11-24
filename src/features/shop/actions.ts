@@ -7,6 +7,7 @@ import { field } from "@/lib/form";
 import { createClient } from "@/lib/supabase/server";
 import type { AddedShopFile, ShopSignInput, ShopSignResult } from "@/types/shop";
 import { readProductForm, readSettingsForm } from "./schema";
+import { readProductMedia, sweepSiteFiles } from "./media";
 import { listProductObjects, signShopFile, sweepProductFiles } from "./upload";
 
 type Db = Awaited<ReturnType<typeof createClient>>;
@@ -66,11 +67,17 @@ export async function createProductAction(formData: FormData): Promise<void> {
     .limit(1)
     .maybeSingle();
   const slug = await uniqueSlug(supabase, user.id, read.data.title);
+  const media = await readProductMedia(user.id, formData, []);
+  if ("error" in media) {
+    await sweepSiteFiles(user.id);
+    return redirectWithError(back, media.error);
+  }
   const { data, error } = await supabase
     .from("products")
-    .insert({ user_id: user.id, slug, position: (last?.position ?? -1) + 1, ...read.data })
+    .insert({ user_id: user.id, slug, position: (last?.position ?? -1) + 1, ...read.data, media: media.list })
     .select("id")
     .single();
+  await sweepSiteFiles(user.id);
   if (error || !data) return redirectWithError(back, dbMessage(error ?? { message: "No row came back." }));
   redirectWithSaved(shopHref("products", data.id), "Product created. You can add files now.");
 }
@@ -82,17 +89,25 @@ export async function saveProductAction(formData: FormData): Promise<void> {
   const back = shopHref("products", id);
   const supabase = await createClient();
 
-  const { data: product } = await supabase.from("products").select("id").eq("id", id).eq("user_id", user.id).maybeSingle();
+  const { data: product } = await supabase
+    .from("products")
+    .select("id, media")
+    .eq("id", id)
+    .eq("user_id", user.id)
+    .maybeSingle();
   if (!product) return redirectWithError(shopHref("products"), "That product does not exist anymore.");
 
   // Files uploaded but not saved are lost after a redirect, so they are deleted on every failure.
   const abort = async (message: string): Promise<void> => {
     await sweepProductFiles(user.id, id, await savedPaths(supabase, id));
+    await sweepSiteFiles(user.id);
     return redirectWithError(back, message);
   };
 
   const read = readProductForm(formData);
   if ("error" in read) return abort(read.error);
+  const media = await readProductMedia(user.id, formData, product.media);
+  if ("error" in media) return abort(media.error);
 
   const prefix = `${user.id}/${id}/`;
   const added: AddedShopFile[] = [];
@@ -134,7 +149,7 @@ export async function saveProductAction(formData: FormData): Promise<void> {
 
   const { error: updateError } = await supabase
     .from("products")
-    .update({ ...read.data, updated_at: new Date().toISOString() })
+    .update({ ...read.data, media: media.list, updated_at: new Date().toISOString() })
     .eq("id", id)
     .eq("user_id", user.id);
   if (updateError) return abort(dbMessage(updateError));
@@ -159,6 +174,7 @@ export async function saveProductAction(formData: FormData): Promise<void> {
   }
 
   await sweepProductFiles(user.id, id, await savedPaths(supabase, id));
+  await sweepSiteFiles(user.id);
   redirectWithSaved(back, "Saved.");
 }
 
@@ -186,6 +202,7 @@ export async function deleteProductAction(formData: FormData): Promise<void> {
   const { error } = await supabase.from("products").delete().eq("id", id).eq("user_id", user.id);
   if (error) return redirectWithError(back, dbMessage(error));
   if (paths.length > 0) await supabase.storage.from(shopConfig.bucket).remove(paths);
+  await sweepSiteFiles(user.id);
   redirectWithSaved(shopHref("products"), "Product deleted.");
 }
 

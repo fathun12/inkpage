@@ -15,6 +15,7 @@ import {
   signShopFileAction,
 } from "@/features/shop/actions";
 import { emptySettings, getOwnProducts, getShopSettings } from "@/features/shop/queries";
+import { signSiteUploadAction } from "@/features/site/actions";
 import { savedText } from "@/lib/flash";
 
 export const metadata: Metadata = { title: "Shop" };
@@ -30,6 +31,7 @@ const productActions = {
   move: moveProductAction,
   setStock: setStockAction,
   sign: signShopFileAction,
+  signMedia: signSiteUploadAction,
 };
 
 export default async function ShopPage({ searchParams }: Props) {

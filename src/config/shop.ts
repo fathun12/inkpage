@@ -9,6 +9,8 @@ export const shopConfig = {
   grantMaxDownloads: 5,
   grantDays: 30,
   signedUrlSeconds: 300,
+  // Frame of a product card (media is cropped to it). A product page shows media in full.
+  cardAspect: "4 / 5",
   limits: {
     title: 80,
     description: 2000,
@@ -16,6 +18,7 @@ export const shopConfig = {
     includedLine: 120,
     licenseNote: 300,
     files: 5,
+    media: 6,
     fileMb: 50,
     fileName: 120,
     maxPriceUsdCents: 100000,
@@ -34,6 +37,15 @@ export const productStatusLabels: Record<ProductStatus, string> = {
   draft: "Draft",
   active: "Active",
   archived: "Archived",
+};
+
+export const legalKinds = ["terms", "privacy", "refund"] as const;
+export type LegalKind = (typeof legalKinds)[number];
+
+export const legalTitles: Record<LegalKind, string> = {
+  terms: "Terms of Sale",
+  privacy: "Privacy Policy",
+  refund: "Refund Policy",
 };
 
 export const shopTabs = ["products", "settings"] as const;
