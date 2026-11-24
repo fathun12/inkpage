@@ -10,7 +10,7 @@ import { Reveal } from "./Reveal";
 type Props = { block: Block; mode: "home" | "page"; first?: boolean };
 
 // One media: the frame follows the Ratio of the file. No border, no shadow, sharp corners.
-function ItemMedia({ file, eager }: { file: ProjectFile; eager: boolean }) {
+export function ItemMedia({ file, eager }: { file: ProjectFile; eager: boolean }) {
   const fill = "site-media-reveal absolute inset-0 size-full object-cover";
   return (
     <div className="relative w-full overflow-hidden bg-surface" style={{ aspectRatio: ratioAspect[file.ratio] }}>

@@ -1,4 +1,5 @@
 import type { BackgroundView } from "@/config/background";
+import { itemLimits } from "@/config/item-data";
 import { fileKey, hasAbout, resolvePage, type BlockPage, type SiteSettings } from "@/config/site-content";
 import type { Block, SocialItem } from "@/types/block";
 
@@ -84,4 +85,16 @@ export function resolveHomeMedia(site: SiteSettings, background: BackgroundView,
     }
   }
   return { hero, indexMedia, gallery };
+}
+
+// Projects ticked "Show as Showcase", in the order of the list, at most 5.
+export function homeShowcase(blocks: Block[]): Block[] {
+  return blocks
+    .filter(
+      (b) =>
+        (b.type === "project" || b.type === "link") &&
+        b.data.showcase === true &&
+        resolvePage(b.page) === "projects",
+    )
+    .slice(0, itemLimits.homeShowcase);
 }

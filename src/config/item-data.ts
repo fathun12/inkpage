@@ -57,3 +57,8 @@ export function tabHref(tab: PagesTab): string {
 export const projectLayout = {
   grid: "md:grid-cols-[minmax(0,4fr)_minmax(0,8fr)]",
 } as const;
+
+// Width of the main media of a Showcase item (about 5/12). Change the numbers to tune it.
+export const showcaseLayout = {
+  grid: "md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]",
+} as const;
