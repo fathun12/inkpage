@@ -2,25 +2,24 @@
 
 import Link from "next/link";
 import { useState, type ComponentProps, type MouseEvent, type ReactNode } from "react";
+import { HomeShop } from "@/components/shop/HomeShop";
 import { CardSlider } from "@/components/site/CardSlider";
 import { FadeGallery } from "@/components/site/FadeGallery";
 import { Hero } from "@/components/site/Hero";
-import { Intro } from "@/components/site/Intro";
-import { resolveGreetings } from "@/config/intro";
 import { HeroContents, type ContentsItem } from "@/components/site/HeroContents";
 import { HomeBiblia } from "@/components/site/HomeBiblia";
 import { HomeDesigns } from "@/components/site/HomeDesigns";
 import { HomeGithub } from "@/components/site/HomeGithub";
 import { HomeProjects } from "@/components/site/HomeProjects";
-import { VisitCards } from "@/components/site/VisitCards";
-import { HomeShop } from "@/components/shop/HomeShop";
-import type { Mode } from "@/components/site/ThemeSwitch";
 import { HomeShowcase } from "@/components/site/HomeShowcase";
 import { IndexSection } from "@/components/site/IndexSection";
+import { Intro } from "@/components/site/Intro";
 import { NewsBar } from "@/components/site/NewsBar";
 import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteFrame } from "@/components/site/SiteFrame";
 import { SiteHeader } from "@/components/site/SiteHeader";
+import type { Mode } from "@/components/site/ThemeSwitch";
+import { VisitCards } from "@/components/site/VisitCards";
 import { Field } from "@/components/ui/Field";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import {
@@ -31,6 +30,7 @@ import {
   type FontId,
   type FontPair,
 } from "@/config/font-choices";
+import { resolveGreetings } from "@/config/intro";
 import type { SiteSettings } from "@/config/site-content";
 import {
   motionHints,
@@ -523,7 +523,7 @@ export function CustomizeStudio({
             style={{ maxWidth: device === "phone" ? phoneWidth : undefined }}
           >
             <div className="absolute inset-0 overflow-y-auto" onClickCapture={stopLinks}>
-                            <SiteFrame
+              <SiteFrame
                 fonts={{ heading: draft.fontHeading, body: draft.fontBody }}
                 style={draft.style}
                 viewportHeight={device === "phone" ? "620px" : "560px"}

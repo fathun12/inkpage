@@ -26,7 +26,7 @@ export function SiteFooter({ brand, note, socials, nav = [], modeControl }: Prop
   const socialNo = (note ? 1 : 0) + (hasNav ? 1 : 0);
 
   return (
-    <footer className="mt-16 sm:mt-24">
+    <footer>
       {/* Upper part: the Tertiary color. */}
       <div className="bg-tertiary px-5 pt-14 text-tertiary-ink sm:px-8 sm:pt-20">
         <div className="mx-auto max-w-5xl">
