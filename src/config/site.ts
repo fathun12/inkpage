@@ -29,6 +29,7 @@ export const routes = {
   customize: "/admin/customize",
   analytics: "/admin/analytics",
   pages: "/admin/pages",
+  shop: "/admin/shop",
   track: "/api/track",
   profile: (username: string) => `/${username}`,
   section: (username: string, section: string) => `/${username}/${section}`,
