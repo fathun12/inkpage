@@ -34,6 +34,7 @@ export const siteLimits = {
   footerNote: 200,
   highlights: 5,
   highlightBody: 1500,
+  highlightMedia: 6,
   credit: 120,
   creditCount: 80,
 } as const;
@@ -41,7 +42,18 @@ export const siteLimits = {
 export type NewsItem = { text: string; url: string | null };
 export type PageText = { title: string | null; intro: string | null };
 export type AboutText = { title: string | null; body: string | null; photo: string | null };
-export type Highlight = { title: string | null; body: string | null; media: string | null };
+export type Highlight = {
+  title: string | null;
+  body: string | null;
+  media: string[];
+  nexus: string | null;
+  github: string | null;
+};
+
+// Shown in the news bar until you write your own lines in Pages.
+export const defaultNews: NewsItem[] = [
+  { text: "Selected projects, writing and downloads. New work is added here.", url: null },
+];
 
 export type SiteSettings = {
   news: NewsItem[];
@@ -97,12 +109,21 @@ function readHighlights(v: unknown): Highlight[] {
   if (!Array.isArray(v)) return [];
   return v.slice(0, siteLimits.highlights).flatMap((item): Highlight[] => {
     const h = obj(item);
-    const entry = {
+    // Older saves kept one media as a text. Newer ones keep a list.
+    const single = link(h.media);
+    const media = Array.isArray(h.media)
+      ? links(h.media, siteLimits.highlightMedia)
+      : single
+        ? [single]
+        : [];
+    const entry: Highlight = {
       title: text(h.title, siteLimits.title),
       body: text(h.body, siteLimits.highlightBody),
-      media: link(h.media),
+      media,
+      nexus: link(h.nexus),
+      github: link(h.github),
     };
-    return entry.title || entry.body || entry.media ? [entry] : [];
+    return entry.title || entry.body || entry.media.length > 0 || entry.nexus || entry.github ? [entry] : [];
   });
 }
 
@@ -119,7 +140,7 @@ export function readSite(raw: unknown): SiteSettings {
       })
     : [];
   return {
-    news,
+    news: news.length > 0 ? news : defaultNews,
     heroCaption: text(r.heroCaption, siteLimits.caption),
     hero: links(r.hero, siteLimits.hero),
     indexMedia: link(r.indexMedia),
@@ -146,7 +167,7 @@ export function siteMediaUrls(site: SiteSettings): string[] {
     ...site.gallery,
     ...(site.indexMedia ? [site.indexMedia] : []),
     ...(site.about.photo ? [site.about.photo] : []),
-    ...site.highlights.flatMap((h) => (h.media ? [h.media] : [])),
+    ...site.highlights.flatMap((h) => h.media),
   ];
 }
 

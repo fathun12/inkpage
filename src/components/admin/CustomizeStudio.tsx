@@ -6,6 +6,7 @@ import { CardSlider } from "@/components/site/CardSlider";
 import { FadeGallery } from "@/components/site/FadeGallery";
 import { Hero } from "@/components/site/Hero";
 import { Highlights } from "@/components/site/Highlights";
+import { HomeProjects } from "@/components/site/HomeProjects";
 import { IndexSection } from "@/components/site/IndexSection";
 import { NewsBar } from "@/components/site/NewsBar";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -45,6 +46,7 @@ type Props = {
   site: SiteSettings;
   media: HomeMedia;
   rows: Block[];
+  projects: Block[];
   cards: Block[];
   socials: SocialItem[];
   nav: { label: string; href: string }[];
@@ -207,6 +209,7 @@ export function CustomizeStudio({
   site,
   media,
   rows,
+  projects,
   cards,
   socials,
   nav,
@@ -474,8 +477,14 @@ export function CustomizeStudio({
                   gray={draft.style.heroGray}
                   credits={site.credits}
                 />
+                <HomeProjects items={projects} title={site.projects.title ?? "Projects"} />
                 {cards.length > 0 && (
-                  <CardSlider items={cards} title={site.cardsTitle} seconds={draft.style.heroSeconds} autoplay={autoplay} />
+                  <CardSlider
+                    items={cards}
+                    title={site.cardsTitle ?? site.writing.title ?? "Writing"}
+                    seconds={draft.style.heroSeconds}
+                    autoplay={autoplay}
+                  />
                 )}
                 <IndexSection
                   blocks={previewRows}

@@ -4,6 +4,7 @@ import { CardSlider } from "@/components/site/CardSlider";
 import { FadeGallery } from "@/components/site/FadeGallery";
 import { Hero } from "@/components/site/Hero";
 import { Highlights } from "@/components/site/Highlights";
+import { HomeProjects } from "@/components/site/HomeProjects";
 import { IndexSection } from "@/components/site/IndexSection";
 import { readBackground } from "@/config/background";
 import { readSite } from "@/config/site-content";
@@ -12,7 +13,7 @@ import { siteConfig } from "@/config/site";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
 import { getSiteUrl } from "@/lib/site-url";
-import { creditOf, homeCards, listBlocks, resolveHomeMedia } from "@/lib/site-view";
+import { creditOf, homeProjects, homeWriting, listBlocks, resolveHomeMedia } from "@/lib/site-view";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -30,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-// Home, top to bottom: hero, sliding cards, list over a media, highlights, gallery.
+// Home, top to bottom: hero, projects (no slide), writing cards (slide), list over a media, highlights, gallery.
 export default async function HomePage({ params }: Props) {
   const { slug } = await params;
   const profile = await getProfileByUsername(slug.toLowerCase());
@@ -41,7 +42,8 @@ export default async function HomePage({ params }: Props) {
   const style = readSiteStyle(profile.site_style);
   const media = resolveHomeMedia(site, readBackground(profile), blocks);
   const rows = listBlocks(blocks, "home");
-  const cards = homeCards(blocks);
+  const projects = homeProjects(blocks);
+  const writing = homeWriting(blocks);
   const autoplay = style.motion !== "off";
 
   return (
@@ -55,8 +57,14 @@ export default async function HomePage({ params }: Props) {
         gray={style.heroGray}
         credits={site.credits}
       />
-      {cards.length > 0 && (
-        <CardSlider items={cards} title={site.cardsTitle} seconds={style.heroSeconds} autoplay={autoplay} />
+      <HomeProjects items={projects} title={site.projects.title ?? "Projects"} />
+      {writing.length > 0 && (
+        <CardSlider
+          items={writing}
+          title={site.cardsTitle ?? site.writing.title ?? "Writing"}
+          seconds={style.heroSeconds}
+          autoplay={autoplay}
+        />
       )}
       {rows.length > 0 && (
         <IndexSection blocks={rows} mediaUrl={media.indexMedia} credit={creditOf(site.credits, media.indexMedia)} />

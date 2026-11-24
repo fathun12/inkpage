@@ -27,11 +27,11 @@ const slotMax = {
   index: 1,
   gallery: siteLimits.gallery,
   about: 1,
-  hl0: 1,
-  hl1: 1,
-  hl2: 1,
-  hl3: 1,
-  hl4: 1,
+  hl0: siteLimits.highlightMedia,
+  hl1: siteLimits.highlightMedia,
+  hl2: siteLimits.highlightMedia,
+  hl3: siteLimits.highlightMedia,
+  hl4: siteLimits.highlightMedia,
 } as const;
 type Slot = keyof typeof slotMax;
 
@@ -142,11 +142,11 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     index: one(old.indexMedia),
     gallery: old.gallery,
     about: one(old.about.photo),
-    hl0: one(old.highlights[0]?.media),
-    hl1: one(old.highlights[1]?.media),
-    hl2: one(old.highlights[2]?.media),
-    hl3: one(old.highlights[3]?.media),
-    hl4: one(old.highlights[4]?.media),
+    hl0: old.highlights[0]?.media ?? [],
+    hl1: old.highlights[1]?.media ?? [],
+    hl2: old.highlights[2]?.media ?? [],
+    hl3: old.highlights[3]?.media ?? [],
+    hl4: old.highlights[4]?.media ?? [],
   };
   const lists = {} as Record<Slot, string[]>;
   for (const slot of Object.keys(slotMax) as Slot[]) {
@@ -167,8 +167,24 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     if (body && body.length > siteLimits.highlightBody) {
       return abort(`Highlight ${i + 1}: the text can be at most ${siteLimits.highlightBody} characters.`);
     }
-    const media = lists[`hl${i}` as Slot][0] ?? null;
-    if (title || body || media) highlights.push({ title: title ?? null, body: body ?? null, media });
+    const nexus = field(formData, `hl_nexus_${i}`);
+    const github = field(formData, `hl_github_${i}`);
+    if (nexus && !isHttpUrl(nexus)) {
+      return abort(`Highlight ${i + 1}: the Nexus link must start with http:// or https://`);
+    }
+    if (github && !isHttpUrl(github)) {
+      return abort(`Highlight ${i + 1}: the GitHub link must start with http:// or https://`);
+    }
+    const media = lists[`hl${i}` as Slot];
+    if (title || body || media.length > 0 || nexus || github) {
+      highlights.push({
+        title: title ?? null,
+        body: body ?? null,
+        media,
+        nexus: nexus ?? null,
+        github: github ?? null,
+      });
+    }
   }
 
   // Credits come as credit__<file name>. Only the ones of files that are still in use are kept.

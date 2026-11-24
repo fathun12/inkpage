@@ -23,12 +23,21 @@ export function listBlocks(blocks: Block[], page: BlockPage): Block[] {
   );
 }
 
-// Items of Projects and Writing that were marked "Also show on Home": the sliding cards on Home.
-export function homeCards(blocks: Block[]): Block[] {
+// Items marked "Also show on Home", split by their page.
+function homeItems(blocks: Block[], page: BlockPage): Block[] {
   return blocks.filter(
-    (b) =>
-      (b.type === "link" || b.type === "project") && b.data.home === true && resolvePage(b.page) !== "home",
+    (b) => (b.type === "link" || b.type === "project") && b.data.home === true && resolvePage(b.page) === page,
   );
+}
+
+// Projects on Home. They do not slide.
+export function homeProjects(blocks: Block[]): Block[] {
+  return homeItems(blocks, "projects");
+}
+
+// Writing cards on Home. These are the ones that slide.
+export function homeWriting(blocks: Block[]): Block[] {
+  return homeItems(blocks, "writing");
 }
 
 export function socialsOf(blocks: Block[]): SocialItem[] {

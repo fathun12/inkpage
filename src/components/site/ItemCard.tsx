@@ -1,9 +1,10 @@
 import { Img } from "@/components/ui/Img";
 import { routes } from "@/config/site";
 import type { Block } from "@/types/block";
+import { Downloads, downloadLinks } from "./Downloads";
 
 // One item of Projects or Writing. Its look follows data.shape: card, button or text link.
-// The main part goes through /go (the click is counted). Download buttons go straight out.
+// The main part goes through /go (the click is counted). Download links go straight out.
 export function ItemCard({ block }: { block: Block }) {
   const shape = block.data.shape ?? "card";
   const arrow = (
@@ -39,11 +40,6 @@ export function ItemCard({ block }: { block: Block }) {
       </>
     );
 
-  const downloads = [
-    block.data.nexus ? { label: "Nexus Mods", url: block.data.nexus } : null,
-    block.data.github ? { label: "GitHub", url: block.data.github } : null,
-  ].filter((d): d is { label: string; url: string } => d !== null);
-
   return (
     <div className="flex h-full flex-col">
       {block.url ? (
@@ -53,21 +49,7 @@ export function ItemCard({ block }: { block: Block }) {
       ) : (
         <div className="block">{main}</div>
       )}
-      {downloads.length > 0 && (
-        <div className="mt-4 flex flex-wrap gap-2">
-          {downloads.map((d) => (
-            <a
-              key={d.label}
-              href={d.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 border border-current px-3 py-1.5 font-mono text-[11px] uppercase tracking-widest transition-colors duration-(--dur-base) hover:border-ink hover:bg-ink hover:text-bg"
-            >
-              {d.label} <span aria-hidden>↓</span>
-            </a>
-          ))}
-        </div>
-      )}
+      <Downloads links={downloadLinks(block.data.nexus, block.data.github)} className="mt-4" />
     </div>
   );
 }

@@ -75,7 +75,7 @@ export function PagesForm({ action, sign, site }: Props) {
       </Section>
 
       <Section title="Home section titles" hint="Small labels above the sliding cards and above the highlights. Empty = no label.">
-        <Field label="Cards title" htmlFor="cards_title" hint="Above the sliding cards (the items you tick as Also show on Home).">
+        <Field label="Cards title" htmlFor="cards_title" hint="Label above the sliding Writing cards on Home. Empty = the Writing page title.">
           <Input id="cards_title" name="cards_title" defaultValue={site.cardsTitle ?? ""} maxLength={siteLimits.title} />
         </Field>
         <Field label="Highlights title" htmlFor="highlights_title">
@@ -89,7 +89,7 @@ export function PagesForm({ action, sign, site }: Props) {
         </Field>
       </Section>
 
-      <Section title="Highlights" hint={`Up to ${siteLimits.highlights} projects on Home, just before the gallery. Media, title and text.`}>
+      <Section title="Highlights" open hint={`Up to ${siteLimits.highlights} projects on Home, just before the gallery. Media, title and text.`}>
         {Array.from({ length: siteLimits.highlights }, (_, i) => {
           const item = site.highlights[i];
           return (
@@ -101,8 +101,14 @@ export function PagesForm({ action, sign, site }: Props) {
               <Field label="Text" htmlFor={`hl_body_${i}`}>
                 <Textarea id={`hl_body_${i}`} name={`hl_body_${i}`} defaultValue={item?.body ?? ""} rows={4} maxLength={siteLimits.highlightBody} />
               </Field>
-              <Field label="Media" htmlFor={`site-hl${i}`} hint={`One item: photo, GIF or video. ${mediaHint}`}>
-                <SiteMediaInput slot={`hl${i}`} current={item?.media ? [item.media] : []} max={1} sign={sign} credits={site.credits} />
+              <Field label="Download" htmlFor={`hl_nexus_${i}`} hint="Optional. Shows the text Download with a link for each box you fill.">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Input id={`hl_nexus_${i}`} name={`hl_nexus_${i}`} type="url" placeholder="Nexus Mods link, https://" defaultValue={item?.nexus ?? ""} />
+                  <Input id={`hl_github_${i}`} name={`hl_github_${i}`} type="url" placeholder="GitHub release link, https://" defaultValue={item?.github ?? ""} />
+                </div>
+              </Field>
+              <Field label={`Media (up to ${siteLimits.highlightMedia})`} htmlFor={`site-hl${i}`} hint={`Several photos, GIFs or videos per project. ${mediaHint}`}>
+                <SiteMediaInput slot={`hl${i}`} current={item?.media ?? []} max={siteLimits.highlightMedia} sign={sign} credits={site.credits} />
               </Field>
             </div>
           );
