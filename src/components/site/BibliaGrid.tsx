@@ -35,16 +35,16 @@ function BibliaCard({ book }: { book: BibliaBook }) {
 // The book covers in a grid: 2 columns on a phone, 3 on a tablet, 6 on a wide screen.
 export function BibliaGrid({ books, bottom }: { books: BibliaBook[]; bottom: string }) {
   return (
-    <Reveal variant="still">
-      <ul
-        className={`mx-auto grid max-w-5xl grid-cols-2 gap-x-5 gap-y-10 px-5 sm:grid-cols-3 sm:px-8 lg:grid-cols-6 ${bottom}`}
-      >
-        {books.map((book) => (
-          <li key={book.slug}>
+    <ul
+      className={`mx-auto grid max-w-5xl grid-cols-2 gap-x-5 gap-y-10 px-5 sm:grid-cols-3 sm:px-8 lg:grid-cols-6 ${bottom}`}
+    >
+      {books.map((book) => (
+        <li key={book.slug}>
+          <Reveal variant="still">
             <BibliaCard book={book} />
-          </li>
-        ))}
-      </ul>
-    </Reveal>
+          </Reveal>
+        </li>
+      ))}
+    </ul>
   );
 }

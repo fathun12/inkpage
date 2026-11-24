@@ -94,6 +94,13 @@ export function HomeForm({ action, sign, site }: WithMedia) {
         <Field label="Label" htmlFor="biblia_title" hint="Optional. Default: Biblia. Also the name in the menu.">
           <Input id="biblia_title" name="biblia_title" defaultValue={site.bibliaTitle ?? ""} maxLength={siteLimits.title} />
         </Field>
+        <Field
+          label="Text under the title"
+          htmlFor="biblia_intro"
+          hint="Shown at the top of the Biblia page. Empty = the default text. Up to 400 characters."
+        >
+          <Textarea id="biblia_intro" name="biblia_intro" defaultValue={site.bibliaIntro ?? ""} rows={3} maxLength={siteLimits.intro} />
+        </Field>
       </Section>
 
       <Section title="Link list" hint="The list of links over a big media.">

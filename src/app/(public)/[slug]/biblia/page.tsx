@@ -28,7 +28,7 @@ export default async function BibliaPage({ params }: Props) {
     <>
       <PageIntro
         title={site.bibliaTitle ?? "Biblia"}
-        intro="A private home library. Browse the shelves here, then come by to borrow."
+        intro={site.bibliaIntro ?? "A private home library. Browse the shelves here, then come by to borrow."}
       />
       <div className="mx-auto max-w-5xl px-5 pb-10 sm:px-8">
         <a
