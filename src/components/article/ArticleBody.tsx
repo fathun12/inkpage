@@ -63,5 +63,9 @@ function renderNode(node: DocNode, key: string): ReactNode {
 
 // Draws a saved article. No editor code is loaded for readers: this is plain React.
 export function ArticleBody({ doc }: { doc: DocNode }) {
-  return <div className="article-prose">{(doc.content ?? []).map((node, i) => renderNode(node, String(i)))}</div>;
+  return (
+    <div className="article-prose" data-indent={doc.attrs?.indent === true ? "true" : undefined}>
+      {(doc.content ?? []).map((node, i) => renderNode(node, String(i)))}
+    </div>
+  );
 }

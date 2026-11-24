@@ -1,10 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ComponentProps } from "react";
 import type { Editor } from "@tiptap/react";
 import { BubbleMenu, FloatingMenu } from "@tiptap/react/menus";
 import { normalizeHref } from "@/lib/article-doc";
 import { cn } from "@/lib/utils";
+
+type BubbleProps = ComponentProps<typeof BubbleMenu>;
+type FloatingProps = ComponentProps<typeof FloatingMenu>;
+
+// These must stay OUTSIDE the component: new objects on every render make the menus re-register in a loop.
+const bubbleOptions: BubbleProps["options"] = { placement: "top", offset: 8 };
+const showBubble: BubbleProps["shouldShow"] = ({ state }) => {
+  const { from, to } = state.selection;
+  return from !== to && state.doc.textBetween(from, to).length > 0;
+};
+const floatingOptions: FloatingProps["options"] = { placement: "left", offset: 12, shift: { padding: 4 } };
+const showFloating: FloatingProps["shouldShow"] = ({ state }) => {
+  const { $anchor, empty } = state.selection;
+  return empty && $anchor.depth === 1 && $anchor.parent.type.name === "paragraph" && $anchor.parent.content.size === 0;
+};
 
 type ToolProps = { label: string; active?: boolean; title?: string; onRun: () => void };
 
@@ -33,12 +48,18 @@ export function EditorMenus({ editor }: { editor: Editor }) {
   const [linkOpen, setLinkOpen] = useState(false);
   const [href, setHref] = useState("");
   const [linkError, setLinkError] = useState(false);
+  const [plusOpen, setPlusOpen] = useState(false);
 
   useEffect(() => {
-    const close = () => setLinkOpen(false);
+    const close = () => {
+      setLinkOpen(false);
+      setPlusOpen(false);
+    };
     editor.on("selectionUpdate", close);
+    editor.on("update", close);
     return () => {
       editor.off("selectionUpdate", close);
+      editor.off("update", close);
     };
   }, [editor]);
 
@@ -65,16 +86,19 @@ export function EditorMenus({ editor }: { editor: Editor }) {
     setLinkOpen(false);
   }
 
+  // What the "+" button offers. New block types (image, code, math, Arabic) are added here later.
+  const inserts: { label: string; title?: string; run: () => void }[] = [
+    { label: "H2", title: "Heading", run: () => editor.chain().focus().toggleHeading({ level: 2 }).run() },
+    { label: "H3", title: "Subheading", run: () => editor.chain().focus().toggleHeading({ level: 3 }).run() },
+    { label: "Quote", run: () => editor.chain().focus().toggleBlockquote().run() },
+    { label: "List", title: "Bulleted list", run: () => editor.chain().focus().toggleBulletList().run() },
+    { label: "1. List", title: "Numbered list", run: () => editor.chain().focus().toggleOrderedList().run() },
+    { label: "* * *", title: "Divider", run: () => editor.chain().focus().setHorizontalRule().run() },
+  ];
+
   return (
     <>
-      <BubbleMenu
-        editor={editor}
-        options={{ placement: "top", offset: 8 }}
-        shouldShow={({ state }) => {
-          const { from, to } = state.selection;
-          return from !== to && state.doc.textBetween(from, to).length > 0;
-        }}
-      >
+      <BubbleMenu editor={editor} options={bubbleOptions} shouldShow={showBubble}>
         <div
           role="toolbar"
           aria-label="Text formatting"
@@ -131,21 +155,45 @@ export function EditorMenus({ editor }: { editor: Editor }) {
         </div>
       </BubbleMenu>
 
-      <FloatingMenu
-        editor={editor}
-        options={{ placement: "right", offset: 8 }}
-        shouldShow={({ state }) => {
-          const { $anchor, empty } = state.selection;
-          return empty && $anchor.depth === 1 && $anchor.parent.type.name === "paragraph" && $anchor.parent.content.size === 0;
-        }}
-      >
-        <div role="toolbar" aria-label="Insert" className="ink-border flex items-center overflow-hidden rounded-md bg-surface text-ink">
-          <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} className="px-2.5 py-1.5 text-sm hover:bg-line/40">H2</button>
-          <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} className="px-2.5 py-1.5 text-sm hover:bg-line/40">H3</button>
-          <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => editor.chain().focus().toggleBlockquote().run()} className="px-2.5 py-1.5 text-sm hover:bg-line/40">Quote</button>
-          <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => editor.chain().focus().toggleBulletList().run()} className="px-2.5 py-1.5 text-sm hover:bg-line/40">List</button>
-          <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => editor.chain().focus().toggleOrderedList().run()} className="px-2.5 py-1.5 text-sm hover:bg-line/40">1. List</button>
-          <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={() => editor.chain().focus().setHorizontalRule().run()} className="px-2.5 py-1.5 text-sm hover:bg-line/40" title="Divider">* * *</button>
+      <FloatingMenu editor={editor} options={floatingOptions} shouldShow={showFloating}>
+        <div className="relative flex items-center">
+          <button
+            type="button"
+            title="Add block"
+            aria-label="Add block"
+            aria-expanded={plusOpen}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => setPlusOpen((open) => !open)}
+            className={cn(
+              "flex h-8 w-8 items-center justify-center rounded-full border border-line bg-bg text-xl leading-none text-ink-soft transition-transform hover:text-ink",
+              plusOpen && "rotate-45 text-ink",
+            )}
+          >
+            +
+          </button>
+          {plusOpen && (
+            <div
+              role="toolbar"
+              aria-label="Insert"
+              className="ink-border absolute left-full top-1/2 ml-2 flex -translate-y-1/2 items-center overflow-hidden whitespace-nowrap rounded-md bg-surface text-ink"
+            >
+              {inserts.map((item) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  title={item.title ?? item.label}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    item.run();
+                    setPlusOpen(false);
+                  }}
+                  className="px-2.5 py-1.5 text-sm hover:bg-line/40"
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </FloatingMenu>
     </>

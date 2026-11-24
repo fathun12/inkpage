@@ -83,6 +83,16 @@ export function ArticleEditor({ initial, username, backHref, viewHref, save, pub
   const running = useRef(false);
   const queued = useRef(false);
 
+  const startIndent = initial.doc.attrs?.indent === true;
+  const [indent, setIndent] = useState(startIndent);
+  const indentRef = useRef(startIndent);
+
+  // The article's own setting (first line indented or not) travels inside the saved document.
+  const docOf = useCallback((ed: Editor): DocNode => {
+    const json = JSON.parse(JSON.stringify(ed.getJSON())) as DocNode;
+    return indentRef.current ? { ...json, attrs: { indent: true } } : json;
+  }, []);
+
   // Sends the text to the server. If more typing arrives while it runs, it goes around once more.
   const flush = useCallback(async () => {
     if (running.current) {
@@ -101,7 +111,7 @@ export function ArticleEditor({ initial, username, backHref, viewHref, save, pub
           result = await save({
             title: titleRef.current,
             subtitle: subtitleRef.current,
-            content: JSON.parse(JSON.stringify(editor.getJSON())),
+            content: docOf(editor),
           });
         } catch {
           result = { ok: false, error: "Could not reach the server. Check your connection." };
@@ -115,7 +125,7 @@ export function ArticleEditor({ initial, username, backHref, viewHref, save, pub
     } finally {
       running.current = false;
     }
-  }, [save]);
+  }, [save, docOf]);
 
   // Drafts save by themselves after a short pause. A published article waits for the Update button.
   const schedule = useCallback(() => {
@@ -187,9 +197,16 @@ export function ArticleEditor({ initial, username, backHref, viewHref, save, pub
     schedule();
   }
 
+  function toggleIndent() {
+    const next = !indentRef.current;
+    indentRef.current = next;
+    setIndent(next);
+    schedule();
+  }
+
   function openDrawer() {
     if (!editor) return;
-    setDrawer({ title, subtitle, content: JSON.stringify(editor.getJSON()) });
+    setDrawer({ title, subtitle, content: JSON.stringify(docOf(editor)) });
   }
 
   const words = editor ? wordCount(editor.getText()) : 0;
@@ -213,6 +230,15 @@ export function ArticleEditor({ initial, username, backHref, viewHref, save, pub
           </a>
           <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">{stateLabels[initial.state]}</span>
           <div className="ml-auto flex flex-wrap items-center gap-3 text-sm text-ink-soft">
+            <button
+              type="button"
+              onClick={toggleIndent}
+              aria-pressed={indent}
+              title="Indent the first line of every paragraph"
+              className="underline underline-offset-4"
+            >
+              First line: {indent ? "Indented" : "Plain"}
+            </button>
             <span>
               {words} words · {readingMinutes(words)} min read
             </span>
@@ -278,7 +304,7 @@ export function ArticleEditor({ initial, username, backHref, viewHref, save, pub
           }}
           className="mt-3 w-full bg-transparent text-xl text-ink-soft outline-none placeholder:text-ink-soft"
         />
-        <div className="relative mt-8">
+        <div className="relative mt-8" data-indent={indent ? "true" : undefined}>
           <EditorContent editor={editor} />
           {editor && <EditorMenus editor={editor} />}
         </div>

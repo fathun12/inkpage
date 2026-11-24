@@ -109,3 +109,9 @@
     pointer-events: none;
   }
 }
+
+/* First line indent: set per article (the editor wrapper and the reader both carry data-indent). */
+[data-indent="true"] .article-prose > p,
+.article-prose[data-indent="true"] > p {
+  text-indent: 1.75em;
+}

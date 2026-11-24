@@ -94,7 +94,9 @@ export function sanitizeDoc(raw: unknown): DocNode {
       if (clean) kids.push(clean);
     }
   }
-  return { type: "doc", content: kids.length > 0 ? kids : [{ type: "paragraph" }] };
+  const doc: DocNode = { type: "doc", content: kids.length > 0 ? kids : [{ type: "paragraph" }] };
+  if ((raw as RawNode).attrs?.indent === true) doc.attrs = { indent: true };
+  return doc;
 }
 
 export const readDoc = sanitizeDoc;
