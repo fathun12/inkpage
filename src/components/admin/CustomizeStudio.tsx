@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useState, type MouseEvent, type ReactNode } from "react";
+import { CardSlider } from "@/components/site/CardSlider";
 import { FadeGallery } from "@/components/site/FadeGallery";
 import { Hero } from "@/components/site/Hero";
+import { Highlights } from "@/components/site/Highlights";
 import { IndexSection } from "@/components/site/IndexSection";
 import { NewsBar } from "@/components/site/NewsBar";
 import { SiteFooter } from "@/components/site/SiteFooter";
@@ -30,7 +32,7 @@ import {
   type SiteStyle,
 } from "@/config/site-style";
 import { routes } from "@/config/site";
-import type { HomeMedia } from "@/lib/site-view";
+import { creditOf, type HomeMedia } from "@/lib/site-view";
 import { cn } from "@/lib/utils";
 import type { Block, SocialItem } from "@/types/block";
 import type { FormAction } from "@/types/form";
@@ -43,6 +45,7 @@ type Props = {
   site: SiteSettings;
   media: HomeMedia;
   rows: Block[];
+  cards: Block[];
   socials: SocialItem[];
   nav: { label: string; href: string }[];
   notice?: ReactNode;
@@ -204,6 +207,7 @@ export function CustomizeStudio({
   site,
   media,
   rows,
+  cards,
   socials,
   nav,
   notice,
@@ -468,9 +472,23 @@ export function CustomizeStudio({
                   seconds={draft.style.heroSeconds}
                   autoplay={autoplay}
                   gray={draft.style.heroGray}
+                  credits={site.credits}
                 />
-                <IndexSection blocks={previewRows} mediaUrl={media.indexMedia} />
-                <FadeGallery images={media.gallery} seconds={draft.style.gallerySeconds} autoplay={autoplay} />
+                {cards.length > 0 && (
+                  <CardSlider items={cards} title={site.cardsTitle} seconds={draft.style.heroSeconds} autoplay={autoplay} />
+                )}
+                <IndexSection
+                  blocks={previewRows}
+                  mediaUrl={media.indexMedia}
+                  credit={creditOf(site.credits, media.indexMedia)}
+                />
+                <Highlights items={site.highlights} title={site.highlightsTitle} credits={site.credits} />
+                <FadeGallery
+                  images={media.gallery}
+                  seconds={draft.style.gallerySeconds}
+                  autoplay={autoplay}
+                  credits={site.credits}
+                />
                 <SiteFooter brand={profile.username} note={site.footerNote} socials={socials} />
               </SiteFrame>
             </div>
