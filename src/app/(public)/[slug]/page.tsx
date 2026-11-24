@@ -102,6 +102,7 @@ export default async function HomePage({ params }: Props) {
         <HomeDesigns
           data={designs}
           title={site.designsTitle ?? "Design"}
+          href={site.designsUrl}
           seconds={style.gallerySeconds}
           autoplay={autoplay}
         />
