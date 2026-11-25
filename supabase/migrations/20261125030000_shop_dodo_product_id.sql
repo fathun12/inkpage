@@ -1,4 +1,4 @@
--- inkpage: 20261125020000_shop_dodo_product_id
+-- inkpage: 20261125030000_shop_dodo_product_id
 -- Purpose: link each shop product to its product on Dodo Payments (phase 18d-2).
 -- The Dodo checkout needs the id of a product created in the Dodo dashboard.
 
