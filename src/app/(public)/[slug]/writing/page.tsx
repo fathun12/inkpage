@@ -37,7 +37,13 @@ export default async function WritingPage({ params }: Props) {
       {articles.length > 0 && <ArticleList articles={articles} username={profile.username} />}
       {rows.length > 0 ? (
         <>
-          <CardSlider items={recent} title="Recently added" seconds={style.heroSeconds} autoplay={style.motion !== "off"} />
+          <CardSlider
+            items={recent}
+            title="Recently added"
+            seconds={style.heroSeconds}
+            autoplay={style.motion !== "off"}
+            spacing="pt-4 pb-10 sm:pt-6 sm:pb-12"
+          />
           <WritingList blocks={rows} />
         </>
       ) : (

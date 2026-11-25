@@ -5,11 +5,11 @@ import type { Block } from "@/types/block";
 import { Reveal } from "./Reveal";
 import { WritingCard } from "./WritingCard";
 
-type Props = { items: Block[]; title: string | null; seconds: number; autoplay: boolean };
+type Props = { items: Block[]; title: string | null; seconds: number; autoplay: boolean; spacing?: string };
 
 // The sliding row of cards on Home. It slides by itself, stops while the pointer is over it,
 // and can be dragged, swiped or moved with the arrows.
-export function CardSlider({ items, title, seconds, autoplay }: Props) {
+export function CardSlider({ items, title, seconds, autoplay, spacing = "py-16 sm:py-24" }: Props) {
   const track = useRef<HTMLUListElement>(null);
   const paused = useRef(false);
   const count = items.length;
@@ -49,7 +49,7 @@ export function CardSlider({ items, title, seconds, autoplay }: Props) {
     <section
       id="selected"
       aria-label={title ?? "Selected"}
-      className="py-16 sm:py-24"
+      className={spacing}
       onPointerEnter={pause}
       onPointerLeave={resume}
       onFocus={pause}

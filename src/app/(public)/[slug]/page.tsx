@@ -114,9 +114,15 @@ export default async function HomePage({ params }: Props) {
           title={site.cardsTitle ?? site.writing.title ?? "Writing"}
           seconds={style.heroSeconds}
           autoplay={autoplay}
+          spacing={articles.length > 0 ? "pt-16 pb-6 sm:pt-24 sm:pb-8" : undefined}
         />
       )}
-      <HomeArticles articles={articles} username={profile.username} title="Articles" />
+      <HomeArticles
+        articles={articles}
+        username={profile.username}
+        title="Articles"
+        joined={writing.length > 0}
+      />
       <HomeProjects items={projects} title={site.projects.title ?? "Projects"} />
       {biblia && (
         <HomeBiblia data={biblia} title={site.bibliaTitle ?? "Biblia"} seeAll={`/${profile.username}/biblia`} />

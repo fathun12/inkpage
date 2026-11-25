@@ -14,7 +14,7 @@ export function ArticleList({ articles, username }: { articles: ArticleSummary[]
           .filter(Boolean)
           .join(" · ");
         return (
-          <li key={article.id} className="border-t border-line first:border-t-0">
+          <li key={article.id} className="border-t border-tertiary first:border-t-0">
             <Reveal delay={Math.min(index, 6) * 60}>
               <Link href={routes.article(username, article.slug)} className="block py-8 hover:opacity-80">
                 <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">{meta}</span>

@@ -24,7 +24,7 @@ export function WritingList({ blocks }: { blocks: Block[] }) {
           </span>
         );
         return (
-          <li key={block.id} className="border-t border-line first:border-t-0">
+          <li key={block.id} className="border-t border-tertiary first:border-t-0">
             <Reveal delay={Math.min(index, 6) * 60}>
               {item.url ? (
                 <a href={routes.go(block.id)} target="_blank" rel="noopener noreferrer" className="block hover:opacity-80">
