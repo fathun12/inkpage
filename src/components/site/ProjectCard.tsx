@@ -60,8 +60,8 @@ export function ProjectCard({ block, mode, first = false, index = 0, total = 1 }
         {total > 1 && (
           <>
             <span aria-hidden className="site-tick mb-4 block h-px w-6 bg-accent" />
-            <p className="mb-4 font-mono text-[11px] uppercase tracking-widest text-ink-soft">
-              {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
+            <p aria-hidden className="mb-3 font-voice text-4xl italic leading-none text-accent sm:text-5xl">
+              {index + 1}
             </p>
           </>
         )}

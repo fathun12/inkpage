@@ -15,18 +15,13 @@ type Props = {
   modeControl?: { value: Mode; onChange: (mode: Mode) => void };
 };
 
-const heading = "font-mono text-xs uppercase tracking-widest opacity-60";
+const heading = "font-voice text-xl italic leading-none opacity-70";
 const link = "text-sm transition-opacity duration-(--dur-base) hover:opacity-60";
-
-const pad = (n: number) => String(n).padStart(2, "0");
 
 export function SiteFooter({ brand, name, bio, note, socials, nav = [], modeControl }: Props) {
   const hasNote = Boolean(name || bio || note);
   const hasNav = nav.length > 0;
   const hasSocials = socials.length > 0;
-  const noteNo = 0;
-  const navNo = hasNote ? 1 : 0;
-  const socialNo = (hasNote ? 1 : 0) + (hasNav ? 1 : 0);
 
   return (
     <footer>
@@ -37,7 +32,7 @@ export function SiteFooter({ brand, name, bio, note, socials, nav = [], modeCont
             <div className="grid gap-12 sm:grid-cols-[repeat(auto-fit,minmax(12rem,1fr))]">
               {hasNote && (
                 <div className="flex flex-col gap-3">
-                  <p className={heading}>{pad(noteNo)} / Note</p>
+                  <p className={heading}>Note</p>
                   {name && <p className="font-display text-base font-normal leading-tight">{name}</p>}
                   {bio && <p className="max-w-xs whitespace-pre-line text-xs opacity-70">{bio}</p>}
                   {note && <p className="max-w-xs whitespace-pre-line text-sm opacity-70">{note}</p>}
@@ -46,7 +41,7 @@ export function SiteFooter({ brand, name, bio, note, socials, nav = [], modeCont
 
               {hasNav && (
                 <nav aria-label="Footer" className="flex flex-col gap-4">
-                  <p className={heading}>{pad(navNo)} / Explore</p>
+                  <p className={heading}>Explore</p>
                   <ul className="flex flex-col gap-2.5">
                     {nav.map((item) => (
                       <li key={item.href}>
@@ -61,7 +56,7 @@ export function SiteFooter({ brand, name, bio, note, socials, nav = [], modeCont
 
               {hasSocials && (
                 <div className="flex flex-col gap-4">
-                  <p className={heading}>{pad(socialNo)} / Connect</p>
+                  <p className={heading}>Connect</p>
                   <ul className="flex flex-col gap-2.5">
                     {socials.map((item) => (
                       <li key={item.url}>
