@@ -591,6 +591,8 @@ export function CustomizeStudio({
                   brand={profile.username}
                   note={site.footerNote}
                   socials={socials}
+                  contactEmail={site.contactEmail}
+                  whatsapp={site.whatsapp}
                   nav={nav}
                   modeControl={{ value: previewMode, onChange: setPreviewMode }}
                   news={{

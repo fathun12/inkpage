@@ -3,8 +3,10 @@
 import { z } from "zod";
 import { resolveTab, tabHref, type PagesTab } from "@/config/item-data";
 import {
+  emailAddress,
   fileKey,
   githubName,
+  whatsappNumber,
   readSite,
   siteLimits,
   siteMediaUrls,
@@ -67,6 +69,8 @@ const textSchema = z.object({
   about_title: text("The About title", siteLimits.title),
   about_body: text("The About text", siteLimits.aboutBody),
   footer_note: text("The footer note", siteLimits.footerNote),
+  contact_email: text("The email address", siteLimits.email),
+  whatsapp: text("The WhatsApp number", 40),
   intro_note: text("The intro note", siteLimits.introNote),
 });
 
@@ -172,6 +176,8 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     about_title: field(formData, "about_title"),
     about_body: field(formData, "about_body"),
     footer_note: field(formData, "footer_note"),
+    contact_email: field(formData, "contact_email"),
+    whatsapp: field(formData, "whatsapp"),
     intro_note: field(formData, "intro_note"),
   });
   if (!parsed.success) return abort(firstError(parsed.error));
@@ -255,7 +261,20 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
   if (tab === "about") {
     next.about = { title: v.about_title ?? null, body: v.about_body ?? null, photo: got("about")[0] ?? null };
   }
-  if (tab === "footer") next.footerNote = v.footer_note ?? null;
+  if (tab === "footer") {
+    next.footerNote = v.footer_note ?? null;
+    const email = v.contact_email ?? null;
+    if (email && !emailAddress(email)) return abort("The email address is not valid. Example: name@example.com");
+    next.contactEmail = email;
+    // Spaces, dashes, dots and brackets are removed, and so is a + at the start.
+    const wa = v.whatsapp?.replace(/[\s().-]/g, "").replace(/^\+/, "") ?? "";
+    if (wa && !whatsappNumber(wa)) {
+      return abort(
+        "The WhatsApp number must start with the country code and have 8 to 15 digits, with no 0 in front. Example: 6281234567890",
+      );
+    }
+    next.whatsapp = wa ? wa : null;
+  }
 
   // Credits come as credit__<file name>. An empty box clears a credit. Only credits of files in use are kept.
   const typed: Record<string, string> = {};

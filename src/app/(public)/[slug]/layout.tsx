@@ -55,6 +55,8 @@ export default async function SiteLayout({ children, params }: Props) {
         bio={profile.bio}
         note={site.footerNote}
         socials={socialsOf(blocks)}
+        contactEmail={site.contactEmail}
+        whatsapp={site.whatsapp}
         nav={buildNav(base, site, { label: shop.settings.home_title ?? "Shop" })}
         news={{
           items: site.news,

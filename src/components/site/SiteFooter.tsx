@@ -3,6 +3,7 @@ import { Credit } from "@/components/ui/Credit";
 import type { SocialItem } from "@/types/block";
 import { NewsTicker, type NewsProps } from "./NewsBar";
 import { ThemeSwitch, type Mode } from "./ThemeSwitch";
+import { WhatsAppLink } from "./WhatsAppLink";
 
 type NavItem = { label: string; href: string };
 type Props = {
@@ -11,6 +12,8 @@ type Props = {
   bio?: string | null;
   note: string | null;
   socials: SocialItem[];
+  contactEmail?: string | null;
+  whatsapp?: string | null;
   nav?: NavItem[];
   // Only the Customize preview sets this, so the buttons change the preview box and not the whole page.
   modeControl?: { value: Mode; onChange: (mode: Mode) => void };
@@ -21,17 +24,16 @@ type Props = {
 const heading = "text-sm font-semibold opacity-80";
 const link = "text-sm transition-opacity duration-(--dur-base) hover:opacity-60";
 
-export function SiteFooter({ brand, name, bio, note, socials, nav = [], modeControl, news }: Props) {
+export function SiteFooter({ brand, name, bio, note, socials, contactEmail = null, whatsapp = null, nav = [], modeControl, news }: Props) {
   const hasNote = Boolean(name || bio || note);
   const hasNav = nav.length > 0;
-  const hasSocials = socials.length > 0;
 
   return (
     <footer>
       {/* Upper part: the Tertiary color. */}
       <div className="bg-tertiary px-5 pt-14 text-tertiary-ink sm:px-8 sm:pt-20">
         <div className="mx-auto max-w-5xl">
-          {(hasNote || hasNav || hasSocials) && (
+          {(
             <div className="grid gap-12 sm:grid-cols-[repeat(auto-fit,minmax(12rem,1fr))]">
               {hasNote && (
                 <div className="flex flex-col gap-3">
@@ -57,20 +59,28 @@ export function SiteFooter({ brand, name, bio, note, socials, nav = [], modeCont
                 </nav>
               )}
 
-              {hasSocials && (
-                <div className="flex flex-col gap-4">
-                  <p className={heading}>Connect</p>
-                  <ul className="flex flex-col gap-2.5">
-                    {socials.map((item) => (
-                      <li key={item.url}>
-                        <a href={item.url} target="_blank" rel="noopener noreferrer" className={link}>
-                          {item.label} <span aria-hidden>↗</span>
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              <div className="flex flex-col gap-4">
+                <p className={heading}>Connect</p>
+                <ul className="flex flex-col gap-2.5">
+                  {contactEmail && (
+                    <li>
+                      <a href={`mailto:${contactEmail}`} className={`${link} break-all`}>
+                        {contactEmail}
+                      </a>
+                    </li>
+                  )}
+                  <li>
+                    <WhatsAppLink number={whatsapp} className={link} />
+                  </li>
+                  {socials.map((item) => (
+                    <li key={item.url}>
+                      <a href={item.url} target="_blank" rel="noopener noreferrer" className={link}>
+                        {item.label} <span aria-hidden>↗</span>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </div>
           )}
 

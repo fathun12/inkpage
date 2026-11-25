@@ -256,8 +256,21 @@ export function FooterForm({ action, site }: Base & { site: SiteSettings }) {
   return (
     <TabForm tab="footer" action={action} label="Save Footer">
       <Section title="Footer" hint="Social links come from your Social links block under Links." open>
-        <Field label="Note" htmlFor="footer_note" hint="Optional. For example an email address or a short line.">
+        <Field label="Note" htmlFor="footer_note" hint="Optional. A short line.">
           <Textarea id="footer_note" name="footer_note" defaultValue={site.footerNote ?? ""} rows={2} maxLength={siteLimits.footerNote} />
+        </Field>
+      </Section>
+
+      <Section title="Connect" hint="Email and WhatsApp in the Connect column of the footer." open>
+        <Field label="Email" htmlFor="contact_email" hint="Optional. Empty = no email line.">
+          <Input id="contact_email" name="contact_email" type="email" placeholder="name@example.com" defaultValue={site.contactEmail ?? ""} maxLength={siteLimits.email} />
+        </Field>
+        <Field
+          label="WhatsApp number"
+          htmlFor="whatsapp"
+          hint="Country code first, digits only, for example 6281234567890. Empty = the WhatsApp line still shows, but visitors see a note that you prefer not to be contacted there."
+        >
+          <Input id="whatsapp" name="whatsapp" inputMode="tel" placeholder="6281234567890" defaultValue={site.whatsapp ?? ""} maxLength={40} />
         </Field>
       </Section>
     </TabForm>

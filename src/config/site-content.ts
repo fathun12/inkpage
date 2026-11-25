@@ -33,6 +33,7 @@ export const siteLimits = {
   intro: 400,
   aboutBody: 4000,
   footerNote: 200,
+  email: 120,
   highlights: 5,
   highlightBody: 1500,
   highlightMedia: 6,
@@ -103,6 +104,9 @@ export type SiteSettings = {
   writing: PageText;
   about: AboutText;
   footerNote: string | null;
+  // Email and WhatsApp number (digits with country code) of the footer Connect column.
+  contactEmail: string | null;
+  whatsapp: string | null;
   intro: IntroSettings;
   showClock: boolean;
 };
@@ -143,6 +147,16 @@ function creditMap(v: unknown): Record<string, string> {
 // A GitHub username: letters, numbers and single hyphens, 1 to 39 characters.
 export function githubName(v: unknown): string | null {
   return typeof v === "string" && /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$/.test(v) ? v : null;
+}
+
+// An email address: one @, a dot in the domain, no spaces.
+export function emailAddress(v: unknown): string | null {
+  return typeof v === "string" && v.length <= siteLimits.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v) ? v : null;
+}
+
+// A WhatsApp number for wa.me: digits only, country code first, no 0 and no + in front, 8 to 15 digits.
+export function whatsappNumber(v: unknown): string | null {
+  return typeof v === "string" && /^[1-9]\d{7,14}$/.test(v) ? v : null;
 }
 
 function readHighlights(v: unknown): Highlight[] {
@@ -233,6 +247,8 @@ export function readSite(raw: unknown): SiteSettings {
       photo: link(about.photo),
     },
     footerNote: text(r.footerNote, siteLimits.footerNote),
+    contactEmail: emailAddress(r.contactEmail),
+    whatsapp: whatsappNumber(r.whatsapp),
     intro: readIntro(r.intro),
     showClock: r.showClock === true,
   };
