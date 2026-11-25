@@ -102,6 +102,7 @@ export async function startCheckoutAction(username: string, productSlug: string,
   try {
     url = await provider.createCheckout({
       id: orderId,
+      token,
       title: product.title,
       amountCents: product.price_usd_cents,
       currency: "USD",

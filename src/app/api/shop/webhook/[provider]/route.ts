@@ -1,9 +1,53 @@
 import { NextResponse } from "next/server";
+import { routes } from "@/config/site";
+import { sendReceipt } from "@/features/shop/email";
 import { getProvider } from "@/features/shop/providers";
 import type { ProviderEvent } from "@/features/shop/providers/types";
+import { hashToken } from "@/features/shop/token";
+import { getSiteUrl } from "@/lib/site-url";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 type Ctx = { params: Promise<{ provider: string }> };
+
+// After a payment: email the receipt with the order page link. Never throws: the order is already paid,
+// and an error here would make Dodo retry the whole webhook.
+async function sendPaidReceipt(db: ReturnType<typeof createAdminClient>, event: ProviderEvent): Promise<void> {
+  try {
+    if (!event.orderId || !event.orderToken) {
+      console.warn("shop: paid order without a token in the payment, no receipt", event.orderId);
+      return;
+    }
+    const { data: order } = await db
+      .from("orders")
+      .select("id, user_id, email, amount_cents, paid_at, token_hash, products(title, license_note)")
+      .eq("id", event.orderId)
+      .maybeSingle();
+    if (!order || order.token_hash !== hashToken(event.orderToken)) {
+      console.warn("shop: receipt skipped, the token does not match the order", event.orderId);
+      return;
+    }
+    const [profile, settings] = await Promise.all([
+      db.from("profiles").select("username").eq("id", order.user_id).maybeSingle(),
+      db.from("shop_settings").select("contact_email").eq("user_id", order.user_id).maybeSingle(),
+    ]);
+    if (!profile.data) return;
+    const product = Array.isArray(order.products) ? order.products[0] : order.products;
+    const origin = (await getSiteUrl()).replace(/\/$/, "");
+    const sent = await sendReceipt({
+      to: order.email,
+      orderId: order.id,
+      title: product?.title ?? "Your order",
+      priceCents: order.amount_cents,
+      paidAt: order.paid_at ? new Date(order.paid_at) : new Date(),
+      orderUrl: `${origin}${routes.profile(profile.data.username)}/order/${event.orderToken}`,
+      license: product?.license_note ?? null,
+      replyTo: settings.data?.contact_email ?? null,
+    });
+    if (!sent.ok) console.error("shop receipt failed", order.id, sent.error);
+  } catch (e) {
+    console.error("shop receipt failed", e instanceof Error ? e.message : e);
+  }
+}
 
 async function apply(db: ReturnType<typeof createAdminClient>, event: ProviderEvent): Promise<void> {
   if (event.kind === "refunded") {
@@ -20,6 +64,8 @@ async function apply(db: ReturnType<typeof createAdminClient>, event: ProviderEv
     const { data, error } = await db.rpc("shop_settle", { p_order: event.orderId, p_provider_ref: event.providerRef });
     if (error) throw new Error(error.message);
     if (data === "needs_review") console.warn("shop: late payment needs review", event.orderId);
+    // Only the first settlement sends the receipt ("already_paid" means an earlier event did it).
+    if (data === "paid" || data === "paid_late") await sendPaidReceipt(db, event);
     return;
   }
   const { error } = await db.rpc("shop_release", { p_order: event.orderId, p_status: event.kind });

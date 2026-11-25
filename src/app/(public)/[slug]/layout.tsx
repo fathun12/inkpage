@@ -14,7 +14,7 @@ import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
 import { getPublicShop } from "@/features/shop/public";
 import { musicEmbed } from "@/lib/music";
-import { buildNav, socialsOf } from "@/lib/site-view";
+import { buildNav, homeCountdown, socialsOf } from "@/lib/site-view";
 
 type Props = { children: ReactNode; params: Promise<{ slug: string }> };
 
@@ -30,8 +30,8 @@ export default async function SiteLayout({ children, params }: Props) {
   const base = routes.profile(profile.username);
   const music = musicEmbed(site.musicUrl);
   const shop = await getPublicShop(profile.id);
-  // The first Countdown block (admin Links) with a date. The bars hide it by themselves once the time has come.
-  const timer = blocks.find((b) => b.type === "countdown" && b.data.target);
+  // The same countdown as the Home section: the nearest one that has not come yet. The bars hide it by themselves once the time has come.
+  const timer = homeCountdown(blocks);
   const countdown = timer && timer.data.target ? { title: timer.title, target: timer.data.target } : null;
 
   return (

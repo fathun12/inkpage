@@ -18,7 +18,7 @@ export const shopConfig = {
     description: 2000,
     includedLines: 10,
     includedLine: 120,
-    licenseNote: 300,
+    licenseNote: 1000,
     files: 5,
     media: 6,
     fileMb: 50,
