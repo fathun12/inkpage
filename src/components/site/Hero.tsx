@@ -20,11 +20,13 @@ type Props = {
 const stillOnStorage = /\/storage\/v1\/object\/public\/media\/.+\.(webp|jpe?g|png)$/i;
 const phoneWidths = [828, 1200];
 
-// Phones get a lighter copy made by Vercel (quality 90). Wide screens keep the original file, so they lose no sharpness.
+// A lighter copy (made by Vercel, quality 90) is used only when the screen really needs few pixels.
+// `sizes` is the width the picture is DRAWN at, not the screen width: object-cover in a full-height box
+// enlarges a wide picture on a tall phone screen (about 1.9 x the height), so phones pick the original.
 function responsive(src: string): { srcSet?: string; sizes?: string } {
   if (!stillOnStorage.test(src)) return {};
   const lighter = phoneWidths.map((w) => `/_next/image?url=${encodeURIComponent(src)}&w=${w}&q=90 ${w}w`);
-  return { srcSet: [...lighter, `${src} 2560w`].join(", "), sizes: "100vw" };
+  return { srcSet: [...lighter, `${src} 2560w`].join(", "), sizes: "max(100vw, calc(100vh * 1.9))" };
 }
 
 // Full width media (video, GIF or photo) that can slide, with one small caption.
