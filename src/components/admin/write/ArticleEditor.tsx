@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type ChangeEvent } from "react";
 import Highlight from "@tiptap/extension-highlight";
 import { Mathematics } from "@tiptap/extension-mathematics";
 import { Placeholder } from "@tiptap/extension-placeholder";
@@ -18,6 +18,7 @@ import { readingMinutes, wordCount } from "@/lib/article-doc";
 import { imageFiles, prepareArticleImage } from "@/lib/article-image";
 import { uploadToSignedPath } from "@/lib/direct-upload";
 import { lowlight } from "@/lib/lowlight";
+import { typedFrom } from "@/lib/typeset";
 import { cleanPastedHtml } from "@/lib/paste-word";
 import type {
   ArticleSaveResult,
@@ -65,12 +66,21 @@ type AutoProps = { value: string; onChange: (value: string) => void; onEnter: ()
 // A title box that grows with its text.
 function AutoTextarea({ value, onChange, onEnter }: AutoProps) {
   const ref = useRef<HTMLTextAreaElement>(null);
+  const caret = useRef<number | null>(null);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     el.style.height = "auto";
     el.style.height = `${el.scrollHeight}px`;
   }, [value]);
+  // After a typing rule changed the text, the caret goes back right after the typed character.
+  useLayoutEffect(() => {
+    const el = ref.current;
+    if (el && caret.current !== null) {
+      el.setSelectionRange(caret.current, caret.current);
+      caret.current = null;
+    }
+  });
   return (
     <textarea
       ref={ref}
@@ -79,7 +89,11 @@ function AutoTextarea({ value, onChange, onEnter }: AutoProps) {
       maxLength={articleLimits.title}
       placeholder="Title"
       aria-label="Title"
-      onChange={(e) => onChange(e.target.value.replace(/\n/g, " "))}
+      onChange={(e) => {
+        const typed = typedFrom(e);
+        if (typed.value !== e.currentTarget.value) caret.current = typed.caret;
+        onChange(typed.value.replace(/\n/g, " "));
+      }}
       onKeyDown={(e) => {
         if (e.key === "Enter") {
           e.preventDefault();
@@ -102,6 +116,14 @@ export function ArticleEditor({ initial, username, backHref, viewHref, save, sig
   const titleRef = useRef(initial.title);
   const subtitleRef = useRef(initial.subtitle);
   const subtitleInput = useRef<HTMLInputElement>(null);
+  const subtitleCaret = useRef<number | null>(null);
+  useLayoutEffect(() => {
+    const el = subtitleInput.current;
+    if (el && subtitleCaret.current !== null) {
+      el.setSelectionRange(subtitleCaret.current, subtitleCaret.current);
+      subtitleCaret.current = null;
+    }
+  });
   const editorRef = useRef<Editor | null>(null);
   const scheduleRef = useRef<() => void>(() => {});
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -424,7 +446,11 @@ export function ArticleEditor({ initial, username, backHref, viewHref, save, sig
           maxLength={articleLimits.subtitle}
           placeholder="Subtitle (optional)"
           aria-label="Subtitle"
-          onChange={(e) => onSubtitle(e.target.value)}
+          onChange={(e) => {
+            const typed = typedFrom(e);
+            if (typed.value !== e.currentTarget.value) subtitleCaret.current = typed.caret;
+            onSubtitle(typed.value);
+          }}
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
