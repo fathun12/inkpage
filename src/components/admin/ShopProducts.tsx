@@ -116,6 +116,13 @@ function ProductFields({
         >
           <Input id={`idr-${key}`} name="price_idr" inputMode="numeric" defaultValue={product?.price_idr ?? ""} />
         </Field>
+        <Field
+          label="Dodo product ID"
+          htmlFor={`dodo-${key}`}
+          hint="Needed for paid products. Create the same product in Dodo with the same price, then copy its ID here. Leave empty for Free."
+        >
+          <Input id={`dodo-${key}`} name="dodo_product_id" defaultValue={product?.dodo_product_id ?? ""} />
+        </Field>
       </Part>
 
       <Part title="Stock" hint="How many can be sold.">

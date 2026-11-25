@@ -33,4 +33,17 @@ export const env = {
   get cronSecret() {
     return process.env.CRON_SECRET || undefined;
   },
+  // Dodo Payments, server only. Optional: without the key, paid checkout answers "not connected yet".
+  get dodoApiKey() {
+    return process.env.DODO_PAYMENTS_API_KEY || undefined;
+  },
+  // Must be exactly test_mode or live_mode (anything else counts as not set).
+  get dodoEnvironment() {
+    const value = process.env.DODO_PAYMENTS_ENVIRONMENT;
+    return value === "test_mode" || value === "live_mode" ? value : undefined;
+  },
+  // The signing secret of the webhook endpoint (starts with whsec_).
+  get dodoWebhookKey() {
+    return process.env.DODO_PAYMENTS_WEBHOOK_KEY || undefined;
+  },
 };

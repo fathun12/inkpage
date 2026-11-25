@@ -6,15 +6,20 @@ import { createAdminClient } from "@/lib/supabase/admin";
 type Ctx = { params: Promise<{ provider: string }> };
 
 async function apply(db: ReturnType<typeof createAdminClient>, event: ProviderEvent): Promise<void> {
+  if (event.kind === "refunded") {
+    // A refund event may name only the provider's payment: then the saved payment reference finds the order.
+    const reference = event.orderId ?? event.providerRef;
+    if (!reference) return;
+    const update = db.from("orders").update({ status: "refunded" }).eq("status", "paid");
+    const { error } = await (event.orderId ? update.eq("id", event.orderId) : update.eq("provider_ref", reference));
+    if (error) throw new Error(error.message);
+    return;
+  }
+  if (!event.orderId) return;
   if (event.kind === "paid") {
     const { data, error } = await db.rpc("shop_settle", { p_order: event.orderId, p_provider_ref: event.providerRef });
     if (error) throw new Error(error.message);
     if (data === "needs_review") console.warn("shop: late payment needs review", event.orderId);
-    return;
-  }
-  if (event.kind === "refunded") {
-    const { error } = await db.from("orders").update({ status: "refunded" }).eq("id", event.orderId).eq("status", "paid");
-    if (error) throw new Error(error.message);
     return;
   }
   const { error } = await db.rpc("shop_release", { p_order: event.orderId, p_status: event.kind });

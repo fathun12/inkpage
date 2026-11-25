@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Credit } from "@/components/ui/Credit";
 import type { SocialItem } from "@/types/block";
+import { NewsTicker, type NewsProps } from "./NewsBar";
 import { ThemeSwitch, type Mode } from "./ThemeSwitch";
 
 type NavItem = { label: string; href: string };
@@ -13,12 +14,14 @@ type Props = {
   nav?: NavItem[];
   // Only the Customize preview sets this, so the buttons change the preview box and not the whole page.
   modeControl?: { value: Mode; onChange: (mode: Mode) => void };
+  // The news in the black band (also the clock and the countdown). Left out = no news in the footer.
+  news?: NewsProps;
 };
 
 const heading = "text-sm font-semibold opacity-80";
 const link = "text-sm transition-opacity duration-(--dur-base) hover:opacity-60";
 
-export function SiteFooter({ brand, name, bio, note, socials, nav = [], modeControl }: Props) {
+export function SiteFooter({ brand, name, bio, note, socials, nav = [], modeControl, news }: Props) {
   const hasNote = Boolean(name || bio || note);
   const hasNav = nav.length > 0;
   const hasSocials = socials.length > 0;
@@ -87,6 +90,11 @@ export function SiteFooter({ brand, name, bio, note, socials, nav = [], modeCont
           <p className="text-xs opacity-70">
             © {new Date().getFullYear()} {brand} · <Credit />
           </p>
+          {news && (
+            <div className="order-last flex basis-full justify-center sm:order-none sm:min-w-0 sm:flex-1">
+              <NewsTicker {...news} />
+            </div>
+          )}
           <div className="flex items-center gap-3">
             <ThemeSwitch control={modeControl} />
             <a

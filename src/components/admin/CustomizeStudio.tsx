@@ -593,6 +593,13 @@ export function CustomizeStudio({
                   socials={socials}
                   nav={nav}
                   modeControl={{ value: previewMode, onChange: setPreviewMode }}
+                  news={{
+                    items: site.news,
+                    seconds: draft.style.heroSeconds,
+                    autoplay,
+                    showClock: site.showClock,
+                    countdown: null,
+                  }}
                 />
               </SiteFrame>
             </div>

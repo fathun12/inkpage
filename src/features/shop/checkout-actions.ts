@@ -42,7 +42,7 @@ export async function startCheckoutAction(username: string, productSlug: string,
   // Price and status come from the database, never from the browser.
   const { data: product } = await db
     .from("products")
-    .select("id, title, price_usd_cents, license_note")
+    .select("id, title, price_usd_cents, license_note, dodo_product_id")
     .eq("user_id", profile.id)
     .eq("slug", productSlug)
     .eq("status", "active")
@@ -52,6 +52,8 @@ export async function startCheckoutAction(username: string, productSlug: string,
   const paid = product.price_usd_cents > 0;
   const provider = paid ? getActiveProvider() : null;
   if (paid && !provider) return fail("Paid checkout is not connected yet.");
+  // Checked before any stock is held. The only provider today is Dodo, which needs its own product id.
+  if (provider && !product.dodo_product_id) return fail("This product is not ready for payment yet.");
 
   await expireHolds();
   const settings = await db
@@ -104,6 +106,7 @@ export async function startCheckoutAction(username: string, productSlug: string,
       amountCents: product.price_usd_cents,
       currency: "USD",
       email,
+      providerProductId: product.dodo_product_id,
       returnUrl: `${origin}${orderPath}`,
     });
   } catch (e) {

@@ -42,6 +42,15 @@ export function readProductForm(formData: FormData): { data: ProductInput } | { 
     if (idr > L.maxPriceIdr) return { error: `The IDR price can be at most ${L.maxPriceIdr}.` };
   }
 
+  let dodoId: string | null = null;
+  const dodoText = field(formData, "dodo_product_id");
+  if (dodoText !== undefined) {
+    if (!/^[A-Za-z0-9_-]{1,100}$/.test(dodoText)) {
+      return { error: "The Dodo product id can only have letters, numbers, - and _. Copy it from the Dodo dashboard." };
+    }
+    dodoId = dodoText;
+  }
+
   let stock: number | null = null;
   const stockText = field(formData, "stock");
   if (stockText !== undefined) {
@@ -67,6 +76,7 @@ export function readProductForm(formData: FormData): { data: ProductInput } | { 
       description: parsed.data.description ?? null,
       price_usd_cents: cents,
       price_idr: idr,
+      dodo_product_id: dodoId,
       stock,
       included,
       license_note: parsed.data.license_note ?? null,

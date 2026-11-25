@@ -30,10 +30,19 @@ export default async function SiteLayout({ children, params }: Props) {
   const base = routes.profile(profile.username);
   const music = musicEmbed(site.musicUrl);
   const shop = await getPublicShop(profile.id);
+  // The first Countdown block (admin Links) with a date. The bars hide it by themselves once the time has come.
+  const timer = blocks.find((b) => b.type === "countdown" && b.data.target);
+  const countdown = timer && timer.data.target ? { title: timer.title, target: timer.data.target } : null;
 
   return (
     <SiteFrame fonts={readFonts(profile)} style={style}>
-      <NewsBar items={site.news} seconds={style.heroSeconds} autoplay={style.motion !== "off"} showClock={site.showClock} />
+      <NewsBar
+        items={site.news}
+        seconds={style.heroSeconds}
+        autoplay={style.motion !== "off"}
+        showClock={site.showClock}
+        countdown={countdown}
+      />
       <SiteHeader
         brand={profile.username}
         home={base}
@@ -47,6 +56,13 @@ export default async function SiteLayout({ children, params }: Props) {
         note={site.footerNote}
         socials={socialsOf(blocks)}
         nav={buildNav(base, site, { label: shop.settings.home_title ?? "Shop" })}
+        news={{
+          items: site.news,
+          seconds: style.heroSeconds,
+          autoplay: style.motion !== "off",
+          showClock: site.showClock,
+          countdown,
+        }}
       />
       {music && <MusicPlayer embed={music} />}
       <ViewBeacon endpoint={routes.track} username={profile.username} />

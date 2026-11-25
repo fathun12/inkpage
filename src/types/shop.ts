@@ -8,6 +8,8 @@ export type Product = {
   description: string | null;
   price_usd_cents: number;
   price_idr: number | null;
+  // The id of the same product in the Dodo dashboard (needed to sell it for money).
+  dodo_product_id: string | null;
   // null = unlimited, 0 = sold out
   stock: number | null;
   included: string[];
@@ -38,6 +40,7 @@ export type ProductInput = {
   description: string | null;
   price_usd_cents: number;
   price_idr: number | null;
+  dodo_product_id: string | null;
   stock: number | null;
   included: string[];
   license_note: string | null;

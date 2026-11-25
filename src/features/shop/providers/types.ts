@@ -6,6 +6,8 @@ export type CheckoutOrder = {
   amountCents: number;
   currency: string;
   email: string;
+  // The id of this product on the provider's side (Dodo: the product id from the Dodo dashboard).
+  providerProductId: string | null;
   // Where the provider sends the buyer after paying (the order page).
   returnUrl: string;
 };
@@ -15,7 +17,8 @@ export type ProviderEventKind = "paid" | "failed" | "expired" | "canceled" | "re
 export type ProviderEvent = {
   eventId: string;
   kind: ProviderEventKind;
-  orderId: string;
+  // null when the provider names only its own payment (refund events): then providerRef finds the order.
+  orderId: string | null;
   providerRef: string | null;
 };
 
