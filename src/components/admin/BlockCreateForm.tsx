@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Field, Input, Textarea } from "@/components/ui/Field";
 import { ImageInput } from "@/components/ui/ImageInput";
 import { SubmitButton } from "@/components/ui/SubmitButton";
+import { countdownConfig } from "@/config/countdown";
 import { mediaConfig } from "@/config/media";
 import { siteConfig } from "@/config/site";
 import type { BlockType } from "@/types/block";
@@ -165,6 +166,15 @@ export function BlockCreateForm({ action, allowGif = true }: { action: FormActio
         <Wide>
           <Field label="Counts down to" htmlFor="new-countdown-target" hint={`Time in ${siteConfig.timezoneLabel}.`}>
             <Input id="new-countdown-target" name="target" type="datetime-local" required />
+          </Field>
+        </Wide>
+        <Wide>
+          <Field
+            label="Description"
+            htmlFor="new-countdown-body"
+            hint={`Optional. What is coming. Shown under the title on Home. Up to ${countdownConfig.descriptionMax} characters.`}
+          >
+            <Textarea id="new-countdown-body" name="body" rows={3} maxLength={countdownConfig.descriptionMax} />
           </Field>
         </Wide>
       </TypeCard>

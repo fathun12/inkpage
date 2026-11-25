@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { cardRanges, mediaDefaults } from "@/config/card";
+import { countdownConfig } from "@/config/countdown";
 import { blockPages } from "@/config/site-content";
 import { mediaConfig } from "@/config/media";
 import { parseEmbed } from "@/lib/embed";
@@ -84,6 +85,13 @@ export const blockSchema = z
         code: "custom",
         path: ["target"],
         message: "Pick the date and time to count down to.",
+      });
+    }
+    if (v.type === "countdown" && v.body && v.body.length > countdownConfig.descriptionMax) {
+      ctx.addIssue({
+        code: "custom",
+        path: ["body"],
+        message: `The description can be at most ${countdownConfig.descriptionMax} characters.`,
       });
     }
     if (v.nexus && !isHttpUrl(v.nexus)) {

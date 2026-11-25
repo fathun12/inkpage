@@ -91,7 +91,7 @@ function toRow(
   current: BlockData | null,
 ) {
   const hasUrl = v.type === "link" || v.type === "project" || v.type === "embed";
-  const hasBody = v.type === "link" || v.type === "project" || v.type === "text";
+  const hasBody = v.type === "link" || v.type === "project" || v.type === "text" || v.type === "countdown";
   const hasImage = v.type === "link" || v.type === "project";
 
   const data: BlockData = {};

@@ -106,6 +106,20 @@ export function newestFirst(blocks: Block[]): Block[] {
   return [...blocks].sort((a, b) => b.created_at.localeCompare(a.created_at));
 }
 
+// The countdown shown as a section on Home: the nearest one that has not come yet.
+// When every countdown has come, the one that came last. It stays until the owner hides or deletes it.
+export function homeCountdown(blocks: Block[]): Block | null {
+  const now = Date.now();
+  const items = blocks
+    .filter((b) => b.type === "countdown" && b.data.target)
+    .map((b) => ({ block: b, end: new Date(b.data.target as string).getTime() }))
+    .filter((item) => Number.isFinite(item.end));
+  if (items.length === 0) return null;
+  const upcoming = items.filter((item) => item.end > now).sort((a, b) => a.end - b.end);
+  if (upcoming.length > 0) return upcoming[0].block;
+  return [...items].sort((a, b) => b.end - a.end)[0].block;
+}
+
 // "Recently added" on the Writing page: the 5 newest.
 export function recentWriting(newest: Block[]): Block[] {
   return newest.slice(0, 5);

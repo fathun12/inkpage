@@ -9,6 +9,7 @@ import { resolveGreetings } from "@/config/intro";
 import { HomeArticles } from "@/components/site/HomeArticles";
 import { getPublicArticles } from "@/features/articles/queries";
 import { HomeBiblia } from "@/components/site/HomeBiblia";
+import { HomeCountdown } from "@/components/site/HomeCountdown";
 import { HomeDesigns } from "@/components/site/HomeDesigns";
 import { HomeGithub } from "@/components/site/HomeGithub";
 import { HomeProjects } from "@/components/site/HomeProjects";
@@ -28,7 +29,15 @@ import { fetchBiblia } from "@/features/site/biblia";
 import { fetchDesigns } from "@/features/site/designs";
 import { fetchGithub } from "@/features/site/github";
 import { getSiteUrl } from "@/lib/site-url";
-import { creditOf, homeProjects, homeShowcase, homeWriting, listBlocks, resolveHomeMedia } from "@/lib/site-view";
+import {
+  creditOf,
+  homeCountdown,
+  homeProjects,
+  homeShowcase,
+  homeWriting,
+  listBlocks,
+  resolveHomeMedia,
+} from "@/lib/site-view";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -60,6 +69,7 @@ export default async function HomePage({ params }: Props) {
   const projects = homeProjects(blocks);
   const writing = homeWriting(blocks);
   const showcase = homeShowcase(blocks);
+  const countdown = homeCountdown(blocks);
   const autoplay = style.motion !== "off";
   const [biblia, designs, github, shop, articles] = await Promise.all([
     fetchBiblia(site.bibliaUrl, 6),
@@ -72,6 +82,7 @@ export default async function HomePage({ params }: Props) {
   const shopTitle = shop.settings.home_title ?? "Shop";
   // The table of contents over the hero: the sections that really show up on Home, in page order.
   const contents = [
+    countdown && { id: "countdown", label: "Countdown" },
     writing.length > 0 && { id: "writing", label: site.cardsTitle ?? site.writing.title ?? "Writing" },
     articles.length > 0 && { id: "articles", label: "Articles" },
     projects.length > 0 && { id: "projects", label: site.projects.title ?? "Projects" },
@@ -107,6 +118,14 @@ export default async function HomePage({ params }: Props) {
         )}
         <HeroContents items={contents} />
       </Hero>
+      {countdown && (
+        <HomeCountdown
+          title={countdown.title}
+          description={countdown.body}
+          target={countdown.data.target ?? ""}
+          start={countdown.created_at}
+        />
+      )}
       {writing.length > 0 && <span id="writing" className="block" />}
       {writing.length > 0 && (
         <CardSlider

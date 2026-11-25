@@ -2,6 +2,7 @@ import { Field, Input, Textarea } from "@/components/ui/Field";
 import { Img } from "@/components/ui/Img";
 import { ImageInput } from "@/components/ui/ImageInput";
 import { SubmitButton } from "@/components/ui/SubmitButton";
+import { countdownConfig } from "@/config/countdown";
 import { mediaConfig } from "@/config/media";
 import { blockPageLabels, resolvePage } from "@/config/site-content";
 import { readMedia } from "@/lib/card-media";
@@ -66,7 +67,7 @@ type CardProps = { block: BlockView; index: number; total: number; actions: Acti
 function BlockCard({ block, index, total, actions, gifCount }: CardProps) {
   const type = block.type;
   const hasUrl = type === "link" || type === "project" || type === "embed";
-  const hasBody = type === "link" || type === "project" || type === "text";
+  const hasBody = type === "link" || type === "project" || type === "text" || type === "countdown";
   const hasImage = type === "link" || type === "project";
   const images = block.data.images ?? [];
   const socialLines = (block.data.items ?? []).map((item) => item.url).join("\n");
@@ -152,7 +153,7 @@ function BlockCard({ block, index, total, actions, gifCount }: CardProps) {
                     name="body"
                     defaultValue={block.body ?? ""}
                     rows={type === "text" ? 4 : 2}
-                    maxLength={500}
+                    maxLength={type === "countdown" ? countdownConfig.descriptionMax : 500}
                     required={type === "text"}
                   />
                 </Field>
