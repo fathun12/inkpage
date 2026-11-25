@@ -1,7 +1,7 @@
 /* article.css: how an article looks. The editor and the reader use the SAME class, so what you write is what is read. */
 
 .article-prose {
-  font-family: var(--font-body);
+  font-family: var(--nf-f-newsreader), Georgia, "Times New Roman", serif;
   font-size: 1.125rem;
   line-height: 1.8;
   color: var(--c-ink);
@@ -402,4 +402,33 @@
 /* In the editor the code sits in a div that Tiptap makes: keep long lines on one line, like the reader. */
 .article-prose .code-block pre [data-node-view-content] {
   white-space: pre !important;
+}
+
+/* Reading settings (the reader's choices, set by ReaderShell). Medium width and size 2 are the defaults. */
+.reader {
+  max-width: 42rem;
+}
+.reader[data-width="narrow"] {
+  max-width: 34rem;
+}
+.reader[data-width="wide"] {
+  max-width: 54rem;
+}
+.reader[data-size="1"] .article-prose {
+  font-size: 1rem;
+}
+.reader[data-size="3"] .article-prose {
+  font-size: 1.25rem;
+}
+.reader[data-size="4"] .article-prose {
+  font-size: 1.375rem;
+}
+.reader[data-size="5"] .article-prose {
+  font-size: 1.5rem;
+}
+.reader[data-font="sans"] .article-prose {
+  font-family: var(--font-body);
+}
+.reader[data-align="justify"] .article-prose p:not([dir="rtl"]) {
+  text-align: justify;
 }

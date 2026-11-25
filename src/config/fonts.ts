@@ -76,6 +76,7 @@ const dmSerifDisplay = DM_Serif_Display({
 const newsreader = Newsreader({
   subsets: ["latin"],
   variable: "--nf-f-newsreader",
+  style: ["normal", "italic"],
   display: "swap",
   preload: false,
 });
