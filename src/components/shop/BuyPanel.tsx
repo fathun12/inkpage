@@ -36,9 +36,9 @@ export function BuyPanel({ state, action, error, links }: Props) {
       )}
 
       {state.buyable ? (
-        <form action={action} className="flex flex-col gap-4">
+        <form action={action} className="relative flex flex-col gap-4">
           {/* Honeypot: people never see it, simple bots fill it in. */}
-          <div aria-hidden className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+          <div aria-hidden className="pointer-events-none absolute -left-[9999px] h-0 w-0 overflow-hidden">
             <label>
               Website
               <input type="text" name="website" tabIndex={-1} autoComplete="off" />
