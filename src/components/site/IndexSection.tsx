@@ -81,7 +81,7 @@ export function IndexSection({ blocks, mediaUrl, tone = "dark", credit }: Props)
           const download = isDownload(block.url);
           const content = (
             <>
-              <span className="font-voice text-2xl italic leading-none text-accent">{number}</span>
+              <span className="text-sm font-medium text-accent">{number}</span>
               <span className="min-w-0">
                 {!dark && block.image_url && (
                   <Img src={block.image_url} className="mb-4 aspect-video w-full max-w-lg object-cover" />

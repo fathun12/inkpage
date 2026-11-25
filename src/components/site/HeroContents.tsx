@@ -69,7 +69,7 @@ export function HeroContents({ items }: { items: ContentsItem[] }) {
               className="site-contents-link block py-2 pr-4 text-right font-mono text-xs uppercase tracking-widest text-white/80 transition-colors duration-(--dur-base) hover:text-white hover:underline hover:decoration-accent hover:decoration-1 hover:underline-offset-4"
             >
               {item.label}
-              <span aria-hidden className="ml-3 font-voice text-base normal-case italic tracking-normal opacity-60">
+              <span aria-hidden className="ml-3 font-body normal-case tracking-normal opacity-60">
                 {i + 1}
               </span>
             </a>

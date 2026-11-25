@@ -37,15 +37,21 @@ export function ItemMedia({ file, eager }: { file: ProjectFile; eager: boolean }
   );
 }
 
-// A project: media on the left (B under A), text and buttons on the right. On a phone the media is on top.
+// A project: media on the left (B under A), text on the right. On a phone the media is on top.
+// The text column is as tall as the media: the accent line is level with the top of the media, the button
+// follows the text, and the text links sit at the bottom, level with the bottom of the media.
 // Home shows two media at most. The Projects page shows all of them.
-export function ProjectCard({ block, mode, first = false, index = 0, total = 1 }: Props) {
+export function ProjectCard({ block, mode, first = false, total = 1 }: Props) {
   const item = readProjectItem(block);
   const shown: ProjectFile[] =
     mode === "home" ? Object.values(pickHomeMedia(item.files)).filter((f): f is ProjectFile => f !== null) : item.files;
   const hasMedia = shown.length > 0;
 
-  const title = <h3 className="font-display text-3xl leading-tight sm:text-5xl">{item.title}</h3>;
+  const title = (
+    <h3 className="font-display text-3xl font-medium leading-tight sm:text-5xl">
+      <span className="site-sweep">{item.title}</span>
+    </h3>
+  );
 
   return (
     <div className={hasMedia ? `grid gap-8 ${projectLayout.grid}` : "grid"}>
@@ -56,25 +62,20 @@ export function ProjectCard({ block, mode, first = false, index = 0, total = 1 }
           ))}
         </Reveal>
       )}
-      <Reveal delay={100} className="flex flex-col justify-center">
-        {total > 1 && (
-          <>
-            <span aria-hidden className="site-tick mb-4 block h-px w-6 bg-accent" />
-            <p aria-hidden className="mb-3 font-voice text-4xl italic leading-none text-accent sm:text-5xl">
-              {index + 1}
-            </p>
-          </>
-        )}
-        {item.url ? (
-          <a href={routes.go(block.id)} className="underline-offset-4 hover:underline">
-            {title}
-          </a>
-        ) : (
-          title
-        )}
-        {item.body && <p className="mt-5 max-w-xl whitespace-pre-line text-ink-soft">{item.body}</p>}
-        <Downloads links={item.downloads} className="mt-7" />
-        <TextLinks links={item.links} className="mt-4" />
+      <Reveal delay={100} className="flex flex-col justify-between gap-8 self-stretch">
+        <div>
+          {total > 1 && <span aria-hidden className="site-tick mb-5 block h-px w-6 bg-accent" />}
+          {item.url ? (
+            <a href={routes.go(block.id)} className="block">
+              {title}
+            </a>
+          ) : (
+            title
+          )}
+          {item.body && <p className="mt-5 max-w-xl whitespace-pre-line text-ink-soft">{item.body}</p>}
+          <Downloads links={item.downloads} className="mt-7" />
+        </div>
+        <TextLinks links={item.links} className="mt-2" />
       </Reveal>
     </div>
   );

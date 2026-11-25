@@ -15,7 +15,7 @@ type Props = {
   modeControl?: { value: Mode; onChange: (mode: Mode) => void };
 };
 
-const heading = "font-voice text-xl italic leading-none opacity-70";
+const heading = "text-sm font-semibold opacity-80";
 const link = "text-sm transition-opacity duration-(--dur-base) hover:opacity-60";
 
 export function SiteFooter({ brand, name, bio, note, socials, nav = [], modeControl }: Props) {
