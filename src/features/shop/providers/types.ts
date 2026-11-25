@@ -2,15 +2,13 @@
 
 export type CheckoutOrder = {
   id: string;
-  // The buyer's secret order token. Dodo copies it onto the payment so the webhook can email the same order page link.
-  token: string;
   title: string;
   amountCents: number;
   currency: string;
   email: string;
   // The id of this product on the provider's side (Dodo: the product id from the Dodo dashboard).
   providerProductId: string | null;
-  // Where the provider sends the buyer after paying (the order page).
+  // Where the provider sends the buyer after paying (the product page: it never carries a secret).
   returnUrl: string;
 };
 
@@ -22,8 +20,6 @@ export type ProviderEvent = {
   // null when the provider names only its own payment (refund events): then providerRef finds the order.
   orderId: string | null;
   providerRef: string | null;
-  // The order token Dodo copied from the checkout (paid events only).
-  orderToken?: string | null;
 };
 
 export type PaymentProvider = {

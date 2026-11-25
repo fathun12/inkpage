@@ -40,8 +40,8 @@ async function createCheckout(order: CheckoutOrder): Promise<string> {
       product_cart: [{ product_id: order.providerProductId, quantity: 1 }],
       customer: { email: order.email },
       return_url: order.returnUrl,
-      // Dodo copies this onto the payment, so the webhook can name our order and email its page link.
-      metadata: { order_id: order.id, order_token: order.token },
+      // Dodo copies this onto the payment, so the webhook can name our order. No secret is ever sent to Dodo.
+      metadata: { order_id: order.id },
     }),
     signal: AbortSignal.timeout(requestTimeoutMs),
     cache: "no-store",
@@ -112,8 +112,7 @@ async function verifyWebhook(request: Request, rawBody: string): Promise<Provide
       return null;
     }
     const kind = type === "payment.succeeded" ? "paid" : type === "payment.failed" ? "failed" : "canceled";
-    const orderToken = asString(asObject(data.metadata)?.order_token);
-    return { eventId: id, kind, orderId, providerRef, orderToken };
+    return { eventId: id, kind, orderId, providerRef };
   }
 
   if (type === "refund.succeeded") {

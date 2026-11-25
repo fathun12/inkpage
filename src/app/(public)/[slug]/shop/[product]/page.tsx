@@ -8,7 +8,9 @@ import { getPublicShop, legalLinks } from "@/features/shop/public";
 import { productState } from "@/lib/shop-status";
 
 type Props = { params: Promise<{ slug: string; product: string }> };
-type PageProps = Props & { searchParams: Promise<{ buy_error?: string | string[] }> };
+type PageProps = Props & {
+  searchParams: Promise<{ buy_error?: string | string[]; bought?: string | string[] }>;
+};
 
 async function load(slug: string, productSlug: string) {
   const profile = await getProfileByUsername(slug.toLowerCase());
@@ -30,22 +32,30 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function ProductPage({ params, searchParams }: PageProps) {
   const { slug, product: productSlug } = await params;
-  const { buy_error } = await searchParams;
+  const { buy_error, bought } = await searchParams;
   const found = await load(slug, productSlug);
   if (!found) notFound();
   const { profile, shop, product } = found;
   const rawError = Array.isArray(buy_error) ? buy_error[0] : buy_error;
 
   return (
-    <ProductDetail
-      product={product}
-      state={productState(product, shop.settings.is_open)}
-      back={routes.section(profile.username, "shop")}
-      backLabel={shop.settings.home_title ?? "Shop"}
-      links={legalLinks(shop.settings, routes.profile(profile.username))}
-      email={shop.settings.contact_email}
-      action={startCheckoutAction.bind(null, profile.username, product.slug)}
-      error={rawError ? rawError.slice(0, 200) : null}
-    />
+    <>
+      {bought && (
+        <p role="status" className="mx-auto max-w-5xl px-5 pt-6 text-sm text-ink sm:px-8">
+          Payment received. Your download link is being sent to your email. If it does not arrive in a few minutes,
+          check your spam folder or contact the seller.
+        </p>
+      )}
+      <ProductDetail
+        product={product}
+        state={productState(product, shop.settings.is_open)}
+        back={routes.section(profile.username, "shop")}
+        backLabel={shop.settings.home_title ?? "Shop"}
+        links={legalLinks(shop.settings, routes.profile(profile.username))}
+        email={shop.settings.contact_email}
+        action={startCheckoutAction.bind(null, profile.username, product.slug)}
+        error={rawError ? rawError.slice(0, 200) : null}
+      />
+    </>
   );
 }

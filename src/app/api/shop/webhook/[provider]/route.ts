@@ -3,27 +3,27 @@ import { routes } from "@/config/site";
 import { sendReceipt } from "@/features/shop/email";
 import { getProvider } from "@/features/shop/providers";
 import type { ProviderEvent } from "@/features/shop/providers/types";
-import { hashToken } from "@/features/shop/token";
+import { hashToken, newToken } from "@/features/shop/token";
 import { getSiteUrl } from "@/lib/site-url";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 type Ctx = { params: Promise<{ provider: string }> };
 
-// After a payment: email the receipt with the order page link. Never throws: the order is already paid,
-// and an error here would make Dodo retry the whole webhook.
+// After a payment: make the buyer's real order token (only its hash is stored), then email the order page link.
+// The hash is saved BEFORE the email, so the link in the email always works. Never throws: the order is already
+// paid, and an error here would make Dodo retry the whole webhook. If the email fails the owner presses
+// "Send link again" in the Orders tab.
 async function sendPaidReceipt(db: ReturnType<typeof createAdminClient>, event: ProviderEvent): Promise<void> {
   try {
-    if (!event.orderId || !event.orderToken) {
-      console.warn("shop: paid order without a token in the payment, no receipt", event.orderId);
-      return;
-    }
+    if (!event.orderId) return;
     const { data: order } = await db
       .from("orders")
-      .select("id, user_id, email, amount_cents, paid_at, token_hash, products(title, license_note)")
+      .select("id, user_id, email, amount_cents, paid_at, products(title, license_note)")
       .eq("id", event.orderId)
+      .eq("status", "paid")
       .maybeSingle();
-    if (!order || order.token_hash !== hashToken(event.orderToken)) {
-      console.warn("shop: receipt skipped, the token does not match the order", event.orderId);
+    if (!order) {
+      console.warn("shop: receipt skipped, the order is not paid", event.orderId);
       return;
     }
     const [profile, settings] = await Promise.all([
@@ -31,6 +31,18 @@ async function sendPaidReceipt(db: ReturnType<typeof createAdminClient>, event: 
       db.from("shop_settings").select("contact_email").eq("user_id", order.user_id).maybeSingle(),
     ]);
     if (!profile.data) return;
+
+    const token = newToken();
+    const saved = await db
+      .from("orders")
+      .update({ token_hash: hashToken(token) })
+      .eq("id", order.id)
+      .eq("status", "paid");
+    if (saved.error) {
+      console.error("shop receipt failed: token not saved", order.id, saved.error.message);
+      return;
+    }
+
     const product = Array.isArray(order.products) ? order.products[0] : order.products;
     const origin = (await getSiteUrl()).replace(/\/$/, "");
     const sent = await sendReceipt({
@@ -39,7 +51,7 @@ async function sendPaidReceipt(db: ReturnType<typeof createAdminClient>, event: 
       title: product?.title ?? "Your order",
       priceCents: order.amount_cents,
       paidAt: order.paid_at ? new Date(order.paid_at) : new Date(),
-      orderUrl: `${origin}${routes.profile(profile.data.username)}/order/${event.orderToken}`,
+      orderUrl: `${origin}${routes.profile(profile.data.username)}/order/${token}`,
       license: product?.license_note ?? null,
       replyTo: settings.data?.contact_email ?? null,
     });

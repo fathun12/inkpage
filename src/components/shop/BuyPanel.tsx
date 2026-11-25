@@ -37,7 +37,7 @@ export function BuyPanel({ state, action, error, links }: Props) {
 
       {state.buyable ? (
         <form action={action} className="flex flex-col gap-4">
-          <Field label="Email" htmlFor="buy-email" hint="Your download link is shown on the next page. Keep it.">
+          <Field label="Email" htmlFor="buy-email" hint="Your download link is sent to this email.">
             <Input
               id="buy-email"
               name="email"

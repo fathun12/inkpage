@@ -62,6 +62,8 @@ export async function startCheckoutAction(username: string, productSlug: string,
     .eq("user_id", profile.id)
     .maybeSingle();
 
+  // Free orders use this token as the buyer's link. For paid orders it is only a placeholder that nobody ever sees:
+  // the real token is made by the webhook after the payment, and only it is emailed.
   const token = newToken();
   const reserved = await db.rpc("shop_reserve", {
     p_product: product.id,
@@ -102,13 +104,12 @@ export async function startCheckoutAction(username: string, productSlug: string,
   try {
     url = await provider.createCheckout({
       id: orderId,
-      token,
       title: product.title,
       amountCents: product.price_usd_cents,
       currency: "USD",
       email,
       providerProductId: product.dodo_product_id,
-      returnUrl: `${origin}${orderPath}`,
+      returnUrl: `${origin}${routes.section(profile.username, "shop")}/${productSlug}?bought=1`,
     });
   } catch (e) {
     await db.rpc("shop_release", { p_order: orderId, p_status: "failed" });
