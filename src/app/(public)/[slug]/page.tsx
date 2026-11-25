@@ -97,7 +97,7 @@ export default async function HomePage({ params }: Props) {
   ].filter((item): item is ContentsItem => Boolean(item));
 
   return (
-    <>
+    <main>
       <Hero
         slides={media.hero}
         name={profile.display_name}
@@ -171,6 +171,6 @@ export default async function HomePage({ params }: Props) {
       <VisitCards items={site.visits} title={site.visitTitle ?? "Visit website"} />
       {media.gallery.length > 0 && <span id="gallery" className="block" />}
       <FadeGallery images={media.gallery} seconds={style.gallerySeconds} autoplay={autoplay} credits={site.credits} />
-    </>
+    </main>
   );
 }

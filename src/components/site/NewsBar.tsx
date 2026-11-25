@@ -122,7 +122,12 @@ function Slides({
           style={{ transform: `translateX(-${at * 100}%)` }}
         >
           {slides.map((slide, i) => (
-            <div key={i} className="flex h-full w-full flex-none items-center justify-center px-2" aria-hidden={i !== at}>
+            <div
+              key={i}
+              className="flex h-full w-full flex-none items-center justify-center px-2"
+              aria-hidden={i !== at}
+              inert={i !== at}
+            >
               {slide}
             </div>
           ))}

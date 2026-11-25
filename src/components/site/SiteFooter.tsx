@@ -91,7 +91,7 @@ export function SiteFooter({ brand, name, bio, note, socials, nav = [], modeCont
             © {new Date().getFullYear()} {brand} · <Credit />
           </p>
           {news && (
-            <div className="order-last flex basis-full justify-center sm:order-none sm:min-w-0 sm:flex-1">
+            <div className="order-last flex min-w-0 basis-full justify-center sm:order-none sm:flex-1">
               <NewsTicker {...news} />
             </div>
           )}
