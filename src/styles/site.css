@@ -1,6 +1,12 @@
 /* site.css: layout and motion of the public website. Colors come from the theme.
    Motion is set on the page wrapper: data-motion = full, subtle or off (Customize studio). */
 
+/* Safety net: whatever sticks out sideways inside the website is cut off, so the page never scrolls sideways.
+   "clip" (not "hidden") keeps the sticky header working. */
+.site-root {
+  overflow-x: clip;
+}
+
 /* Header: a normal bar. On Home, at the very top, it is transparent over the hero and the brand is big. */
 .site-header {
   position: sticky;

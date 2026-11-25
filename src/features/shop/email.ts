@@ -76,6 +76,31 @@ ${license}
 </div></body></html>`;
 }
 
+// Brevo fills {{params.x}} in the text version too, so braces from a title or license become round brackets.
+function plain(text: string): string {
+  return text.replace(/\{/g, "(").replace(/\}/g, ")");
+}
+
+// The same receipt as plain text, for mail programs and filters that read no HTML.
+function receiptText(input: ReceiptInput): string {
+  const lines = [
+    "Thank you for your order.",
+    "",
+    `Order:   ${input.orderId.slice(0, 8).toUpperCase()}`,
+    `Product: ${plain(input.title)}`,
+    `Price:   ${priceText(input.priceCents)}`,
+    `Date:    ${dateText(input.paidAt)}`,
+    "",
+    "Your files are on your order page:",
+    input.orderUrl,
+    "",
+    `Keep this email: the link works for ${shopConfig.grantDays} days, up to ${shopConfig.grantMaxDownloads} downloads per file.`,
+  ];
+  if (input.license) lines.push("", "License:", plain(input.license));
+  lines.push("", "This is an automated message. Reply to this email to reach the seller.");
+  return lines.join("\n");
+}
+
 // Never throws: a failed email must not break an order.
 export async function sendReceipt(input: ReceiptInput): Promise<MailResult> {
   const apiKey = env.brevoApiKey;
@@ -95,6 +120,7 @@ export async function sendReceipt(input: ReceiptInput): Promise<MailResult> {
         replyTo: input.replyTo ? { email: input.replyTo } : undefined,
         subject: `Your order: ${input.title}`.slice(0, 150),
         htmlContent: receiptHtml(input),
+        textContent: receiptText(input),
         tags: ["shop-receipt"],
       }),
       signal: AbortSignal.timeout(shopConfig.mail.timeoutMs),
