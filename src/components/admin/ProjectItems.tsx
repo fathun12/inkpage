@@ -106,7 +106,7 @@ function ProjectForm({ item, visible, save, sign }: FormProps) {
                 <Field
                   label="Own logo (optional)"
                   htmlFor={`p-dl-file-${uid}-${i}`}
-                  hint={`PNG or WebP with a transparent background, up to ${itemLimits.logoKb} KB. It is drawn in the button color and replaces the logo picked above.`}
+                  hint={`PNG or WebP, up to ${itemLimits.logoKb} KB. It keeps its own colors and replaces the logo picked above.`}
                 >
                   <DownloadLogoInput
                     index={i}

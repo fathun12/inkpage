@@ -1,4 +1,5 @@
 import { siGithub } from "simple-icons";
+import { Img } from "@/components/ui/Img";
 import { downloadWord, logoLabels } from "@/config/item-data";
 import type { DownloadLogo, ItemDownload, ItemLink } from "@/types/block";
 
@@ -16,30 +17,9 @@ export function downloadLinks(nexus?: string | null, github?: string | null): Do
 // A simple mark drawn by hand: an N cut out of a square.
 const nexusPath = "M3 3h18v18H3zM7 17V7h2.4l5.2 6.4V7H17v10h-2.4L9.4 10.6V17z";
 
-const safeLogo = /^https?:\/\/[^\s"'()\\]+$/;
-
 function Logo({ logo, logoUrl }: { logo: DownloadLogo; logoUrl?: string | null }) {
-  // A logo you uploaded is drawn as a mask: it takes the color of the button, also when the button flips on hover.
-  if (logoUrl) {
-    if (!safeLogo.test(logoUrl)) return null;
-    const mask = `url("${logoUrl}")`;
-    return (
-      <span
-        aria-hidden
-        className="inline-block size-4 shrink-0 bg-current"
-        style={{
-          maskImage: mask,
-          WebkitMaskImage: mask,
-          maskSize: "contain",
-          WebkitMaskSize: "contain",
-          maskRepeat: "no-repeat",
-          WebkitMaskRepeat: "no-repeat",
-          maskPosition: "center",
-          WebkitMaskPosition: "center",
-        }}
-      />
-    );
-  }
+  // A logo you uploaded is shown as it is, with its own colors.
+  if (logoUrl) return <Img src={logoUrl} className="size-5 shrink-0 object-contain" />;
   if (logo === "none") return null;
   return (
     <svg viewBox="0 0 24 24" aria-hidden className="size-4 shrink-0 fill-current">
