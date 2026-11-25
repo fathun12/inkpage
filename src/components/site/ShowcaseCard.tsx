@@ -15,7 +15,11 @@ export function ShowcaseCard({ block, first = false }: { block: Block; first?: b
   const item = readProjectItem(block);
   const { main, photos } = pickShowcase(item.files);
 
-  const title = <h3 className="font-display text-3xl leading-tight sm:text-5xl">{item.title}</h3>;
+  const title = (
+    <h3 className="font-display text-3xl leading-tight sm:text-5xl">
+      <span className="site-sweep">{item.title}</span>
+    </h3>
+  );
 
   return (
     <div className="flex flex-col gap-10">
@@ -27,7 +31,7 @@ export function ShowcaseCard({ block, first = false }: { block: Block; first?: b
         )}
         <Reveal delay={100} className="flex flex-col justify-center">
           {item.url ? (
-            <a href={routes.go(block.id)} className="underline-offset-4 hover:underline">
+            <a href={routes.go(block.id)} className="block">
               {title}
             </a>
           ) : (
