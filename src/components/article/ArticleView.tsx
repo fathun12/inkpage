@@ -32,7 +32,7 @@ export function ArticleView({ title, subtitle, publishedAt, minutes, cover, doc,
       }
       meta={<p className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">{meta}</p>}
     >
-      {cover && <Img src={cover} className="mt-8 aspect-[2/1] w-full bg-surface object-cover" />}
+      {cover && <Img src={cover} className="mt-8 aspect-2/1 w-full bg-surface object-cover" />}
       <div className="mt-10">
         <ArticleBody doc={doc} />
       </div>

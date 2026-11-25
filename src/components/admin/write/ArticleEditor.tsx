@@ -438,7 +438,7 @@ export function ArticleEditor({ initial, username, backHref, viewHref, save, sig
         </div>
       )}
 
-      <main className="mx-auto w-full max-w-[42rem] px-5 pb-40 pt-10 sm:px-8">
+      <main className="mx-auto w-full max-w-2xl px-5 pb-40 pt-10 sm:px-8">
         <AutoTextarea value={title} onChange={onTitle} onEnter={() => subtitleInput.current?.focus()} />
         <input
           ref={subtitleInput}

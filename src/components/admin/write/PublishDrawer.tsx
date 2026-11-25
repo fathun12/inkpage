@@ -115,9 +115,9 @@ export function PublishDrawer({
             <span className="text-sm font-medium text-ink-soft">Cover picture</span>
             <input type="hidden" name="cover_url" value={cover ?? ""} />
             {cover ? (
-              <Img src={cover} className="ink-border aspect-[2/1] w-full rounded-sm bg-surface object-cover" />
+              <Img src={cover} className="ink-border aspect-2/1 w-full rounded-sm bg-surface object-cover" />
             ) : (
-              <div className="ink-border flex aspect-[2/1] w-full items-center justify-center rounded-sm bg-surface text-sm text-ink-soft">
+              <div className="ink-border flex aspect-2/1 w-full items-center justify-center rounded-sm bg-surface text-sm text-ink-soft">
                 No cover
               </div>
             )}
