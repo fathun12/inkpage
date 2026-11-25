@@ -42,8 +42,8 @@ export default async function ProductPage({ params, searchParams }: PageProps) {
     <>
       {bought && (
         <p role="status" className="mx-auto max-w-5xl px-5 pt-6 text-sm text-ink sm:px-8">
-          Payment received. Your download link is being sent to your email. If it does not arrive in a few minutes,
-          check your spam folder or contact the seller.
+          If you completed the payment, your download link is being sent to your email. If it does not arrive in a
+          few minutes, check your spam folder or contact the seller.
         </p>
       )}
       <ProductDetail
