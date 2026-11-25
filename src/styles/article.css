@@ -160,13 +160,11 @@
    --hl-height is how tall the stripe is (0.55em = about half the letters). */
 .article-prose mark {
   --hl: rgb(255 226 120 / 0.6);
-  --hl-height: 0.45em;
   color: inherit;
-  background-color: transparent !important;
-  padding: 0 0.14em;
+  background-color: var(--hl) !important;
+  padding: 0.05em 0.14em;
   margin-inline: -0.14em;
-  border-radius: 0.15em;
-  box-shadow: inset 0 calc(var(--hl-height) * -1) 0 0 var(--hl);
+  border-radius: 0.2em;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
 }
