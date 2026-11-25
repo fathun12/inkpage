@@ -7,21 +7,30 @@
   top: 0;
   z-index: 30;
   height: 3.75rem;
-  background: var(--c-bg);
   color: var(--c-ink);
+  transition: color 700ms var(--ease-out);
+}
+/* The white bar (background and bottom line) is its own layer, so it can slide while the brand and menu stay. */
+.site-header::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--c-bg);
   border-bottom: 1px solid var(--c-line);
-  transition:
-    background-color 700ms var(--ease-out),
-    border-color 700ms var(--ease-out),
-    color 700ms var(--ease-out);
+  will-change: transform;
+  transition: transform 700ms var(--ease-out);
 }
 .site-header[data-overlay] {
   margin-bottom: -3.75rem;
 }
+/* At the very top of Home the bar slides up and hides (behind the news bar if there is one, else above the screen).
+   Scrolling down brings it back from above. */
 .site-header[data-overlay][data-top] {
-  background: transparent;
-  border-bottom-color: transparent;
   color: #fff;
+}
+.site-header[data-overlay][data-top]::before {
+  transform: translateY(-100%);
 }
 .site-brand {
   --brand-small: clamp(calc(1.5 / 7), tan(atan2(1.5rem, 9vw)), calc(1.5 / 2.75));
@@ -62,6 +71,7 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .site-header,
+  .site-header::before,
   .site-brand {
     transition-duration: 0.01ms;
   }
