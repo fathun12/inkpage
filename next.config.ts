@@ -13,6 +13,24 @@ const nextConfig: NextConfig = {
       },
     },
   },
+  async redirects() {
+    return [
+      // Old Vercel address goes to the main domain. /api is left alone so cron and webhooks keep working.
+      {
+        source: "/:path((?!api/).*)",
+        has: [{ type: "host", value: "inkpage-delta.vercel.app" }],
+        destination: "https://mfniam.com/:path",
+        permanent: true,
+      },
+      // The main domain opens the profile page directly.
+      {
+        source: "/",
+        has: [{ type: "host", value: "mfniam.com" }],
+        destination: "/zdtzer0",
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
