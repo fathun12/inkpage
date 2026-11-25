@@ -366,3 +366,38 @@
     transform: none !important;
   }
 }
+
+/* Header on phones: the brand on the first row, the tabs on a second row that scrolls sideways. */
+@media (max-width: 39.999rem) {
+  .site-header {
+    height: 5.75rem;
+  }
+  .site-header[data-overlay] {
+    margin-bottom: -5.75rem;
+  }
+  .site-brand {
+    top: 0.875rem;
+  }
+  .site-header[data-overlay][data-top] .site-brand {
+    top: 0.5rem;
+    font-size: 2.75rem;
+  }
+  .site-nav {
+    top: 3.25rem;
+    right: 0;
+    left: 0;
+    height: 2.5rem;
+    gap: 1.25rem;
+    padding-inline: 1.25rem;
+    overflow-x: auto;
+    white-space: nowrap;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  .site-nav::-webkit-scrollbar {
+    display: none;
+  }
+  .site-nav > * {
+    flex: none;
+  }
+}
