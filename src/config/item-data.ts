@@ -9,6 +9,7 @@ export const itemLimits = {
   homeShowcase: 5, // Showcase items on Home
   downloads: 3,
   links: 3,
+  logoKb: 300, // own logo of a Download button (checked in the browser)
   label: 40,
   credit: 120,
 } as const;

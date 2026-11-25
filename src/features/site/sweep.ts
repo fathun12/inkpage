@@ -15,7 +15,10 @@ export async function sweepKeeping(userId: string, keep: string[]): Promise<void
   const used = (data as { data: BlockData | null; image_url: string | null }[]).flatMap((row) => {
     const files = Array.isArray(row.data?.files) ? row.data.files : [];
     const urls = files.map((f) => f?.url).filter((u): u is string => typeof u === "string");
-    return row.image_url ? [...urls, row.image_url] : urls;
+    const downloads = Array.isArray(row.data?.downloads) ? row.data.downloads : [];
+    const logos = downloads.map((d) => d?.logoUrl).filter((u): u is string => typeof u === "string");
+    const all = [...urls, ...logos];
+    return row.image_url ? [...all, row.image_url] : all;
   });
   // Shop product media lives in the same folder too.
   const shop = await supabase.from("products").select("media").eq("user_id", userId);

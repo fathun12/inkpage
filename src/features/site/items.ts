@@ -77,6 +77,10 @@ export async function saveProjectAction(formData: FormData): Promise<void> {
   if (body && body.length > bodyMax) return abort(`The description can be at most ${bodyMax} characters.`);
 
   const downloads: ItemDownload[] = [];
+  // Own logos this project already has. A "keep" value from the form must be one of them.
+  const ownLogos = new Set(
+    current ? readProjectItem(current).downloads.flatMap((d) => (d.logoUrl ? [d.logoUrl] : [])) : [],
+  );
   for (let i = 0; i < itemLimits.downloads; i++) {
     const url = field(formData, `dl_url_${i}`);
     if (!url) continue;
@@ -85,7 +89,20 @@ export async function saveProjectAction(formData: FormData): Promise<void> {
     const logo = (downloadLogos as readonly string[]).includes(picked ?? "")
       ? (picked as ItemDownload["logo"])
       : detectLogo(url);
-    downloads.push({ url, logo });
+
+    // An own logo (uploaded just now, or kept from before) wins over the picked one.
+    let logoUrl: string | null = null;
+    const logoPath = field(formData, `dl_logo_file_${i}`);
+    const logoKeep = field(formData, `dl_logo_keep_${i}`);
+    if (logoPath) {
+      if (!/\.(png|webp)$/.test(logoPath)) return abort(`Download ${i + 1}: the logo must be a PNG or WebP file.`);
+      const foundLogo = await findSitePaths(user.id, [logoPath]);
+      if ("error" in foundLogo) return abort(foundLogo.error);
+      logoUrl = foundLogo.urls[0] ?? null;
+    } else if (logoKeep && ownLogos.has(logoKeep)) {
+      logoUrl = logoKeep;
+    }
+    downloads.push(logoUrl ? { url, logo, logoUrl } : { url, logo });
   }
 
   const links: ItemLink[] = [];

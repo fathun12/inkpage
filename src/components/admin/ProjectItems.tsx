@@ -8,6 +8,7 @@ import { downloadLogos, type BlockView } from "@/types/block";
 import type { FormAction } from "@/types/form";
 import type { VideoSignAction } from "@/types/media";
 import { DeleteItem, ItemBar, type BarActions } from "./ItemParts";
+import { DownloadLogoInput } from "./DownloadLogoInput";
 import { SiteMediaInput } from "./SiteMediaInput";
 
 type Props = {
@@ -101,6 +102,20 @@ function ProjectForm({ item, visible, save, sign }: FormProps) {
                   ))}
                 </Select>
               </Field>
+              <div className="sm:col-span-2">
+                <Field
+                  label="Own logo (optional)"
+                  htmlFor={`p-dl-file-${uid}-${i}`}
+                  hint={`PNG or WebP with a transparent background, up to ${itemLimits.logoKb} KB. It is drawn in the button color and replaces the logo picked above.`}
+                >
+                  <DownloadLogoInput
+                    index={i}
+                    id={`p-dl-file-${uid}-${i}`}
+                    current={d?.logoUrl ?? null}
+                    sign={sign}
+                  />
+                </Field>
+              </div>
             </div>
           );
         })}

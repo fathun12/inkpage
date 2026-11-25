@@ -16,7 +16,30 @@ export function downloadLinks(nexus?: string | null, github?: string | null): Do
 // A simple mark drawn by hand: an N cut out of a square.
 const nexusPath = "M3 3h18v18H3zM7 17V7h2.4l5.2 6.4V7H17v10h-2.4L9.4 10.6V17z";
 
-function Logo({ logo }: { logo: DownloadLogo }) {
+const safeLogo = /^https?:\/\/[^\s"'()\\]+$/;
+
+function Logo({ logo, logoUrl }: { logo: DownloadLogo; logoUrl?: string | null }) {
+  // A logo you uploaded is drawn as a mask: it takes the color of the button, also when the button flips on hover.
+  if (logoUrl) {
+    if (!safeLogo.test(logoUrl)) return null;
+    const mask = `url("${logoUrl}")`;
+    return (
+      <span
+        aria-hidden
+        className="inline-block size-4 shrink-0 bg-current"
+        style={{
+          maskImage: mask,
+          WebkitMaskImage: mask,
+          maskSize: "contain",
+          WebkitMaskSize: "contain",
+          maskRepeat: "no-repeat",
+          WebkitMaskRepeat: "no-repeat",
+          maskPosition: "center",
+          WebkitMaskPosition: "center",
+        }}
+      />
+    );
+  }
   if (logo === "none") return null;
   return (
     <svg viewBox="0 0 24 24" aria-hidden className="size-4 shrink-0 fill-current">
@@ -36,11 +59,11 @@ export function Downloads({ links, className = "" }: { links: DownloadLink[]; cl
           href={l.url}
           target="_blank"
           rel="noopener noreferrer"
-          aria-label={l.logo === "none" ? downloadWord : `${downloadWord} on ${logoLabels[l.logo]}`}
+          aria-label={l.logoUrl || l.logo === "none" ? downloadWord : `${downloadWord} on ${logoLabels[l.logo]}`}
           className="inline-flex items-center gap-2 border border-ink px-4 py-2.5 font-mono text-xs uppercase tracking-widest transition-colors duration-(--dur-base) hover:bg-ink hover:text-bg"
         >
           <span>{downloadWord}</span>
-          <Logo logo={l.logo} />
+          <Logo logo={l.logo} logoUrl={l.logoUrl} />
         </a>
       ))}
     </div>

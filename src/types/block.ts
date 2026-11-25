@@ -44,7 +44,7 @@ export type ItemRatio = (typeof itemRatios)[number];
 export const downloadLogos = ["github", "nexus", "none"] as const;
 export type DownloadLogo = (typeof downloadLogos)[number];
 export type ItemFile = { url: string; ratio: ItemRatio; credit: string | null };
-export type ItemDownload = { url: string; logo: DownloadLogo };
+export type ItemDownload = { url: string; logo: DownloadLogo; logoUrl?: string | null };
 export type ItemLink = { label: string; url: string };
 
 // Extra per-type data stored in blocks.data (jsonb).

@@ -58,7 +58,7 @@ function readDownloads(d: Record<string, unknown>): ItemDownload[] {
     ? d.downloads.flatMap((item): ItemDownload[] => {
         const x = obj(item);
         const url = link(x.url);
-        return url ? [{ url, logo: pick(x.logo, downloadLogos, detectLogo(url)) }] : [];
+        return url ? [{ url, logo: pick(x.logo, downloadLogos, detectLogo(url)), logoUrl: link(x.logoUrl) }] : [];
       })
     : [];
   // Older items kept one Nexus link and one GitHub link.
