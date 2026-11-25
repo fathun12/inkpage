@@ -5,9 +5,18 @@ import { pickHomeMedia, readProjectItem, type ProjectFile } from "@/lib/item-dat
 import type { Block } from "@/types/block";
 import { Credit } from "./Credit";
 import { Downloads, TextLinks } from "./Downloads";
+import { MediaSlider } from "./MediaSlider";
 import { Reveal } from "./Reveal";
 
-type Props = { block: Block; mode: "home" | "page"; first?: boolean; index?: number; total?: number };
+type Props = {
+  block: Block;
+  mode: "home" | "page";
+  first?: boolean;
+  index?: number;
+  total?: number;
+  // Only the Projects page uses it: how the row of extra media slides.
+  slide?: { seconds: number; autoplay: boolean };
+};
 
 // One media: the frame follows the Ratio of the file. No border, no shadow, sharp corners.
 export function ItemMedia({ file, eager }: { file: ProjectFile; eager: boolean }) {
@@ -37,14 +46,17 @@ export function ItemMedia({ file, eager }: { file: ProjectFile; eager: boolean }
   );
 }
 
-// A project: media on the left (B under A), text on the right. On a phone the media is on top.
-// The text column is as tall as the media: the accent line is level with the top of the media, the button
-// follows the text, and the text links sit at the bottom, level with the bottom of the media.
-// Home shows two media at most. The Projects page shows all of them.
-export function ProjectCard({ block, mode, first = false, total = 1 }: Props) {
+// A project: at most two media on the left (the same two as on Home), text on the right. On a phone the media is on top.
+// Two portrait media sit side by side; anything else is stacked (B under A).
+// The text column is as tall as the media: the accent line is level with the top of the media, the Download buttons
+// follow the text, and the text links sit at the bottom, level with the bottom of the media.
+// Home shows only the two media. The Projects page also shows the rest as a sliding row under the project.
+export function ProjectCard({ block, mode, first = false, total = 1, slide = { seconds: 5, autoplay: true } }: Props) {
   const item = readProjectItem(block);
-  const shown: ProjectFile[] =
-    mode === "home" ? Object.values(pickHomeMedia(item.files)).filter((f): f is ProjectFile => f !== null) : item.files;
+  const { a, b } = pickHomeMedia(item.files);
+  const shown = [a, b].filter((f): f is ProjectFile => f !== null);
+  const rest = mode === "page" ? item.files.filter((f) => !shown.includes(f)) : [];
+  const side = shown.length === 2 && shown.every((f) => f.ratio === "portrait");
   const hasMedia = shown.length > 0;
 
   const title = (
@@ -54,29 +66,46 @@ export function ProjectCard({ block, mode, first = false, total = 1 }: Props) {
   );
 
   return (
-    <div className={hasMedia ? `grid gap-8 ${projectLayout.grid}` : "grid"}>
-      {hasMedia && (
-        <Reveal variant="still" className="flex flex-col gap-3">
-          {shown.map((file, i) => (
-            <ItemMedia key={file.url} file={file} eager={first && i === 0} />
-          ))}
+    <div className="flex flex-col gap-10">
+      <div className={hasMedia ? `grid gap-8 ${projectLayout.grid}` : "grid"}>
+        {hasMedia && (
+          <Reveal variant="still" className={side ? "grid grid-cols-2 gap-3" : "flex flex-col gap-3"}>
+            {shown.map((file, i) => (
+              <ItemMedia key={file.url} file={file} eager={first && i === 0} />
+            ))}
+          </Reveal>
+        )}
+        <Reveal delay={100} className="flex flex-col justify-between gap-8 self-stretch">
+          <div>
+            {total > 1 && <span aria-hidden className="site-tick mb-5 block h-px w-6 bg-accent" />}
+            {item.url ? (
+              <a href={routes.go(block.id)} className="block">
+                {title}
+              </a>
+            ) : (
+              title
+            )}
+            {item.body && <p className="mt-5 max-w-xl whitespace-pre-line text-ink-soft">{item.body}</p>}
+            <Downloads links={item.downloads} className="mt-7" />
+          </div>
+          <TextLinks links={item.links} className="mt-2" />
+        </Reveal>
+      </div>
+      {rest.length > 0 && (
+        <Reveal variant="still">
+          <MediaSlider count={rest.length} seconds={slide.seconds} autoplay={slide.autoplay}>
+            {rest.map((file) => (
+              <li
+                key={file.url}
+                className="shrink-0 snap-start"
+                style={{ width: `calc(var(--slide-h) * ${ratioAspect[file.ratio]})` }}
+              >
+                <ItemMedia file={file} eager={false} />
+              </li>
+            ))}
+          </MediaSlider>
         </Reveal>
       )}
-      <Reveal delay={100} className="flex flex-col justify-between gap-8 self-stretch">
-        <div>
-          {total > 1 && <span aria-hidden className="site-tick mb-5 block h-px w-6 bg-accent" />}
-          {item.url ? (
-            <a href={routes.go(block.id)} className="block">
-              {title}
-            </a>
-          ) : (
-            title
-          )}
-          {item.body && <p className="mt-5 max-w-xl whitespace-pre-line text-ink-soft">{item.body}</p>}
-          <Downloads links={item.downloads} className="mt-7" />
-        </div>
-        <TextLinks links={item.links} className="mt-2" />
-      </Reveal>
     </div>
   );
 }

@@ -2,7 +2,15 @@ import type { Block } from "@/types/block";
 import { ProjectCard } from "./ProjectCard";
 
 // The list of projects on Home and on the Projects page. Same card in both places.
-export function ProjectList({ blocks, mode }: { blocks: Block[]; mode: "home" | "page" }) {
+export function ProjectList({
+  blocks,
+  mode,
+  slide,
+}: {
+  blocks: Block[];
+  mode: "home" | "page";
+  slide?: { seconds: number; autoplay: boolean };
+}) {
   const items = blocks.filter((b) => b.type !== "header");
   if (items.length === 0) return null;
   return (
@@ -12,7 +20,7 @@ export function ProjectList({ blocks, mode }: { blocks: Block[]; mode: "home" | 
           key={block.id}
           className={index < items.length - 1 ? "mb-14 border-b border-tertiary pb-14 sm:mb-22 sm:pb-22" : undefined}
         >
-          <ProjectCard block={block} mode={mode} first={index === 0} index={index} total={items.length} />
+          <ProjectCard block={block} mode={mode} first={index === 0} index={index} total={items.length} slide={slide} />
         </li>
       ))}
     </ul>
