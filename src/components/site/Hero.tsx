@@ -52,7 +52,12 @@ export function Hero({ slides, name, caption, seconds, autoplay, gray, credits =
                   className={media}
                 />
               ) : (
-                <Img src={src} loading={i === 0 ? "eager" : "lazy"} className={media} />
+                <Img
+                  src={src}
+                  loading={i === 0 ? "eager" : "lazy"}
+                  fetchPriority={i === 0 ? "high" : undefined}
+                  className={media}
+                />
               )}
               <Credit text={creditOf(credits, src)} />
             </div>
