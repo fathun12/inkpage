@@ -33,6 +33,10 @@ export const mediaConfig = {
   siteMedia: {
     folder: "site",
     maxMb: 10,
+    // Still pictures are made smaller in the browser before they upload (see lib/site-image.ts).
+    // maxPx = longest side. quality 0 to 1. Raise either one if a picture ever looks soft.
+    maxPx: 2560,
+    quality: 0.92,
     types: [
       { mime: "image/jpeg", ext: "jpg" },
       { mime: "image/png", ext: "png" },

@@ -8,6 +8,7 @@ import { mediaConfig } from "@/config/media";
 import { fileKey } from "@/config/site-content";
 import { uploadToSignedPath } from "@/lib/direct-upload";
 import { roleLabels } from "@/lib/item-data";
+import { prepareSiteImage } from "@/lib/site-image";
 import { mediaKind, type MediaKind } from "@/lib/site-view";
 import { itemRatios, type ItemFile, type ItemRatio } from "@/types/block";
 import type { VideoSignAction } from "@/types/media";
@@ -87,6 +88,7 @@ export function SiteMediaInput({ slot, current, max, sign, credits, files, input
     lockSave(true);
     const done: Added[] = [];
     const problems: string[] = [];
+    const shrunk: string[] = [];
     let free = room;
     try {
       for (const file of picked) {
@@ -102,22 +104,27 @@ export function SiteMediaInput({ slot, current, max, sign, credits, files, input
           problems.push(`${file.name} is ${(file.size / MB).toFixed(1)} MB. The limit is ${rules.maxMb} MB.`);
           continue;
         }
+        setNote({ tone: "info", text: `Preparing ${file.name}...` });
+        const ready = await prepareSiteImage(file);
         setNote({ tone: "info", text: `Uploading ${file.name}... keep this page open.` });
-        const signed = await sign({ name: file.name, type: file.type, size: file.size });
+        const signed = await sign({ name: ready.name, type: ready.type, size: ready.size });
         if ("error" in signed) {
           problems.push(`${file.name}: ${signed.error}`);
           continue;
         }
-        const failure = await uploadToSignedPath(mediaConfig.bucket, signed.path, signed.token, file);
+        const failure = await uploadToSignedPath(mediaConfig.bucket, signed.path, signed.token, ready);
         if (failure) {
           problems.push(`${file.name}: upload failed, ${failure}`);
           continue;
         }
         done.push({
           path: signed.path,
-          preview: URL.createObjectURL(file),
+          preview: URL.createObjectURL(ready),
           kind: mediaKind(`x.${signed.path.split(".").pop()}`),
         });
+        if (ready !== file) {
+          shrunk.push(`${file.name}: ${(file.size / MB).toFixed(1)} MB to ${(ready.size / MB).toFixed(1)} MB.`);
+        }
         free -= 1;
       }
     } catch {
@@ -142,7 +149,13 @@ export function SiteMediaInput({ slot, current, max, sign, credits, files, input
       setAdded((list) => (single ? [done[done.length - 1]] : [...list, ...done]));
     }
     if (problems.length > 0) setNote({ tone: "error", text: problems.join(" ") });
-    else setNote({ tone: "info", text: `${done.length} uploaded. Press the Save button to use ${done.length === 1 ? "it" : "them"}.` });
+    else {
+      const smaller = shrunk.length > 0 ? ` Made smaller: ${shrunk.join(" ")}` : "";
+      setNote({
+        tone: "info",
+        text: `${done.length} uploaded.${smaller} Press the Save button to use ${done.length === 1 ? "it" : "them"}.`,
+      });
+    }
   }
 
   function move(index: number, dir: -1 | 1) {
