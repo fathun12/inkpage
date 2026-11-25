@@ -29,7 +29,11 @@ export async function uploadImage(userId: string, file: File): Promise<UploadRes
   const path = `${userId}/${randomUUID()}.${ext}`;
   const { error } = await supabase.storage
     .from(mediaConfig.bucket)
-    .upload(path, file, { contentType: file.type, upsert: false });
+    .upload(path, file, {
+      contentType: file.type,
+      upsert: false,
+      cacheControl: String(mediaConfig.cacheSeconds),
+    });
   if (error) return { error: `Could not upload the image: ${error.message}` };
 
   return { url: supabase.storage.from(mediaConfig.bucket).getPublicUrl(path).data.publicUrl };
@@ -56,7 +60,11 @@ export async function uploadCardMedia(
   const path = `${userId}/cards/${randomUUID()}.${ext}`;
   const { error } = await supabase.storage
     .from(mediaConfig.bucket)
-    .upload(path, file, { contentType: file.type, upsert: false });
+    .upload(path, file, {
+      contentType: file.type,
+      upsert: false,
+      cacheControl: String(mediaConfig.cacheSeconds),
+    });
   if (error) return { error: `Could not upload the card media: ${error.message}` };
 
   return {

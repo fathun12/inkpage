@@ -1,6 +1,8 @@
 // Upload and block limits live here. Change a number and the whole app follows.
 export const mediaConfig = {
   bucket: "media",
+  // How long browsers may keep a public file. Every upload gets a new random name, so a year is safe.
+  cacheSeconds: 31536000,
   accept: "image/jpeg,image/png,image/webp",
   maxMb: 2,
   maxBytes: 2 * 1024 * 1024,
