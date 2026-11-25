@@ -31,6 +31,7 @@ import type { FormAction } from "@/types/form";
 import { ArticleImage } from "./ArticleImage";
 import { ArticleCodeBlock } from "./ArticleCodeBlock";
 import { ArticleDirection, ArticleFootnote } from "./ArticleExtras";
+import { ArticleTypography } from "./ArticleTypography";
 import { EditorMenus } from "./EditorMenus";
 import { PublishDrawer, type DrawerSnapshot } from "./PublishDrawer";
 
@@ -185,6 +186,7 @@ export function ArticleEditor({ initial, username, backHref, viewHref, save, sig
       Superscript,
       ArticleDirection,
       ArticleFootnote,
+      ArticleTypography,
       TableKit,
       ArticleCodeBlock.configure({ lowlight, defaultLanguage: "plaintext", enableTabIndentation: true, tabSize: 2 }),
       Mathematics.configure({ katexOptions: { throwOnError: false, strict: "ignore" } }),
