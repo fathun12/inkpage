@@ -18,6 +18,23 @@ export const defaultGreetings: Record<DayPart, string> = {
   night: "Hello, night owl!",
 };
 
+// How the Home intro drifts away while you scroll down (and comes back when you scroll up).
+// All numbers live here. A line fades and slides left over its own range of the scroll (0 = top, 1 = fully scrolled).
+export const introScroll = {
+  // The intro is gone after scrolling this many screens.
+  spanScreens: 0.8,
+  // How far a line slides to the left when gone, in vw.
+  distanceVw: 40,
+  // Smoothing time in ms. Bigger = softer and slower to catch up with the wheel.
+  smoothMs: 140,
+  // Greeting, date, big sentence. Each starts and ends at a different point, so they go one after another.
+  ranges: [
+    [0, 0.5],
+    [0.1, 0.6],
+    [0.25, 0.9],
+  ],
+} as const;
+
 export function dayPartFor(hour: number): DayPart {
   if (hour >= 5 && hour < 12) return "morning";
   if (hour >= 12 && hour < 18) return "afternoon";

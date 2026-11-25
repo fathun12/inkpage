@@ -269,19 +269,7 @@
     transform: none;
   }
 }
-@keyframes site-intro-away {
-  to {
-    opacity: 0;
-    transform: translateX(-40vw);
-  }
-}
-@supports (animation-timeline: scroll()) {
-  [data-motion="full"] .site-intro {
-    animation: site-intro-away linear both;
-    animation-timeline: scroll(root);
-    animation-range: 0 80svh;
-  }
-}
+/* The drift away on scroll is done in Intro.tsx (smoothed), see introScroll in config/intro.ts. */
 @media (prefers-reduced-motion: reduce) {
   .site-intro,
   .site-intro-line {
