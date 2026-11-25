@@ -1,11 +1,29 @@
 import { articleConfig, articleImages, articleLimits } from "@/config/article";
+import { isCodeLanguage } from "@/config/code-languages";
 import { mediaConfig } from "@/config/media";
 import type { ArticleState, DocMark, DocNode } from "@/types/article";
 
 export const emptyDoc: DocNode = { type: "doc", content: [{ type: "paragraph" }] };
 
 // Only what the editor can make. Anything else is dropped when saving (the server never trusts the browser).
-const blockTypes = new Set(["paragraph", "heading", "blockquote", "bulletList", "orderedList", "listItem"]);
+const blockTypes = new Set([
+  "paragraph",
+  "heading",
+  "blockquote",
+  "bulletList",
+  "orderedList",
+  "listItem",
+  "table",
+  "tableRow",
+  "tableCell",
+  "tableHeader",
+]);
+const tableFamily = new Set(["table", "tableRow", "tableCell", "tableHeader"]);
+// A table holds rows, a row holds cells. Anything else placed inside them is dropped.
+const tableChildren: Record<string, Set<string>> = {
+  table: new Set(["tableRow"]),
+  tableRow: new Set(["tableCell", "tableHeader"]),
+};
 const leafTypes = new Set(["horizontalRule", "hardBreak"]);
 const markTypes = new Set(["bold", "italic", "underline", "code", "link", "highlight", "superscript"]);
 
@@ -82,6 +100,23 @@ function cleanMarks(raw: unknown): DocMark[] | undefined {
   return out.length > 0 ? out : undefined;
 }
 
+// Only the plain text of a code block is kept (no marks, no other nodes).
+function rawText(raw: unknown): string {
+  if (!Array.isArray(raw)) return "";
+  let out = "";
+  for (const item of raw) {
+    if (typeof item !== "object" || item === null) continue;
+    const part = item as RawNode;
+    if (part.type === "text" && typeof part.text === "string") out += part.text;
+  }
+  return out;
+}
+
+// A merged cell spans 2 or more columns or rows; anything else is 1.
+function spanOf(value: unknown): number {
+  return typeof value === "number" && Number.isInteger(value) && value > 1 && value <= articleLimits.tableCols ? value : 1;
+}
+
 type Budget = { nodes: number; images: number; userId?: string };
 
 function cleanNode(raw: unknown, depth: number, budget: Budget): DocNode | null {
@@ -110,6 +145,17 @@ function cleanNode(raw: unknown, depth: number, budget: Budget): DocNode | null 
       typeof n.attrs?.note === "string" ? n.attrs.note.replace(/\s+/g, " ").trim().slice(0, articleLimits.footnote) : "";
     return note ? { type: "footnote", attrs: { note } } : null;
   }
+  if (n.type === "inlineMath" || n.type === "blockMath") {
+    const latex = typeof n.attrs?.latex === "string" ? n.attrs.latex.trim().slice(0, articleLimits.latex) : "";
+    return latex ? { type: n.type, attrs: { latex } } : null;
+  }
+  if (n.type === "codeBlock") {
+    const language = n.attrs?.language;
+    const code = rawText(n.content).slice(0, articleLimits.codeChars);
+    const block: DocNode = { type: "codeBlock", attrs: { language: isCodeLanguage(language) ? language : null } };
+    if (code) block.content = [{ type: "text", text: code }];
+    return block;
+  }
   if (leafTypes.has(n.type)) return { type: n.type };
   if (!blockTypes.has(n.type)) return null;
 
@@ -122,14 +168,34 @@ function cleanNode(raw: unknown, depth: number, budget: Budget): DocNode | null 
     const start = n.attrs?.start;
     if (typeof start === "number" && Number.isInteger(start) && start > 1 && start < 10_000) node.attrs = { start };
   }
+  const isCell = n.type === "tableCell" || n.type === "tableHeader";
+  if (isCell) {
+    const attrs: Record<string, unknown> = {};
+    const colspan = spanOf(n.attrs?.colspan);
+    const rowspan = spanOf(n.attrs?.rowspan);
+    if (colspan > 1) attrs.colspan = colspan;
+    if (rowspan > 1) attrs.rowspan = rowspan;
+    if (Object.keys(attrs).length > 0) node.attrs = attrs;
+  }
+  const allowed = tableChildren[n.type];
+  const limit = n.type === "table" ? articleLimits.tableRows : n.type === "tableRow" ? articleLimits.tableCols : Infinity;
+  const kids: DocNode[] = [];
   if (Array.isArray(n.content)) {
-    const kids: DocNode[] = [];
     for (const child of n.content) {
+      if (kids.length >= limit) break;
+      const childType = typeof child === "object" && child !== null ? (child as RawNode).type : undefined;
+      if (allowed) {
+        if (typeof childType !== "string" || !allowed.has(childType)) continue;
+      } else if (typeof childType === "string" && tableFamily.has(childType)) {
+        continue;
+      }
       const clean = cleanNode(child, depth + 1, budget);
       if (clean) kids.push(clean);
     }
-    if (kids.length > 0) node.content = kids;
   }
+  if (isCell) node.content = kids.length > 0 ? kids : [{ type: "paragraph" }];
+  else if (kids.length > 0) node.content = kids;
+  else if (n.type === "table" || n.type === "tableRow") return null;
   return node;
 }
 
@@ -157,6 +223,7 @@ function collect(node: DocNode, out: string[]): void {
     if (node.text) out.push(node.text);
     return;
   }
+  if (node.type === "codeBlock") return;
   if (node.type === "hardBreak") {
     out.push(" ");
     return;

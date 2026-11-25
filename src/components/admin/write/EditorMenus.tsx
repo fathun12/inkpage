@@ -11,14 +11,27 @@ import { cn } from "@/lib/utils";
 type BubbleProps = ComponentProps<typeof BubbleMenu>;
 type FloatingProps = ComponentProps<typeof FloatingMenu>;
 
+const mathTypes = ["inlineMath", "blockMath"];
+
 // These must stay OUTSIDE the component: new objects on every render make the menus re-register in a loop.
 const bubbleOptions: BubbleProps["options"] = { placement: "top", offset: 8 };
-// The bubble shows over selected text, and over a selected footnote marker (to write its note).
+
+// The bubble shows over selected text, and over a selected footnote marker or formula (to edit it).
+// It stays away from code blocks, where text marks do not exist.
 const showBubble: BubbleProps["shouldShow"] = ({ state }) => {
-  if (state.selection instanceof NodeSelection) return state.selection.node.type.name === "footnote";
-  const { from, to } = state.selection;
+  const { selection } = state;
+  if (selection instanceof NodeSelection) {
+    const name = selection.node.type.name;
+    return name === "footnote" || mathTypes.includes(name);
+  }
+  if (selection.$from.parent.type.name === "codeBlock") return false;
+  const { from, to } = selection;
   return from !== to && state.doc.textBetween(from, to).length > 0;
 };
+
+// The table menu shows when the cursor sits in a table (a text selection shows the text menu instead).
+const showTableMenu: BubbleProps["shouldShow"] = ({ editor, state }) =>
+  editor.isActive("table") && state.selection.empty;
 
 const swatches: Record<string, string> = {
   yellow: "rgba(255, 214, 10, 0.75)",
@@ -54,7 +67,47 @@ function Divider() {
   return <span className="mx-1 h-5 w-px bg-bg/30" aria-hidden="true" />;
 }
 
-// The menu over selected text, and the menu on an empty line.
+type MathFieldProps = { initial: string; onApply: (latex: string) => void; onRemove: () => void };
+
+// The LaTeX box for a selected formula. The parent gives it a key per formula, so it starts fresh each time.
+function MathField({ initial, onApply, onRemove }: MathFieldProps) {
+  const [value, setValue] = useState(initial);
+  return (
+    <>
+      <input
+        autoFocus
+        value={value}
+        maxLength={articleLimits.latex}
+        onFocus={(e) => e.currentTarget.select()}
+        onChange={(e) => setValue(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === "Escape") {
+            e.preventDefault();
+            onApply(value);
+          }
+        }}
+        placeholder="LaTeX, for example \frac{a}{b}"
+        aria-label="Formula (LaTeX)"
+        spellCheck={false}
+        className="w-80 bg-transparent px-3 py-1.5 font-mono text-sm text-bg outline-none placeholder:text-bg/60"
+      />
+      <Tool label="Apply" onRun={() => onApply(value)} />
+      <Tool label="Remove" onRun={onRemove} />
+    </>
+  );
+}
+
+// How many rows and columns the table under the cursor has (null = not in a table).
+function tableSize(editor: Editor): { rows: number; cols: number } | null {
+  const { $from } = editor.state.selection;
+  for (let depth = $from.depth; depth > 0; depth -= 1) {
+    const node = $from.node(depth);
+    if (node.type.name === "table") return { rows: node.childCount, cols: node.firstChild?.childCount ?? 0 };
+  }
+  return null;
+}
+
+// The menu over selected text, the table menu, and the menu on an empty line.
 export function EditorMenus({ editor, onPickImage }: { editor: Editor; onPickImage: () => void }) {
   const [linkOpen, setLinkOpen] = useState(false);
   const [href, setHref] = useState("");
@@ -119,9 +172,34 @@ export function EditorMenus({ editor, onPickImage }: { editor: Editor; onPickIma
     editor.chain().focus().insertContentAt(to, { type: "footnote", attrs: { note: "" } }).setNodeSelection(to).run();
   }
 
-  const footnoteOn = editor.isActive("footnote");
-  const rawNote: unknown = footnoteOn ? editor.getAttributes("footnote").note : "";
+  // An inline formula goes after the selected text, selected so its LaTeX box opens at once.
+  function insertInlineMath() {
+    const to = editor.state.selection.to;
+    editor.chain().focus().insertContentAt(to, { type: "inlineMath", attrs: { latex: "x" } }).setNodeSelection(to).run();
+  }
+
+  // A formula on its own line replaces the empty paragraph the "+" button belongs to.
+  function insertBlockMath() {
+    const { $from } = editor.state.selection;
+    const from = $from.before();
+    editor
+      .chain()
+      .focus()
+      .insertContentAt({ from, to: $from.after() }, { type: "blockMath", attrs: { latex: "x = y" } })
+      .setNodeSelection(from)
+      .run();
+  }
+
+  const selection = editor.state.selection;
+  const selectedNode = selection instanceof NodeSelection ? selection.node : null;
+
+  const footnoteOn = selectedNode?.type.name === "footnote";
+  const rawNote: unknown = footnoteOn ? selectedNode?.attrs.note : "";
   const noteText = typeof rawNote === "string" ? rawNote : "";
+
+  const mathNode = selectedNode && mathTypes.includes(selectedNode.type.name) ? selectedNode : null;
+  const rawLatex: unknown = mathNode?.attrs.latex;
+  const mathLatex = typeof rawLatex === "string" ? rawLatex : "";
 
   function setNote(value: string) {
     editor.chain().updateAttributes("footnote", { note: value }).run();
@@ -131,11 +209,30 @@ export function EditorMenus({ editor, onPickImage }: { editor: Editor; onPickIma
     editor.chain().focus().setTextSelection(editor.state.selection.to).run();
   }
 
-  function removeNote() {
+  function removeSelected() {
     editor.chain().focus().deleteSelection().run();
   }
 
-  // What the "+" button offers. New block types (code, math, table) are added here later.
+  function applyMath(latex: string) {
+    if (!mathNode) return;
+    const text = latex.trim();
+    if (text === "") {
+      removeSelected();
+      return;
+    }
+    if (mathNode.type.name === "blockMath") {
+      editor.chain().focus().updateBlockMath({ latex: text }).run();
+    } else {
+      const to = editor.state.selection.to;
+      editor.chain().focus().updateInlineMath({ latex: text }).setTextSelection(to).run();
+    }
+  }
+
+  const size = tableSize(editor);
+  const canAddRow = !size || size.rows < articleLimits.tableRows;
+  const canAddCol = !size || size.cols < articleLimits.tableCols;
+
+  // What the "+" button offers. New block types are added here.
   const inserts: { label: string; title?: string; run: () => void }[] = [
     { label: "H2", title: "Heading", run: () => editor.chain().focus().toggleHeading({ level: 2 }).run() },
     { label: "H3", title: "Subheading", run: () => editor.chain().focus().toggleHeading({ level: 3 }).run() },
@@ -143,6 +240,13 @@ export function EditorMenus({ editor, onPickImage }: { editor: Editor; onPickIma
     { label: "List", title: "Bulleted list", run: () => editor.chain().focus().toggleBulletList().run() },
     { label: "1. List", title: "Numbered list", run: () => editor.chain().focus().toggleOrderedList().run() },
     { label: "Image", title: "Insert picture", run: onPickImage },
+    {
+      label: "Table",
+      title: "Insert table",
+      run: () => editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(),
+    },
+    { label: "Code", title: "Code block", run: () => editor.chain().focus().toggleCodeBlock().run() },
+    { label: "Math", title: "Formula on its own line", run: insertBlockMath },
     { label: "* * *", title: "Divider", run: () => editor.chain().focus().setHorizontalRule().run() },
   ];
 
@@ -172,8 +276,10 @@ export function EditorMenus({ editor, onPickImage }: { editor: Editor; onPickIma
                 className="w-72 bg-transparent px-3 py-1.5 text-sm text-bg outline-none placeholder:text-bg/60"
               />
               <Tool label="Done" onRun={finishNote} />
-              <Tool label="Remove" onRun={removeNote} />
+              <Tool label="Remove" onRun={removeSelected} />
             </>
+          ) : mathNode ? (
+            <MathField key={selection.from} initial={mathLatex} onApply={applyMath} onRemove={removeSelected} />
           ) : markerOpen ? (
             <>
               {highlightColors.map((color) => (
@@ -242,8 +348,21 @@ export function EditorMenus({ editor, onPickImage }: { editor: Editor; onPickIma
               <Divider />
               <Tool label="RTL" title="Right to left (Arabic)" active={editor.getAttributes("paragraph").dir === "rtl" || editor.getAttributes("heading").dir === "rtl"} onRun={toggleRtl} />
               <Tool label="Note" title="Footnote" onRun={insertFootnote} />
+              <Tool label="Math" title="Formula inside the text" onRun={insertInlineMath} />
             </>
           )}
+        </div>
+      </BubbleMenu>
+
+      <BubbleMenu editor={editor} pluginKey="tableMenu" options={bubbleOptions} shouldShow={showTableMenu}>
+        <div role="toolbar" aria-label="Table" className="ink-border flex items-center overflow-hidden rounded-md bg-ink text-bg">
+          {canAddRow && <Tool label="+ Row" title="Add a row below" onRun={() => editor.chain().focus().addRowAfter().run()} />}
+          <Tool label="- Row" title="Delete this row" onRun={() => editor.chain().focus().deleteRow().run()} />
+          {canAddCol && <Tool label="+ Col" title="Add a column on the right" onRun={() => editor.chain().focus().addColumnAfter().run()} />}
+          <Tool label="- Col" title="Delete this column" onRun={() => editor.chain().focus().deleteColumn().run()} />
+          <Divider />
+          <Tool label="Header" title="Make the row a header row, or back" onRun={() => editor.chain().focus().toggleHeaderRow().run()} />
+          <Tool label="Delete table" onRun={() => editor.chain().focus().deleteTable().run()} />
         </div>
       </BubbleMenu>
 

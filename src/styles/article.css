@@ -241,3 +241,165 @@
 .article-notes a {
   text-decoration: none;
 }
+
+/* Tables. The reader wraps each table in .table-scroll so a wide one scrolls inside its own box. */
+.article-prose .table-scroll {
+  overflow-x: auto;
+}
+
+.article-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+  line-height: 1.55;
+}
+
+.article-prose th,
+.article-prose td {
+  position: relative;
+  min-width: 4rem;
+  border: 1px solid var(--c-line);
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.article-prose th {
+  background: var(--c-surface);
+  font-weight: 600;
+}
+
+.article-prose td > * + *,
+.article-prose th > * + * {
+  margin-top: 0.5em;
+}
+
+.article-prose .selectedCell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 132, 255, 0.12);
+  pointer-events: none;
+}
+
+/* Code blocks: a language label at the top left, then the code. */
+.article-prose .code-block {
+  margin-block: 1.75em;
+  border: 1px solid var(--c-line);
+  background: var(--c-surface);
+}
+
+.article-prose .code-block-head {
+  border-bottom: 1px solid var(--c-line);
+  padding: 0.35rem 0.9rem;
+}
+
+.article-prose .code-lang {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-ink-soft);
+}
+
+.article-prose select.code-lang {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+  outline: none;
+}
+
+.article-prose .code-block pre {
+  margin: 0;
+  padding: 1rem 0.9rem;
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  tab-size: 2;
+  white-space: pre;
+}
+
+.article-prose .code-block pre code {
+  border: 0;
+  background: none;
+  padding: 0;
+  font-size: inherit;
+}
+
+/* Syntax colors: accent for keywords, a mix of accent and ink for strings and numbers, soft italic for comments. */
+.article-prose pre .hljs-comment,
+.article-prose pre .hljs-quote {
+  color: var(--c-ink-soft);
+  font-style: italic;
+}
+
+.article-prose pre .hljs-keyword,
+.article-prose pre .hljs-selector-tag,
+.article-prose pre .hljs-built_in,
+.article-prose pre .hljs-type,
+.article-prose pre .hljs-literal,
+.article-prose pre .hljs-doctag {
+  color: var(--c-accent, var(--c-ink));
+  font-weight: 600;
+}
+
+.article-prose pre .hljs-string,
+.article-prose pre .hljs-regexp,
+.article-prose pre .hljs-number,
+.article-prose pre .hljs-symbol,
+.article-prose pre .hljs-bullet,
+.article-prose pre .hljs-addition,
+.article-prose pre .hljs-attr,
+.article-prose pre .hljs-attribute {
+  color: color-mix(in srgb, var(--c-accent, var(--c-ink)) 55%, var(--c-ink));
+}
+
+.article-prose pre .hljs-title,
+.article-prose pre .hljs-section,
+.article-prose pre .hljs-name,
+.article-prose pre .hljs-strong {
+  font-weight: 700;
+}
+
+.article-prose pre .hljs-emphasis {
+  font-style: italic;
+}
+
+.article-prose pre .hljs-deletion {
+  color: var(--c-ink-soft);
+  text-decoration: line-through;
+}
+
+/* Formulas (KaTeX). A block formula sits centered on its own line and scrolls if it is wide. */
+.article-prose .math-block {
+  margin-block: 1.75em;
+  overflow-x: auto;
+  text-align: center;
+}
+
+.article-prose .math-block .katex-display {
+  margin: 0;
+}
+
+.article-prose .tiptap-mathematics-render {
+  cursor: pointer;
+}
+
+.article-prose .tiptap-mathematics-render[data-type="block-math"] {
+  display: block;
+  margin-block: 1.75em;
+  overflow-x: auto;
+  text-align: center;
+}
+
+.article-prose .tiptap-mathematics-render.ProseMirror-selectednode {
+  outline: 1px solid var(--c-ink);
+  outline-offset: 2px;
+}
+
+/* In the editor the code sits in a div that Tiptap makes: keep long lines on one line, like the reader. */
+.article-prose .code-block pre [data-node-view-content] {
+  white-space: pre !important;
+}

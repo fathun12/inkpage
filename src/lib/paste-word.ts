@@ -56,7 +56,7 @@ function cleanWord(html: string): string {
 
   // Empty paragraphs that Word uses as spacing.
   for (const p of Array.from(doc.querySelectorAll("p"))) {
-    if (p.textContent?.replace(/[\s\u00a0]/g, "") === "" && !p.querySelector("img")) p.remove();
+    if (p.textContent?.replace(/[\s\u00a0]/g, "") === "" && !p.querySelector("img") && !p.closest("td, th")) p.remove();
   }
   return doc.body.innerHTML;
 }

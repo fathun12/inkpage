@@ -2,10 +2,14 @@
 
 import { useCallback, useEffect, useRef, useState, type ChangeEvent } from "react";
 import Highlight from "@tiptap/extension-highlight";
+import { Mathematics } from "@tiptap/extension-mathematics";
 import { Placeholder } from "@tiptap/extension-placeholder";
 import Superscript from "@tiptap/extension-superscript";
+import { TableKit } from "@tiptap/extension-table";
+import { NodeSelection } from "@tiptap/pm/state";
 import { EditorContent, useEditor, type Editor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import "katex/dist/katex.min.css";
 import { Button } from "@/components/ui/Button";
 import { FlashNotice } from "@/components/ui/FlashNotice";
 import { articleConfig, articleImages, articleLimits } from "@/config/article";
@@ -13,6 +17,7 @@ import { mediaConfig } from "@/config/media";
 import { readingMinutes, wordCount } from "@/lib/article-doc";
 import { imageFiles, prepareArticleImage } from "@/lib/article-image";
 import { uploadToSignedPath } from "@/lib/direct-upload";
+import { lowlight } from "@/lib/lowlight";
 import { cleanPastedHtml } from "@/lib/paste-word";
 import type {
   ArticleSaveResult,
@@ -24,6 +29,7 @@ import type {
 } from "@/types/article";
 import type { FormAction } from "@/types/form";
 import { ArticleImage } from "./ArticleImage";
+import { ArticleCodeBlock } from "./ArticleCodeBlock";
 import { ArticleDirection, ArticleFootnote } from "./ArticleExtras";
 import { EditorMenus } from "./EditorMenus";
 import { PublishDrawer, type DrawerSnapshot } from "./PublishDrawer";
@@ -179,10 +185,19 @@ export function ArticleEditor({ initial, username, backHref, viewHref, save, sig
       Superscript,
       ArticleDirection,
       ArticleFootnote,
+      TableKit,
+      ArticleCodeBlock.configure({ lowlight, defaultLanguage: "plaintext", enableTabIndentation: true, tabSize: 2 }),
+      Mathematics.configure({ katexOptions: { throwOnError: false, strict: "ignore" } }),
     ],
     content: initial.doc,
     editorProps: {
       attributes: { class: "article-prose", "aria-label": "Article body" },
+      // A click on a formula selects it, and that opens its LaTeX box.
+      handleClickOn: (view, _pos, node, nodePos) => {
+        if (node.type.name !== "inlineMath" && node.type.name !== "blockMath") return false;
+        view.dispatch(view.state.tr.setSelection(NodeSelection.create(view.state.doc, nodePos)));
+        return true;
+      },
       // Word and web pages bring list paragraphs, heading levels and pictures the editor cannot keep.
       transformPastedHTML: (html) => cleanPastedHtml(html),
       // A copied picture (no text with it) or a dropped file becomes a picture in the article.

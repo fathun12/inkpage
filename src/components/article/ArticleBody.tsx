@@ -1,10 +1,62 @@
 import type { ReactNode } from "react";
+import { renderToString } from "katex";
+import "katex/dist/katex.min.css";
 import { Img } from "@/components/ui/Img";
+import { isCodeLanguage, languageLabel } from "@/config/code-languages";
 import { isArticleImageSrc, isHighlightColor, isSafeHref } from "@/lib/article-doc";
+import { lowlight } from "@/lib/lowlight";
 import type { DocMark, DocNode } from "@/types/article";
 
 // Footnotes are numbered in reading order while the text is drawn; the list goes under the article.
 type Ctx = { notes: string[] };
+
+// The part of lowlight's syntax tree (hast) that we draw: text and spans with class names.
+type Hast = { type: string; value?: string; properties?: { className?: unknown }; children?: Hast[] };
+
+function renderHast(nodes: Hast[] | undefined, key: string): ReactNode[] {
+  return (nodes ?? []).map((node, i) => {
+    const k = `${key}.${i}`;
+    if (node.type === "text") return node.value ?? "";
+    if (node.type !== "element") return null;
+    const raw = node.properties?.className;
+    const className = Array.isArray(raw) ? raw.filter((c): c is string => typeof c === "string").join(" ") : undefined;
+    return (
+      <span key={k} className={className}>
+        {renderHast(node.children, k)}
+      </span>
+    );
+  });
+}
+
+// Colors the code on the server, so readers download no highlighter. Unknown language = plain text.
+function codeContent(code: string, language: string | null): ReactNode {
+  if (!language || language === "plaintext" || !lowlight.registered(language)) return code;
+  try {
+    const tree = lowlight.highlight(language, code) as unknown as { children?: Hast[] };
+    return renderHast(tree.children, "c");
+  } catch {
+    return code;
+  }
+}
+
+// A formula drawn by KaTeX on the server. A broken formula shows as red text, never as an error page.
+function Formula({ latex, block }: { latex: string; block: boolean }) {
+  let html: string;
+  try {
+    html = renderToString(latex, { displayMode: block, throwOnError: false, strict: "ignore" });
+  } catch {
+    return <code>{latex}</code>;
+  }
+  return block ? (
+    <div className="math-block" dangerouslySetInnerHTML={{ __html: html }} />
+  ) : (
+    <span className="math-inline" dangerouslySetInnerHTML={{ __html: html }} />
+  );
+}
+
+function spanAttr(value: unknown): number | undefined {
+  return typeof value === "number" && value > 1 ? value : undefined;
+}
 
 function wrap(node: ReactNode, mark: DocMark, key: string): ReactNode {
   switch (mark.type) {
@@ -79,6 +131,48 @@ function renderNode(node: DocNode, key: string, ctx: Ctx): ReactNode {
     }
     case "listItem":
       return <li key={key}>{kids()}</li>;
+    case "table":
+      return (
+        <div key={key} className="table-scroll">
+          <table>
+            <tbody>{kids()}</tbody>
+          </table>
+        </div>
+      );
+    case "tableRow":
+      return <tr key={key}>{kids()}</tr>;
+    case "tableHeader":
+      return (
+        <th key={key} colSpan={spanAttr(node.attrs?.colspan)} rowSpan={spanAttr(node.attrs?.rowspan)}>
+          {kids()}
+        </th>
+      );
+    case "tableCell":
+      return (
+        <td key={key} colSpan={spanAttr(node.attrs?.colspan)} rowSpan={spanAttr(node.attrs?.rowspan)}>
+          {kids()}
+        </td>
+      );
+    case "codeBlock": {
+      const code = (node.content ?? []).map((part) => part.text ?? "").join("");
+      const raw = node.attrs?.language;
+      const language = isCodeLanguage(raw) ? raw : null;
+      return (
+        <div key={key} className="code-block">
+          <div className="code-block-head">
+            <span className="code-lang">{languageLabel(language)}</span>
+          </div>
+          <pre tabIndex={0}>
+            <code>{codeContent(code, language)}</code>
+          </pre>
+        </div>
+      );
+    }
+    case "inlineMath":
+    case "blockMath": {
+      const latex = typeof node.attrs?.latex === "string" ? node.attrs.latex : "";
+      return latex ? <Formula key={key} latex={latex} block={node.type === "blockMath"} /> : null;
+    }
     case "image": {
       const src = node.attrs?.src;
       if (!isArticleImageSrc(src)) return null;
