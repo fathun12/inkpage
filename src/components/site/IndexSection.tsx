@@ -54,10 +54,10 @@ export function IndexSection({ blocks, mediaUrl, tone = "dark", credit }: Props)
                 playsInline
                 preload="metadata"
                 aria-hidden
-                className="site-media-reveal size-full object-cover"
+                className="site-media-reveal site-index-media size-full object-cover"
               />
             ) : (
-              <Img src={mediaUrl} className="site-media-reveal size-full object-cover" />
+              <Img src={mediaUrl} className="site-media-reveal site-index-media size-full object-cover" />
             )}
           </Reveal>
           <div aria-hidden className="site-index-veil absolute inset-0" />
