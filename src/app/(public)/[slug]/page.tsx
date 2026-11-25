@@ -6,6 +6,8 @@ import { Hero } from "@/components/site/Hero";
 import { HeroContents, type ContentsItem } from "@/components/site/HeroContents";
 import { Intro } from "@/components/site/Intro";
 import { resolveGreetings } from "@/config/intro";
+import { HomeArticles } from "@/components/site/HomeArticles";
+import { getPublicArticles } from "@/features/articles/queries";
 import { HomeBiblia } from "@/components/site/HomeBiblia";
 import { HomeDesigns } from "@/components/site/HomeDesigns";
 import { HomeGithub } from "@/components/site/HomeGithub";
@@ -59,17 +61,19 @@ export default async function HomePage({ params }: Props) {
   const writing = homeWriting(blocks);
   const showcase = homeShowcase(blocks);
   const autoplay = style.motion !== "off";
-  const [biblia, designs, github, shop] = await Promise.all([
+  const [biblia, designs, github, shop, articles] = await Promise.all([
     fetchBiblia(site.bibliaUrl, 6),
     fetchDesigns(site.designsUrl, 3),
     fetchGithub(site.githubUser),
     getPublicShop(profile.id),
+    getPublicArticles(profile.id),
   ]);
   const shopItems = shop.products.filter((p) => p.show_on_home).slice(0, shopConfig.homeMax);
   const shopTitle = shop.settings.home_title ?? "Shop";
   // The table of contents over the hero: the sections that really show up on Home, in page order.
   const contents = [
     writing.length > 0 && { id: "writing", label: site.cardsTitle ?? site.writing.title ?? "Writing" },
+    articles.length > 0 && { id: "articles", label: "Articles" },
     projects.length > 0 && { id: "projects", label: site.projects.title ?? "Projects" },
     biblia && biblia.books.length > 0 && { id: "biblia", label: site.bibliaTitle ?? "Biblia" },
     github && { id: "github", label: site.githubTitle ?? "GitHub" },
@@ -112,6 +116,7 @@ export default async function HomePage({ params }: Props) {
           autoplay={autoplay}
         />
       )}
+      <HomeArticles articles={articles} username={profile.username} title="Articles" />
       <HomeProjects items={projects} title={site.projects.title ?? "Projects"} />
       {biblia && (
         <HomeBiblia data={biblia} title={site.bibliaTitle ?? "Biblia"} seeAll={`/${profile.username}/biblia`} />
