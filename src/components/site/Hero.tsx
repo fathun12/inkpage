@@ -17,6 +17,16 @@ type Props = {
   children?: ReactNode;
 };
 
+const stillOnStorage = /\/storage\/v1\/object\/public\/media\/.+\.(webp|jpe?g|png)$/i;
+const phoneWidths = [828, 1200];
+
+// Phones get a lighter copy made by Vercel (quality 90). Wide screens keep the original file, so they lose no sharpness.
+function responsive(src: string): { srcSet?: string; sizes?: string } {
+  if (!stillOnStorage.test(src)) return {};
+  const lighter = phoneWidths.map((w) => `/_next/image?url=${encodeURIComponent(src)}&w=${w}&q=90 ${w}w`);
+  return { srcSet: [...lighter, `${src} 2560w`].join(", "), sizes: "100vw" };
+}
+
 // Full width media (video, GIF or photo) that can slide, with one small caption.
 export function Hero({ slides, name, caption, seconds, autoplay, gray, credits = {}, children }: Props) {
   const [index, setIndex] = useState(0);
@@ -54,6 +64,7 @@ export function Hero({ slides, name, caption, seconds, autoplay, gray, credits =
               ) : (
                 <Img
                   src={src}
+                  {...responsive(src)}
                   loading={i === 0 ? "eager" : "lazy"}
                   fetchPriority={i === 0 ? "high" : undefined}
                   className={media}

@@ -2,7 +2,20 @@ import type { NextConfig } from "next";
 
 const sections = "projects|writing|biblia|shop|about|order|terms|privacy|refund";
 
+// Supabase address (from the same env variable the app already uses), so Vercel may resize its public images.
+const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
+  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
+  : null;
+
 const nextConfig: NextConfig = {
+  images: {
+    remotePatterns: supabaseHost
+      ? [{ protocol: "https", hostname: supabaseHost, pathname: "/storage/v1/object/public/media/**" }]
+      : [],
+    // Only quality 90 is allowed. Files have random names and never change, so keep copies for a year.
+    qualities: [90],
+    minimumCacheTTL: 31536000,
+  },
   experimental: {
     // Gallery uploads: up to 6 images of 2 MB each travel in one request.
     serverActions: { bodySizeLimit: "14mb" },
