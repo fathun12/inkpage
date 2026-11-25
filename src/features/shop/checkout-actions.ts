@@ -33,6 +33,9 @@ export async function startCheckoutAction(username: string, productSlug: string,
   if (!profile) redirect("/");
   const fail = (message: string): never => back(profile.username, productSlug, message);
 
+  // Honeypot: only a bot fills this hidden field.
+  if (String(formData.get("website") ?? "") !== "") return fail("Could not start checkout. Try again.");
+
   const email = String(formData.get("email") ?? "").trim().toLowerCase();
   if (!z.email().max(shopConfig.limits.email).safeParse(email).success) return fail("Enter a valid email address.");
   if (formData.get("agree") !== "on") return fail("Please agree to the Terms and the Refund policy.");
