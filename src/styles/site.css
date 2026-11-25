@@ -367,37 +367,26 @@
   }
 }
 
-/* Header on phones: the brand on the first row, the tabs on a second row that scrolls sideways. */
+/* Header on phones. In the normal bar the tabs start after the brand and scroll sideways if they do not fit.
+   On Home at the very top the brand stays big and low (as designed) and the tabs use the whole top row. */
 @media (max-width: 39.999rem) {
-  .site-header {
-    height: 5.75rem;
-  }
-  .site-header[data-overlay] {
-    margin-bottom: -5.75rem;
-  }
-  .site-brand {
-    top: 0.875rem;
-  }
-  .site-header[data-overlay][data-top] .site-brand {
-    top: 0.5rem;
-    font-size: 2.75rem;
-  }
   .site-nav {
-    top: 3.25rem;
+    left: 6.75rem;
     right: 0;
-    left: 0;
-    height: 2.5rem;
-    gap: 1.25rem;
-    padding-inline: 1.25rem;
+    padding-inline: 0.75rem 1.25rem;
     overflow-x: auto;
     white-space: nowrap;
     scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
   }
   .site-nav::-webkit-scrollbar {
     display: none;
   }
   .site-nav > * {
     flex: none;
+  }
+  .site-header[data-overlay][data-top] .site-nav {
+    left: 0;
+    padding-inline: 1.25rem;
+    justify-content: safe flex-end;
   }
 }
