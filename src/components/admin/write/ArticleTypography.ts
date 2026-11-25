@@ -15,6 +15,12 @@ export const ArticleTypography = Extension.create({
       textInputRule({ find: /--$/, replace: "—" }),
       // Space, hyphen, space after a word becomes an en dash with its spaces.
       textInputRule({ find: /\S\s(-)\s$/, replace: "–" }),
+      // Curly quotes. An opening quote comes at the start, after a space or after an opening bracket or quote;
+      // any other quote closes (a single quote inside a word is the apostrophe, which is a closing quote).
+      textInputRule({ find: /(?:^|[\s{[(<'"\u2018\u201C])(")$/, replace: "“" }),
+      textInputRule({ find: /"$/, replace: "”" }),
+      textInputRule({ find: /(?:^|[\s{[(<'"\u2018\u201C])(')$/, replace: "‘" }),
+      textInputRule({ find: /'$/, replace: "’" }),
     ];
   },
 
