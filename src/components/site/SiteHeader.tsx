@@ -16,7 +16,14 @@ type Props = {
 // and the brand is big. Scrolling down makes it a normal bar again. Other pages always use the normal bar.
 export function SiteHeader({ brand, home, items, overlay }: Props) {
   const pathname = usePathname();
-  const onHome = overlay ?? pathname === home;
+  // On the main domain the owner's name is not in the address (/projects, not /zdtzer0/projects).
+  // Cutting the name off both sides lets the same check work on both kinds of address.
+  const clean = (path: string) => {
+    if (path === home) return "/";
+    return path.startsWith(`${home}/`) ? path.slice(home.length) : path;
+  };
+  const here = clean(pathname);
+  const onHome = overlay ?? here === "/";
   const sentinel = useRef<HTMLDivElement>(null);
   const [top, setTop] = useState(true);
 
@@ -42,7 +49,7 @@ export function SiteHeader({ brand, home, items, overlay }: Props) {
         {items.length > 1 && (
           <nav aria-label="Pages" className="site-nav">
             {items.map((item) => {
-              const active = pathname === item.href;
+              const active = here === clean(item.href);
               return (
                 <Link
                   key={item.href}
