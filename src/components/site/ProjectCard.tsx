@@ -16,16 +16,20 @@ type Props = {
   total?: number;
   // Only the Projects page uses it: how the row of extra media slides.
   slide?: { seconds: number; autoplay: boolean };
+  // Only Home uses these two. stacked = the Grid layout: one photo on top, text below.
+  // mediaHeight = height of each photo in rem (0 = the shape of each photo).
+  stacked?: boolean;
+  mediaHeight?: number;
 };
 
 // One media: the frame follows the Ratio of the file. No border, no shadow, sharp corners.
-export function ItemMedia({ file, eager }: { file: ProjectFile; eager: boolean }) {
+export function ItemMedia({ file, eager, height }: { file: ProjectFile; eager: boolean; height?: number }) {
   const fill =
     "site-media-reveal absolute inset-0 size-full object-cover transition-[scale] duration-500 ease-out group-hover/media:scale-105 motion-reduce:transition-none motion-reduce:group-hover/media:scale-100";
   return (
     <div
       className="group/media relative w-full overflow-hidden bg-surface"
-      style={{ aspectRatio: ratioAspect[file.ratio] }}
+      style={height ? { height: `${height}rem` } : { aspectRatio: ratioAspect[file.ratio] }}
     >
       {file.kind === "video" ? (
         <video
@@ -51,10 +55,19 @@ export function ItemMedia({ file, eager }: { file: ProjectFile; eager: boolean }
 // The text column is as tall as the media: the accent line is level with the top of the media, the Download buttons
 // follow the text, and the text links sit at the bottom, level with the bottom of the media.
 // Home shows only the two media. The Projects page also shows the rest as a sliding row under the project.
-export function ProjectCard({ block, mode, first = false, total = 1, slide = { seconds: 5, autoplay: true } }: Props) {
+export function ProjectCard({
+  block,
+  mode,
+  first = false,
+  total = 1,
+  slide = { seconds: 5, autoplay: true },
+  stacked = false,
+  mediaHeight = 0,
+}: Props) {
   const item = readProjectItem(block);
   const { a, b } = pickHomeMedia(item.files);
-  const shown = [a, b].filter((f): f is ProjectFile => f !== null);
+  // Grid shows one photo per project. List and the slider show the two photos of Home.
+  const shown = (stacked ? [a] : [a, b]).filter((f): f is ProjectFile => f !== null);
   const rest = mode === "page" ? item.files.filter((f) => !shown.includes(f)) : [];
   const side = shown.length === 2 && shown.every((f) => f.ratio === "portrait");
   const hasMedia = shown.length > 0;
@@ -67,11 +80,19 @@ export function ProjectCard({ block, mode, first = false, total = 1, slide = { s
 
   return (
     <div className="flex flex-col gap-10">
-      <div className={hasMedia ? `site-proj-grid grid gap-8 ${projectLayout.grid}` : "grid"}>
+      <div
+        className={
+          hasMedia
+            ? stacked
+              ? "grid gap-6"
+              : `site-proj-grid grid gap-8 ${projectLayout.grid}`
+            : "grid"
+        }
+      >
         {hasMedia && (
           <Reveal variant="still" className={side ? "grid grid-cols-2 gap-3" : "flex flex-col gap-3"}>
             {shown.map((file, i) => (
-              <ItemMedia key={file.url} file={file} eager={first && i === 0} />
+              <ItemMedia key={file.url} file={file} eager={first && i === 0} height={mediaHeight} />
             ))}
           </Reveal>
         )}

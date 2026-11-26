@@ -529,6 +529,15 @@ a:focus-visible .site-sweep {
   }
 }
 
+/* Countdown as a thin strip (Customize, Layout). It sits close to what is above it: only the extra space is
+   added on top. Inside, 1rem below the text before the Tertiary line. */
+.site-strip-pt {
+  padding-top: max(0rem, var(--off-top, 0rem));
+}
+.site-strip-pb {
+  padding-bottom: max(0rem, calc(1rem + var(--off-bottom, 0rem)));
+}
+
 /* Project size, Home only (data-project-size is on the page wrapper, data-project-mode on the list).
    Large = the original look, so it has no rules here. */
 [data-project-size="medium"] [data-project-mode="home"] .site-proj-grid {

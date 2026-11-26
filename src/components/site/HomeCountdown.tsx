@@ -10,6 +10,8 @@ type Props = {
   // The day it counts down to, and the day the countdown was made (where the 20% and 10% steps are measured from).
   target: string;
   start: string;
+  // "section" = the full block. "strip" = one thin line with the title and the time left.
+  variant?: "section" | "strip";
 };
 
 // One shared second counter. It is 0 on the server and on the first browser render, so both HTML versions match.
@@ -20,7 +22,7 @@ function subscribe(onChange: () => void) {
 const getNow = () => Math.floor(Date.now() / 1000);
 const getServerNow = () => 0;
 
-export function HomeCountdown({ title, description, target, start }: Props) {
+export function HomeCountdown({ title, description, target, start, variant = "section" }: Props) {
   const now = useSyncExternalStore(subscribe, getNow, getServerNow);
   const end = Math.floor(new Date(target).getTime() / 1000);
   const begin = Math.floor(new Date(start).getTime() / 1000);
@@ -35,6 +37,25 @@ export function HomeCountdown({ title, description, target, start }: Props) {
     ["Minutes", Math.floor((left % 3600) / 60)],
     ["Seconds", left % 60],
   ];
+
+  if (variant === "strip") {
+    const pad = (n: number) => String(n).padStart(2, "0");
+    const days = Math.floor(left / 86400);
+    const time = `${days > 0 ? `${days}d ` : ""}${pad(Math.floor((left % 86400) / 3600))}:${pad(Math.floor((left % 3600) / 60))}:${pad(left % 60)}`;
+    return (
+      <section id="countdown" aria-label={title} className="site-strip-pt px-5 sm:px-8">
+        <div className="mx-auto flex max-w-5xl items-baseline justify-between gap-4 border-b-2 border-tertiary pt-4 site-strip-pb">
+          <p className="flex min-w-0 items-center gap-2.5 font-mono text-xs uppercase tracking-[0.22em]">
+            <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-accent" />
+            <span className="truncate">{title}</span>
+          </p>
+          <p role="timer" className="shrink-0 font-voice text-xl tabular-nums leading-none sm:text-2xl">
+            {ready ? (stage === "done" ? countdownConfig.messages.done : time) : "--"}
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="countdown" aria-label={title} className="px-5 site-pt-s sm:px-8">

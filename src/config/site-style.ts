@@ -4,16 +4,20 @@
 import type { CSSProperties } from "react";
 import { hexColor, luminance } from "@/config/background";
 import {
+  countdownViews,
   densityModes,
   layoutDefaults,
   projectSizes,
+  projectViews,
   readChoice,
   readOrder,
   readSections,
   sectionDefaults,
   sectionIds,
+  type CountdownView,
   type DensityMode,
   type ProjectSize,
+  type ProjectView,
   type SectionId,
   type SectionSettings,
 } from "@/config/layout";
@@ -41,6 +45,7 @@ export const styleRanges = {
   heroZoom: { min: 100, max: 250, step: 5 },
   indexZoom: { min: 100, max: 250, step: 5 },
   seconds: { min: 3, max: 15, step: 1 },
+  projectMedia: { min: 0, max: 40, step: 2 },
 } as const satisfies Record<string, Range>;
 
 export type SiteStyle = {
@@ -54,6 +59,9 @@ export type SiteStyle = {
   heroGray: boolean;
   density: DensityMode;
   projectSize: ProjectSize;
+  projectView: ProjectView;
+  projectMedia: number;
+  countdownView: CountdownView;
   sections: SectionSettings;
   order: SectionId[];
   colorBg: string;
@@ -77,6 +85,9 @@ export const siteStyleDefaults: SiteStyle = {
   heroGray: false,
   density: layoutDefaults.density,
   projectSize: layoutDefaults.projectSize,
+  projectView: layoutDefaults.projectView,
+  projectMedia: layoutDefaults.projectMedia,
+  countdownView: layoutDefaults.countdownView,
   sections: sectionDefaults,
   order: [...sectionIds],
   colorBg: "#ffffff",
@@ -110,6 +121,9 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     heroGray: typeof r.heroGray === "boolean" ? r.heroGray : d.heroGray,
     density: readChoice(r.density, densityModes, d.density),
     projectSize: readChoice(r.projectSize, projectSizes, d.projectSize),
+    projectView: readChoice(r.projectView, projectViews, d.projectView),
+    projectMedia: num(r.projectMedia, styleRanges.projectMedia, d.projectMedia),
+    countdownView: readChoice(r.countdownView, countdownViews, d.countdownView),
     sections: readSections(r.sections),
     order: readOrder(r.order),
     colorBg: color(r.colorBg, d.colorBg),

@@ -133,6 +133,7 @@ export default async function HomePage({ params }: Props) {
           description={countdown.body}
           target={countdown.data.target ?? ""}
           start={countdown.created_at}
+          variant={style.countdownView}
         />
       </SectionBox>
     ),
@@ -160,7 +161,13 @@ export default async function HomePage({ params }: Props) {
     ),
     projects: on("projects") && (
       <SectionBox setting={sec.projects}>
-        <HomeProjects items={projects} title={site.projects.title ?? "Projects"} />
+        <HomeProjects
+          items={projects}
+          title={site.projects.title ?? "Projects"}
+          view={style.projectView}
+          mediaHeight={style.projectMedia}
+          slide={{ seconds: style.heroSeconds, autoplay }}
+        />
       </SectionBox>
     ),
     biblia: biblia && on("biblia") && (

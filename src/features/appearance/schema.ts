@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { hexColor } from "@/config/background";
 import { fontIds } from "@/config/font-choices";
-import { densityModes, projectSizes, sectionSpace } from "@/config/layout";
+import { countdownViews, densityModes, projectSizes, projectViews, sectionSpace } from "@/config/layout";
 import { motionModes, styleRanges } from "@/config/site-style";
 
 const color = z
@@ -73,6 +73,9 @@ export const appearanceSchema = z.object({
   site_hero_gray: z.boolean(),
   site_density: z.enum(densityModes, { error: "Pick a spacing." }),
   site_project_size: z.enum(projectSizes, { error: "Pick a project size." }),
+  site_project_view: z.enum(projectViews, { error: "Pick a projects layout." }),
+  site_project_media: whole("Projects photo height", styleRanges.projectMedia),
+  site_countdown_view: z.enum(countdownViews, { error: "Pick a countdown style." }),
   site_sections: sectionsJson,
   site_order: orderJson,
 });

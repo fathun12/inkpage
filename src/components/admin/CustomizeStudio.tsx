@@ -36,12 +36,18 @@ import {
 } from "@/config/font-choices";
 import { resolveGreetings } from "@/config/intro";
 import {
+  countdownViewHints,
+  countdownViewLabels,
+  countdownViews,
   densityHints,
   densityLabels,
   densityModes,
   projectSizeHints,
   projectSizeLabels,
   projectSizes,
+  projectViewHints,
+  projectViewLabels,
+  projectViews,
   type SectionId,
   type SectionSetting,
 } from "@/config/layout";
@@ -163,6 +169,7 @@ function Slider({
   range,
   unit = "",
   hint,
+  format,
   onChange,
 }: {
   id: string;
@@ -171,10 +178,11 @@ function Slider({
   range: { min: number; max: number; step: number };
   unit?: string;
   hint?: string;
+  format?: (value: number) => string;
   onChange: (value: number) => void;
 }) {
   return (
-    <Field label={`${label}: ${value}${unit}`} htmlFor={id} hint={hint}>
+    <Field label={`${label}: ${format ? format(value) : `${value}${unit}`}`} htmlFor={id} hint={hint}>
       <input
         id={id}
         type="range"
@@ -316,6 +324,7 @@ export function CustomizeStudio({
           description={countdown.body}
           target={countdown.data.target ?? ""}
           start={countdown.created_at}
+          variant={draft.style.countdownView}
         />
       </SectionBox>
     ),
@@ -342,7 +351,13 @@ export function CustomizeStudio({
     ),
     projects: on("projects") && (
       <SectionBox setting={sec.projects}>
-        <HomeProjects items={projects} title={site.projects.title ?? "Projects"} />
+        <HomeProjects
+          items={projects}
+          title={site.projects.title ?? "Projects"}
+          view={draft.style.projectView}
+          mediaHeight={draft.style.projectMedia}
+          slide={{ seconds: draft.style.heroSeconds, autoplay }}
+        />
       </SectionBox>
     ),
     biblia: biblia && on("biblia") && (
@@ -421,6 +436,9 @@ export function CustomizeStudio({
       <input type="hidden" name="site_project_size" value={draft.style.projectSize} />
       <input type="hidden" name="site_sections" value={JSON.stringify(draft.style.sections)} />
       <input type="hidden" name="site_order" value={JSON.stringify(draft.style.order)} />
+      <input type="hidden" name="site_project_view" value={draft.style.projectView} />
+      <input type="hidden" name="site_project_media" value={draft.style.projectMedia} />
+      <input type="hidden" name="site_countdown_view" value={draft.style.countdownView} />
       {draft.style.heroGray && <input type="hidden" name="site_hero_gray" value="on" />}
 
       <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line px-5 py-3">
@@ -474,7 +492,13 @@ export function CustomizeStudio({
             title="Layout"
             open
             onReset={() =>
-              setStyle({ density: siteStyleDefaults.density, projectSize: siteStyleDefaults.projectSize })
+              setStyle({
+                density: siteStyleDefaults.density,
+                projectSize: siteStyleDefaults.projectSize,
+                projectView: siteStyleDefaults.projectView,
+                projectMedia: siteStyleDefaults.projectMedia,
+                countdownView: siteStyleDefaults.countdownView,
+              })
             }
           >
             <div className="flex flex-col gap-2">
@@ -512,6 +536,51 @@ export function CustomizeStudio({
                 ))}
               </div>
               <p className="text-xs text-ink-soft">{projectSizeHints[draft.style.projectSize]}</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-medium text-ink-soft">Projects layout on Home</span>
+              <div className="flex flex-wrap gap-2">
+                {projectViews.map((m) => (
+                  <label key={m} className={pill}>
+                    <input
+                      type="radio"
+                      value={m}
+                      checked={draft.style.projectView === m}
+                      onChange={() => setStyle({ projectView: m })}
+                      className="sr-only"
+                    />
+                    {projectViewLabels[m]}
+                  </label>
+                ))}
+              </div>
+              <p className="text-xs text-ink-soft">{projectViewHints[draft.style.projectView]}</p>
+            </div>
+            <Slider
+              id="ui_project_media"
+              label="Projects photo height"
+              value={draft.style.projectMedia}
+              range={styleRanges.projectMedia}
+              format={(v) => (v === 0 ? "Auto" : `${v} rem`)}
+              hint="Height of each photo on Home. Auto keeps the shape of each photo."
+              onChange={(projectMedia) => setStyle({ projectMedia })}
+            />
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-medium text-ink-soft">Countdown style</span>
+              <div className="flex flex-wrap gap-2">
+                {countdownViews.map((m) => (
+                  <label key={m} className={pill}>
+                    <input
+                      type="radio"
+                      value={m}
+                      checked={draft.style.countdownView === m}
+                      onChange={() => setStyle({ countdownView: m })}
+                      className="sr-only"
+                    />
+                    {countdownViewLabels[m]}
+                  </label>
+                ))}
+              </div>
+              <p className="text-xs text-ink-soft">{countdownViewHints[draft.style.countdownView]}</p>
             </div>
           </Section>
           <Section

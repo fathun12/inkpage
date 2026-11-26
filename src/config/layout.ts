@@ -31,9 +31,49 @@ export const projectSizeHints: Record<ProjectSize, string> = {
   large: "The original size.",
 };
 
-export const layoutDefaults: { density: DensityMode; projectSize: ProjectSize } = {
+// How the Projects section looks on Home. The Projects page is always a list.
+export const projectViews = ["list", "grid", "slider"] as const;
+export type ProjectView = (typeof projectViews)[number];
+
+export const projectViewLabels: Record<ProjectView, string> = {
+  list: "List",
+  grid: "Grid",
+  slider: "Slider",
+};
+
+export const projectViewHints: Record<ProjectView, string> = {
+  list: "Photos on the left, text on the right (the original).",
+  grid: "Two columns: one photo on top, text below. One column on a phone.",
+  slider: "One project at a time. It slides by itself and has arrows.",
+};
+
+// How the Countdown section looks.
+export const countdownViews = ["section", "strip"] as const;
+export type CountdownView = (typeof countdownViews)[number];
+
+export const countdownViewLabels: Record<CountdownView, string> = {
+  section: "Section",
+  strip: "Strip",
+};
+
+export const countdownViewHints: Record<CountdownView, string> = {
+  section: "The full block: message, title, text and big numbers.",
+  strip: "One thin line: the title and the time left.",
+};
+
+// projectMedia = height of each Projects photo on Home in rem. 0 = Auto (the shape of each photo, as before).
+export const layoutDefaults: {
+  density: DensityMode;
+  projectSize: ProjectSize;
+  projectView: ProjectView;
+  projectMedia: number;
+  countdownView: CountdownView;
+} = {
   density: "comfortable",
   projectSize: "large",
+  projectView: "list",
+  projectMedia: 0,
+  countdownView: "section",
 };
 
 // Safe reader: an unknown or missing value falls back to the default.
