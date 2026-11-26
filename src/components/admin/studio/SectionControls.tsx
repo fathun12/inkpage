@@ -17,6 +17,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import type { ReactNode } from "react";
 import { Field } from "@/components/ui/Field";
 import {
   sectionHasSpace,
@@ -40,6 +41,8 @@ type Props = {
   sections: SectionSettings;
   // The section picked in the preview (inspect mode). Its row gets an outline.
   selected?: SectionId | null;
+  // Settings that belong to one section only (size, layout...). Shown at the top of that section's panel.
+  extra?: Partial<Record<SectionId, ReactNode>>;
   onOrder: (order: SectionId[]) => void;
   onSection: (id: SectionId, patch: Partial<SectionSetting>) => void;
 };
@@ -79,6 +82,7 @@ function Row({
   count,
   setting,
   selected,
+  extra,
   onSection,
   onMove,
 }: {
@@ -87,6 +91,7 @@ function Row({
   count: number;
   setting: SectionSetting;
   selected: boolean;
+  extra?: ReactNode;
   onSection: (id: SectionId, patch: Partial<SectionSetting>) => void;
   onMove: (from: number, to: number) => void;
 }) {
@@ -137,6 +142,7 @@ function Row({
             {head}
           </summary>
           <div className="flex flex-col gap-4 px-3 pb-3 pt-1">
+            {extra && <div className="flex flex-col gap-4 border-b border-line pb-4">{extra}</div>}
             <Space
               id={`ui_sec_${id}_top`}
               label="Space above"
@@ -216,7 +222,7 @@ function Row({
 }
 
 // The list of Home sections in the Customize studio: drag to reorder, Show tick, extra space per section.
-export function SectionControls({ order, sections, selected = null, onOrder, onSection }: Props) {
+export function SectionControls({ order, sections, selected = null, extra = {}, onOrder, onSection }: Props) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -248,6 +254,7 @@ export function SectionControls({ order, sections, selected = null, onOrder, onS
               count={order.length}
               setting={sections[id]}
               selected={selected === id}
+              extra={extra[id]}
               onSection={onSection}
               onMove={move}
             />

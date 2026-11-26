@@ -537,6 +537,77 @@ export function CustomizeStudio({
     ),
   };
 
+  // Settings that belong to one section only. They sit inside that section's row in the Sections panel.
+  const projectControls = (
+    <>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-ink-soft">Size on Home</span>
+        <div className="flex flex-wrap gap-2">
+          {projectSizes.map((m) => (
+            <label key={m} className={pill}>
+              <input
+                type="radio"
+                value={m}
+                checked={draft.style.projectSize === m}
+                onChange={() => setStyle({ projectSize: m })}
+                className="sr-only"
+              />
+              {projectSizeLabels[m]}
+            </label>
+          ))}
+        </div>
+        <p className="text-xs text-ink-soft">{projectSizeHints[draft.style.projectSize]}</p>
+      </div>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-ink-soft">Layout on Home</span>
+        <div className="flex flex-wrap gap-2">
+          {projectViews.map((m) => (
+            <label key={m} className={pill}>
+              <input
+                type="radio"
+                value={m}
+                checked={draft.style.projectView === m}
+                onChange={() => setStyle({ projectView: m })}
+                className="sr-only"
+              />
+              {projectViewLabels[m]}
+            </label>
+          ))}
+        </div>
+        <p className="text-xs text-ink-soft">{projectViewHints[draft.style.projectView]}</p>
+      </div>
+      <Slider
+        id="ui_project_media"
+        label="Photo height"
+        value={draft.style.projectMedia}
+        range={styleRanges.projectMedia}
+        format={(v) => (v === 0 ? "Auto" : `${v} rem`)}
+        hint="Height of each photo on Home. Auto keeps the shape of each photo."
+        onChange={(projectMedia) => setStyle({ projectMedia })}
+      />
+    </>
+  );
+  const countdownControls = (
+    <div className="flex flex-col gap-2">
+      <span className="text-sm font-medium text-ink-soft">Style</span>
+      <div className="flex flex-wrap gap-2">
+        {countdownViews.map((m) => (
+          <label key={m} className={pill}>
+            <input
+              type="radio"
+              value={m}
+              checked={draft.style.countdownView === m}
+              onChange={() => setStyle({ countdownView: m })}
+              className="sr-only"
+            />
+            {countdownViewLabels[m]}
+          </label>
+        ))}
+      </div>
+      <p className="text-xs text-ink-soft">{countdownViewHints[draft.style.countdownView]}</p>
+    </div>
+  );
+
   return (
     <form action={action} className="fixed inset-0 z-40 flex flex-col overflow-hidden bg-bg">
       {/* The sidebar controls have no name. These hidden inputs are what the server receives. */}
@@ -613,15 +684,7 @@ export function CustomizeStudio({
           <Section
             title="Layout"
             open
-            onReset={() =>
-              setStyle({
-                density: siteStyleDefaults.density,
-                projectSize: siteStyleDefaults.projectSize,
-                projectView: siteStyleDefaults.projectView,
-                projectMedia: siteStyleDefaults.projectMedia,
-                countdownView: siteStyleDefaults.countdownView,
-              })
-            }
+            onReset={() => setStyle({ density: siteStyleDefaults.density })}
           >
             <div className="flex flex-col gap-2">
               <span className="text-sm font-medium text-ink-soft">Space between sections</span>
@@ -641,84 +704,32 @@ export function CustomizeStudio({
               </div>
               <p className="text-xs text-ink-soft">{densityHints[draft.style.density]}</p>
             </div>
-            <div className="flex flex-col gap-2">
-              <span className="text-sm font-medium text-ink-soft">Projects size on Home</span>
-              <div className="flex flex-wrap gap-2">
-                {projectSizes.map((m) => (
-                  <label key={m} className={pill}>
-                    <input
-                      type="radio"
-                      value={m}
-                      checked={draft.style.projectSize === m}
-                      onChange={() => setStyle({ projectSize: m })}
-                      className="sr-only"
-                    />
-                    {projectSizeLabels[m]}
-                  </label>
-                ))}
-              </div>
-              <p className="text-xs text-ink-soft">{projectSizeHints[draft.style.projectSize]}</p>
-            </div>
-            <div className="flex flex-col gap-2">
-              <span className="text-sm font-medium text-ink-soft">Projects layout on Home</span>
-              <div className="flex flex-wrap gap-2">
-                {projectViews.map((m) => (
-                  <label key={m} className={pill}>
-                    <input
-                      type="radio"
-                      value={m}
-                      checked={draft.style.projectView === m}
-                      onChange={() => setStyle({ projectView: m })}
-                      className="sr-only"
-                    />
-                    {projectViewLabels[m]}
-                  </label>
-                ))}
-              </div>
-              <p className="text-xs text-ink-soft">{projectViewHints[draft.style.projectView]}</p>
-            </div>
-            <Slider
-              id="ui_project_media"
-              label="Projects photo height"
-              value={draft.style.projectMedia}
-              range={styleRanges.projectMedia}
-              format={(v) => (v === 0 ? "Auto" : `${v} rem`)}
-              hint="Height of each photo on Home. Auto keeps the shape of each photo."
-              onChange={(projectMedia) => setStyle({ projectMedia })}
-            />
-            <div className="flex flex-col gap-2">
-              <span className="text-sm font-medium text-ink-soft">Countdown style</span>
-              <div className="flex flex-wrap gap-2">
-                {countdownViews.map((m) => (
-                  <label key={m} className={pill}>
-                    <input
-                      type="radio"
-                      value={m}
-                      checked={draft.style.countdownView === m}
-                      onChange={() => setStyle({ countdownView: m })}
-                      className="sr-only"
-                    />
-                    {countdownViewLabels[m]}
-                  </label>
-                ))}
-              </div>
-              <p className="text-xs text-ink-soft">{countdownViewHints[draft.style.countdownView]}</p>
-            </div>
           </Section>
           <Section
             title="Sections"
             id="studio-sections"
-            onReset={() => setStyle({ sections: siteStyleDefaults.sections, order: siteStyleDefaults.order })}
+            onReset={() =>
+              setStyle({
+                sections: siteStyleDefaults.sections,
+                order: siteStyleDefaults.order,
+                projectSize: siteStyleDefaults.projectSize,
+                projectView: siteStyleDefaults.projectView,
+                projectMedia: siteStyleDefaults.projectMedia,
+                countdownView: siteStyleDefaults.countdownView,
+              })
+            }
           >
             <p className="text-xs text-ink-soft">
-              Drag :: or use the arrows to change the order. Untick Show to hide a section. Click a name to change
-              its space (added to the Spacing choice above), its background and its divider line. A section with
-              nothing to show stays hidden anyway. The hero is always first and the footer always last.
+              Drag :: or use the arrows to change the order. Untick Show to hide a section. Click a name to open
+              the settings of that section: its own options (size, layout...), its space (added to the Spacing
+              choice above), its background and its divider line. A section with nothing to show stays hidden
+              anyway. The hero is always first and the footer always last.
             </p>
             <SectionControls
               order={draft.style.order}
               sections={sec}
               selected={picked}
+              extra={{ projects: projectControls, countdown: countdownControls }}
               onOrder={(order) => setStyle({ order })}
               onSection={setSection}
             />
