@@ -8,13 +8,15 @@ type Props = {
   autoplay: boolean;
   // Full width use: the arrows and the first photo keep the side space of the page.
   inset?: boolean;
+  // Full width use: only the arrows keep the side space; the tiles run to the edges of the screen.
+  bleed?: boolean;
   children: ReactNode;
 };
 
 // The row of extra media under a project on the Projects page. It slides by itself, stops while the pointer
 // is over it, and can be swiped or moved with the arrows. Same behavior as the Writing cards on Home.
 // The tiles come in as children (made on the server), so this file stays small.
-export function MediaSlider({ count, seconds, autoplay, inset = false, children }: Props) {
+export function MediaSlider({ count, seconds, autoplay, inset = false, bleed = false, children }: Props) {
   const track = useRef<HTMLUListElement>(null);
   const paused = useRef(false);
 
@@ -60,7 +62,7 @@ export function MediaSlider({ count, seconds, autoplay, inset = false, children 
   return (
     <div onPointerEnter={pause} onPointerLeave={resume} onFocus={pause} onBlur={resume}>
       {count > 1 && (
-        <div className={`mb-3 flex justify-end gap-2${inset ? " px-5 sm:px-8" : ""}`}>
+        <div className={`mb-3 flex justify-end gap-2${inset || bleed ? " px-5 sm:px-8" : ""}`}>
           <button type="button" aria-label="Previous" onClick={() => step(-1)} className={arrow}>
             ←
           </button>

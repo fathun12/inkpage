@@ -67,11 +67,14 @@ function Caption({ project, inset }: { project: DesignProject; inset: boolean })
 type Shape = { projects: DesignProject[]; height: number };
 
 // One project per row: a photo across the whole screen, a tight row of documentation photos, then the title.
-function Stack({ projects, height }: Shape) {
-  return (
-    <ul className="flex flex-col gap-14 sm:gap-24">
-      {projects.map((p) => (
-        <li key={p.slug}>
+function Stack({
+  projects,
+  height,
+  slide,
+}: Shape & { slide?: { seconds: number; autoplay: boolean } }) {
+  // With slide (Stack slide): the same project, one per screen, sliding by itself.
+  const items = projects.map((p) => (
+        <li key={p.slug} className={slide ? "w-full shrink-0 snap-start" : undefined}>
           <Reveal variant="still">
             <a href={p.href} {...link} className="group block">
               <span
@@ -115,9 +118,15 @@ function Stack({ projects, height }: Shape) {
             </a>
           </Reveal>
         </li>
-      ))}
-    </ul>
-  );
+  ));
+  if (slide) {
+    return (
+      <MediaSlider count={projects.length} seconds={slide.seconds} autoplay={slide.autoplay} bleed>
+        {items}
+      </MediaSlider>
+    );
+  }
+  return <ul className="flex flex-col gap-14 sm:gap-24">{items}</ul>;
 }
 
 // Two columns edge to edge with tall photos. A last project that stands alone spans both columns.
@@ -257,5 +266,6 @@ export function DesignWide({
   if (view === "sheet") return <Sheet projects={projects} height={height} />;
   if (view === "mosaic") return <Mosaic projects={projects} height={height} />;
   if (view === "filmstrip") return <Filmstrip projects={projects} height={height} slide={slide} />;
+  if (view === "stackslide") return <Stack projects={projects} height={height} slide={slide} />;
   return <Stack projects={projects} height={height} />;
 }

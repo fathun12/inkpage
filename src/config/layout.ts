@@ -95,11 +95,12 @@ export const designModeHints: Record<DesignMode, string> = {
 };
 
 // The Full width forms.
-export const designWideViews = ["stack", "split", "sheet", "mosaic", "filmstrip"] as const;
+export const designWideViews = ["stack", "stackslide", "split", "sheet", "mosaic", "filmstrip"] as const;
 export type DesignWideView = (typeof designWideViews)[number];
 
 export const designWideViewLabels: Record<DesignWideView, string> = {
   stack: "Stack",
+  stackslide: "Stack slide",
   split: "Split",
   sheet: "Contact sheet",
   mosaic: "Mosaic",
@@ -108,6 +109,7 @@ export const designWideViewLabels: Record<DesignWideView, string> = {
 
 export const designWideViewHints: Record<DesignWideView, string> = {
   stack: "One project per row: a photo across the whole screen, a tight row of photos, then the title.",
+  stackslide: "Like Stack, but one project at a time across the whole screen. It slides by itself and has arrows.",
   split: "Two columns edge to edge with tall photos.",
   sheet: "Square photos touching each other, like a contact sheet. The title shows on hover.",
   mosaic: "Photos of different sizes in one tight grid.",
@@ -191,11 +193,12 @@ export const showcaseSizeHints: Record<ShowcaseSize, string> = {
   large: "The original size: two cards per row in Grid, the original photo column in List.",
 };
 
-export const showcaseWideViews = ["stack", "split", "filmstrip", "sheet", "mosaic"] as const;
+export const showcaseWideViews = ["stack", "stackslide", "split", "filmstrip", "sheet", "mosaic"] as const;
 export type ShowcaseWideView = (typeof showcaseWideViews)[number];
 
 export const showcaseWideViewLabels: Record<ShowcaseWideView, string> = {
   stack: "Stack",
+  stackslide: "Stack slide",
   split: "Split",
   filmstrip: "Filmstrip",
   sheet: "Contact sheet",
@@ -204,6 +207,7 @@ export const showcaseWideViewLabels: Record<ShowcaseWideView, string> = {
 
 export const showcaseWideViewHints: Record<ShowcaseWideView, string> = {
   stack: "One project per row: the main photo across the whole screen, a tight row of photos, then title and buttons.",
+  stackslide: "Like Stack, but one project at a time across the whole screen. It slides by itself and has arrows.",
   split: "Photo on one half of the screen, text on the other half. The sides swap on each project.",
   filmstrip: "One row of tall panels that slides sideways, with arrows.",
   sheet: "Square photos touching each other. Only the title shows, on hover.",

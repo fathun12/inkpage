@@ -109,11 +109,14 @@ function Details({ item, clamp = false }: { item: ProjectItem; clamp?: boolean }
 type Shape = { entries: Entry[]; height: number };
 
 // One project per row: the main media across the whole screen, a tight row of photos, then title and text.
-function Stack({ entries, height }: Shape) {
-  return (
-    <ul className="flex flex-col gap-16 sm:gap-28">
-      {entries.map((e, i) => (
-        <li key={e.block.id}>
+function Stack({
+  entries,
+  height,
+  slide,
+}: Shape & { slide?: { seconds: number; autoplay: boolean } }) {
+  // With slide (Stack slide): the same project, one per screen, sliding by itself.
+  const items = entries.map((e, i) => (
+        <li key={e.block.id} className={slide ? "w-full shrink-0 snap-start" : undefined}>
           <Reveal variant="still">
             <Frame entry={e} eager={i === 0} style={frame(height, "16 / 9")} />
           </Reveal>
@@ -127,9 +130,15 @@ function Stack({ entries, height }: Shape) {
             </div>
           </Reveal>
         </li>
-      ))}
-    </ul>
-  );
+  ));
+  if (slide) {
+    return (
+      <MediaSlider count={entries.length} seconds={slide.seconds} autoplay={slide.autoplay} bleed>
+        {items}
+      </MediaSlider>
+    );
+  }
+  return <ul className="flex flex-col gap-16 sm:gap-28">{items}</ul>;
 }
 
 // Media on one half of the screen, text on the other. The sides swap on each project.
@@ -301,5 +310,6 @@ export function ShowcaseWide({
   if (view === "filmstrip") return <Filmstrip entries={entries} height={height} slide={slide} />;
   if (view === "sheet") return <Sheet entries={entries} height={height} />;
   if (view === "mosaic") return <Mosaic entries={entries} height={height} />;
+  if (view === "stackslide") return <Stack entries={entries} height={height} slide={slide} />;
   return <Stack entries={entries} height={height} />;
 }
