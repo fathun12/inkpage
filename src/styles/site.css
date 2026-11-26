@@ -471,40 +471,20 @@ a:focus-visible .site-sweep {
 
 /* Entrance of the top of Home (hero, news bar, brand, tabs). Plays once per visit: SiteHeader sets
    data-entered on .site-root after 3 s. "backwards" keeps the natural style afterwards (opacity 0.7 of tabs). */
-/* Home: the hero falls as a whole from above and touches the top edge (first 60%). Then the news bar falls
-   from above and pushes it down to its place (last 40%), on the same curve, so no gap opens between them.
+/* Home: the news bar and the hero fall from above the page as ONE block, in one smooth motion (no stop in
+   between). Both move the same distance (--drop, longer than the hero), so the bar always sits right on top
+   of the hero and no white gap opens. The hero covers the screen first; the bar slides into view as it lands.
    --lag delays brand, tabs and intro on Home until the hero is down. */
 .site-root {
-  --bar-h: 0px;
+  --drop: calc(max(100svh, 28rem) + 3rem);
   --lag: 0ms;
-}
-.site-root:has(.site-bar-in) {
-  --bar-h: calc(2.25rem + 1px);
 }
 .site-root:has(.site-hero) {
   --lag: 700ms;
 }
-@keyframes site-hero-drop {
+@keyframes site-fall-in {
   from {
-    translate: 0 calc(-100% - var(--bar-h));
-    animation-timing-function: var(--ease-out);
-  }
-  60% {
-    translate: 0 calc(0px - var(--bar-h));
-    animation-timing-function: var(--ease-out);
-  }
-  to {
-    translate: 0 0;
-  }
-}
-@keyframes site-bar-drop {
-  from,
-  60% {
-    translate: 0 -100%;
-    animation-timing-function: var(--ease-out);
-  }
-  to {
-    translate: 0 0;
+    translate: 0 calc(-1 * var(--drop));
   }
 }
 @keyframes site-drop {
@@ -524,11 +504,9 @@ a:focus-visible .site-sweep {
     opacity: 0;
   }
 }
-.site-root:not([data-entered])[data-motion="full"] .site-hero {
-  animation: site-hero-drop 1000ms backwards;
-}
+.site-root:not([data-entered])[data-motion="full"] .site-hero,
 .site-root:has(.site-hero):not([data-entered])[data-motion="full"] .site-bar-in {
-  animation: site-bar-drop 1000ms backwards;
+  animation: site-fall-in 1100ms cubic-bezier(0.3, 0.7, 0.3, 1) backwards;
 }
 .site-root:not([data-entered])[data-motion="full"] .site-brand {
   animation: site-drop 900ms var(--ease-out) calc(450ms + var(--lag)) backwards;
