@@ -38,6 +38,13 @@
 .site-header[data-overlay][data-top]::before {
   transform: translateY(-100%);
 }
+/* While the entrance of Home plays, this parked white layer would sit ABOVE the falling hero (the header is
+   z-index 30, the hero has none) and paint a white strip over its top edge. The news bar (z-index 40) only
+   covers that strip once it has landed. So the layer stays invisible until the entrance is over (data-entered).
+   After that it is hidden behind the news bar, as designed. */
+.site-root:not([data-entered]) .site-header[data-overlay][data-top]::before {
+  opacity: 0;
+}
 .site-brand {
   --brand-small: clamp(calc(1.5 / 7), tan(atan2(1.5rem, 9vw)), calc(1.5 / 2.75));
   --brand-dy: -2.375rem;
