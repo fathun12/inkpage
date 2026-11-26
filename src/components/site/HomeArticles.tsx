@@ -4,7 +4,7 @@ import type { ArticleSummary } from "@/types/article";
 import { ArticleList } from "./ArticleList";
 import { Reveal } from "./Reveal";
 
-// The newest articles written inside inkpage, with a link to all of them (the Writing page).
+// The newest articles written inside inkpage, with a link to all of them (the Articles page).
 // joined = the card slider sits right above, so this section sits close to it (one section to the eye).
 export function HomeArticles({
   articles,
@@ -26,7 +26,7 @@ export function HomeArticles({
           <h2 className="font-mono text-xs uppercase tracking-widest opacity-70">{title}</h2>
         </Reveal>
         <Link
-          href={routes.section(username, "writing")}
+          href={routes.section(username, "articles")}
           className="font-mono text-xs uppercase tracking-widest hover:opacity-70"
         >
           More articles &rarr;

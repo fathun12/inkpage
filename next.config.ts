@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const sections = "projects|writing|biblia|shop|about|order|terms|privacy|refund";
+const sections = "projects|writing|articles|biblia|shop|about|order|terms|privacy|refund";
 
 // Supabase address (from the same env variable the app already uses), so Vercel may resize its public images.
 const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
