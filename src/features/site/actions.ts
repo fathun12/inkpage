@@ -38,6 +38,7 @@ const tabSlots: Record<PagesTab, Slot[]> = {
   home: ["hero", "index", "gallery"],
   projects: [],
   writing: [],
+  articles: [],
   about: ["about"],
   footer: [],
 };
@@ -66,6 +67,8 @@ const textSchema = z.object({
   projects_intro: text("The Projects text", siteLimits.intro),
   writing_title: text("The Writing title", siteLimits.title),
   writing_intro: text("The Writing text", siteLimits.intro),
+  articles_title: text("The Articles title", siteLimits.title),
+  articles_intro: text("The Articles text", siteLimits.intro),
   about_title: text("The About title", siteLimits.title),
   about_body: text("The About text", siteLimits.aboutBody),
   footer_note: text("The footer note", siteLimits.footerNote),
@@ -173,6 +176,8 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     projects_intro: field(formData, "projects_intro"),
     writing_title: field(formData, "writing_title"),
     writing_intro: field(formData, "writing_intro"),
+    articles_title: field(formData, "articles_title"),
+    articles_intro: field(formData, "articles_intro"),
     about_title: field(formData, "about_title"),
     about_body: field(formData, "about_body"),
     footer_note: field(formData, "footer_note"),
@@ -258,6 +263,7 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
   }
   if (tab === "projects") next.projects = { title: v.projects_title ?? null, intro: v.projects_intro ?? null };
   if (tab === "writing") next.writing = { title: v.writing_title ?? null, intro: v.writing_intro ?? null };
+  if (tab === "articles") next.articles = { title: v.articles_title ?? null, intro: v.articles_intro ?? null };
   if (tab === "about") {
     next.about = { title: v.about_title ?? null, body: v.about_body ?? null, photo: got("about")[0] ?? null };
   }

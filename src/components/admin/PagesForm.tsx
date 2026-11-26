@@ -219,7 +219,7 @@ export function PageTextForm({
   name,
   value,
   action,
-}: Base & { tab: "projects" | "writing"; name: string; value: PageText }) {
+}: Base & { tab: "projects" | "writing" | "articles"; name: string; value: PageText }) {
   return (
     <TabForm tab={tab} action={action} label={`Save ${name} page text`}>
       <Section title={`${name} page`} hint="Title and text at the top of the page." open>

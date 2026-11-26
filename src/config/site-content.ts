@@ -102,6 +102,7 @@ export type SiteSettings = {
   credits: Record<string, string>;
   projects: PageText;
   writing: PageText;
+  articles: PageText;
   about: AboutText;
   footerNote: string | null;
   // Email and WhatsApp number (digits with country code) of the footer Connect column.
@@ -210,6 +211,7 @@ export function readSite(raw: unknown): SiteSettings {
   const r = obj(raw);
   const projects = obj(r.projects);
   const writing = obj(r.writing);
+  const articles = obj(r.articles);
   const about = obj(r.about);
   const news = Array.isArray(r.news)
     ? r.news.slice(0, siteLimits.news).flatMap((item): NewsItem[] => {
@@ -241,6 +243,7 @@ export function readSite(raw: unknown): SiteSettings {
     credits: creditMap(r.credits),
     projects: { title: text(projects.title, siteLimits.title), intro: text(projects.intro, siteLimits.intro) },
     writing: { title: text(writing.title, siteLimits.title), intro: text(writing.intro, siteLimits.intro) },
+    articles: { title: text(articles.title, siteLimits.title), intro: text(articles.intro, siteLimits.intro) },
     about: {
       title: text(about.title, siteLimits.title),
       body: text(about.body, siteLimits.aboutBody),

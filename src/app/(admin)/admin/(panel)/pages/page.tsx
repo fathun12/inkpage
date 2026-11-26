@@ -72,6 +72,18 @@ export default async function PagesPage({ searchParams }: Props) {
         </>
       )}
 
+      {tab === "articles" && (
+        <>
+          <PageTextForm key={formKey} tab="articles" name="Articles" value={site.articles} action={saveSiteAction} />
+          <p className="text-sm text-ink-soft">The articles themselves are written and managed in Write.</p>
+          <div>
+            <ButtonLink href={routes.write} size="sm">
+              Open Write
+            </ButtonLink>
+          </div>
+        </>
+      )}
+
       {tab === "about" && <AboutForm key={formKey} action={saveSiteAction} sign={signSiteUploadAction} site={site} />}
       {tab === "footer" && <FooterForm key={formKey} action={saveSiteAction} site={site} />}
     </div>

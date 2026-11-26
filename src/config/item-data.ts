@@ -35,13 +35,14 @@ export const logoLabels: Record<DownloadLogo, string> = {
 export const downloadWord = "Download";
 
 // Tabs of the Pages screen (/admin/pages?tab=...).
-export const pagesTabs = ["home", "projects", "writing", "about", "footer"] as const;
+export const pagesTabs = ["home", "projects", "writing", "articles", "about", "footer"] as const;
 export type PagesTab = (typeof pagesTabs)[number];
 
 export const pagesTabLabels: Record<PagesTab, string> = {
   home: "Home",
   projects: "Projects",
   writing: "Writing",
+  articles: "Articles",
   about: "About",
   footer: "Footer",
 };

@@ -57,7 +57,7 @@ export function buildNav(
     { label: "Home", href: base },
     { label: site.projects.title ?? "Projects", href: `${base}/projects` },
     { label: site.writing.title ?? "Writing", href: `${base}/writing` },
-    ...(hasArticles ? [{ label: "Articles", href: `${base}/articles` }] : []),
+    ...(hasArticles ? [{ label: site.articles.title ?? "Articles", href: `${base}/articles` }] : []),
     ...(site.bibliaUrl ? [{ label: site.bibliaTitle ?? "Biblia", href: `${base}/biblia` }] : []),
     ...(shop ? [{ label: shop.label, href: `${base}/shop` }] : []),
     ...(hasAbout(site) ? [{ label: site.about.title ?? "About", href: `${base}/about` }] : []),

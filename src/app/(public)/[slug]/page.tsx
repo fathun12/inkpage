@@ -84,7 +84,7 @@ export default async function HomePage({ params }: Props) {
   const contents = [
     countdown && { id: "countdown", label: "Countdown" },
     writing.length > 0 && { id: "writing", label: site.cardsTitle ?? site.writing.title ?? "Writing" },
-    articles.length > 0 && { id: "articles", label: "Articles" },
+    articles.length > 0 && { id: "articles", label: site.articles.title ?? "Articles" },
     projects.length > 0 && { id: "projects", label: site.projects.title ?? "Projects" },
     biblia && biblia.books.length > 0 && { id: "biblia", label: site.bibliaTitle ?? "Biblia" },
     github && { id: "github", label: site.githubTitle ?? "GitHub" },
@@ -139,7 +139,7 @@ export default async function HomePage({ params }: Props) {
       <HomeArticles
         articles={articles}
         username={profile.username}
-        title="Articles"
+        title={site.articles.title ?? "Articles"}
         joined={writing.length > 0}
       />
       <HomeProjects items={projects} title={site.projects.title ?? "Projects"} />
