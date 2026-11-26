@@ -46,7 +46,7 @@ export function Hero({ slides, name, caption, seconds, autoplay, gray, credits =
   return (
     <section
       id="top"
-      className="site-hero site-hero-in relative h-[var(--site-vh,100svh)] min-h-[28rem] w-full overflow-hidden site-black"
+      className="site-hero relative h-[var(--site-vh,100svh)] min-h-[28rem] w-full overflow-hidden site-black"
     >
       {count > 0 && (
         <div className="site-hero-track" style={{ transform: `translateX(-${at * 100}%)` }}>
