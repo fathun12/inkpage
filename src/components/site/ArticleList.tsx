@@ -5,11 +5,17 @@ import { formatArticleDate } from "@/lib/article-doc";
 import type { ArticleSummary } from "@/types/article";
 import { Reveal } from "./Reveal";
 
-type Props = { articles: ArticleSummary[]; username: string; previews?: boolean };
+type Props = {
+  articles: ArticleSummary[];
+  username: string;
+  // The Articles page: cover plus an extra line of the excerpt.
+  previews?: boolean;
+  // Home: only the cover is added (at the right, when the article has one).
+  covers?: boolean;
+};
 
 // Articles written inside inkpage. Newest first (the query sorts).
-// previews = the Articles page: each row also shows the cover and the excerpt. Home keeps the plain list.
-export function ArticleList({ articles, username, previews = false }: Props) {
+export function ArticleList({ articles, username, previews = false, covers = false }: Props) {
   return (
     <ul className="mx-auto flex max-w-5xl flex-col px-5 pb-12 pt-4 sm:px-8">
       {articles.map((article, index) => {
@@ -18,22 +24,20 @@ export function ArticleList({ articles, username, previews = false }: Props) {
           .filter(Boolean)
           .join(" · ");
         const lead = article.subtitle ?? article.excerpt;
+        const cover = previews || covers ? article.cover_url : null;
         return (
           <li key={article.id} className="border-t border-tertiary first:border-t-0">
             <Reveal delay={Math.min(index, 6) * 60}>
               <Link
                 href={routes.article(username, article.slug)}
                 className={
-                  previews
+                  cover
                     ? "flex flex-col gap-5 py-8 hover:opacity-80 sm:flex-row sm:items-start sm:gap-8"
                     : "block py-8 hover:opacity-80"
                 }
               >
-                {previews && article.cover_url && (
-                  <Img
-                    src={article.cover_url}
-                    className="aspect-2/1 w-full shrink-0 bg-surface object-cover sm:order-last sm:w-64"
-                  />
+                {cover && (
+                  <Img src={cover} className="aspect-2/1 w-full shrink-0 bg-surface object-cover sm:order-last sm:w-64" />
                 )}
                 <span className="block min-w-0 flex-1">
                   <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">{meta}</span>

@@ -32,7 +32,7 @@ export function HomeArticles({
           More articles &rarr;
         </Link>
       </div>
-      <ArticleList articles={shown} username={username} />
+      <ArticleList articles={shown} username={username} covers />
     </section>
   );
 }
