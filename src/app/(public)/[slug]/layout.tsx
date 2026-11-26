@@ -10,6 +10,7 @@ import { readFonts } from "@/config/font-choices";
 import { readSite } from "@/config/site-content";
 import { readSiteStyle } from "@/config/site-style";
 import { routes } from "@/config/site";
+import { getPublicArticles } from "@/features/articles/queries";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
 import { getPublicShop } from "@/features/shop/public";
@@ -29,7 +30,8 @@ export default async function SiteLayout({ children, params }: Props) {
   const style = readSiteStyle(profile.site_style);
   const base = routes.profile(profile.username);
   const music = musicEmbed(site.musicUrl);
-  const shop = await getPublicShop(profile.id);
+  const [shop, articles] = await Promise.all([getPublicShop(profile.id), getPublicArticles(profile.id)]);
+  const nav = buildNav(base, site, { label: shop.settings.home_title ?? "Shop" }, articles.length > 0);
   // The same countdown as the Home section: the nearest one that has not come yet. The bars hide it by themselves once the time has come.
   const timer = homeCountdown(blocks);
   const countdown = timer && timer.data.target ? { title: timer.title, target: timer.data.target } : null;
@@ -46,7 +48,7 @@ export default async function SiteLayout({ children, params }: Props) {
       <SiteHeader
         brand={profile.username}
         home={base}
-        items={buildNav(base, site, { label: shop.settings.home_title ?? "Shop" })}
+        items={nav}
       />
       {children}
       <SiteFooter
@@ -57,7 +59,7 @@ export default async function SiteLayout({ children, params }: Props) {
         socials={socialsOf(blocks)}
         contactEmail={site.contactEmail}
         whatsapp={site.whatsapp}
-        nav={buildNav(base, site, { label: shop.settings.home_title ?? "Shop" })}
+        nav={nav}
         news={{
           items: site.news,
           seconds: style.heroSeconds,

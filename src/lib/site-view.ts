@@ -45,12 +45,19 @@ export function socialsOf(blocks: Block[]): SocialItem[] {
   return blocks.flatMap((b) => (b.type === "socials" ? (b.data.items ?? []) : []));
 }
 
-// The menu: Home, Projects and Writing are always there. About shows up once it has content.
-export function buildNav(base: string, site: SiteSettings, shop: { label: string } | null = null) {
+// The menu: Home, Projects and Writing are always there. Articles shows up once one is published.
+// About shows up once it has content.
+export function buildNav(
+  base: string,
+  site: SiteSettings,
+  shop: { label: string } | null = null,
+  hasArticles = false,
+) {
   return [
     { label: "Home", href: base },
     { label: site.projects.title ?? "Projects", href: `${base}/projects` },
     { label: site.writing.title ?? "Writing", href: `${base}/writing` },
+    ...(hasArticles ? [{ label: "Articles", href: `${base}/articles` }] : []),
     ...(site.bibliaUrl ? [{ label: site.bibliaTitle ?? "Biblia", href: `${base}/biblia` }] : []),
     ...(shop ? [{ label: shop.label, href: `${base}/shop` }] : []),
     ...(hasAbout(site) ? [{ label: site.about.title ?? "About", href: `${base}/about` }] : []),
