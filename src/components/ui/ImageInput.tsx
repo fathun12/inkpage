@@ -1,10 +1,10 @@
 "use client";
 
-import Cropper, { type Area } from "react-easy-crop";
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useCrop } from "@/components/ui/CropDialog";
 import { Input } from "@/components/ui/Field";
 import { cropPresets, cropQuality, type CropKind } from "@/config/crops";
-import { centerArea, cropToFile, loadImage, type PixelArea } from "@/lib/image-crop";
+import { loadImage, resizeToFile } from "@/lib/image-crop";
 
 type Props = {
   id: string;
@@ -24,31 +24,16 @@ function putFiles(input: HTMLInputElement, files: File[]) {
   input.files = transfer.files;
 }
 
-function jpgName(name: string) {
-  return `${name.replace(/\.[^.]+$/, "") || "image"}.jpg`;
-}
-
-// File input with a crop step. The cropped, resized JPEG replaces the chosen file,
-// so the form sends a small file and the server action stays unchanged.
+// File input with a crop window (Free, 1:1, 4:5, 3:2, 16:9, Portrait or Landscape).
+// The cropped, resized file replaces the chosen file, so the form sends a small file and the server action stays unchanged.
+// "Use original" keeps the whole picture and only makes it smaller.
 export function ImageInput({ id, name, kind, accept, multiple, required, onFile }: Props) {
   const preset = cropPresets[kind];
   const wrapRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const imageRef = useRef<Promise<HTMLImageElement> | null>(null);
-  const nameRef = useRef("image.jpg");
   const runRef = useRef(0);
-
-  const [source, setSource] = useState<string | null>(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
   const [previews, setPreviews] = useState<string[]>([]);
   const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    return () => {
-      if (source) URL.revokeObjectURL(source);
-    };
-  }, [source]);
+  const { ask, dialog } = useCrop();
 
   useEffect(() => {
     return () => {
@@ -56,13 +41,12 @@ export function ImageInput({ id, name, kind, accept, multiple, required, onFile 
     };
   }, [previews]);
 
-  // The form is reset after a successful save, so clear the crop panel too.
+  // The form is reset after a successful save, so clear the previews too.
   useEffect(() => {
     const form = wrapRef.current?.closest("form");
     if (!form) return;
     function clear() {
       runRef.current += 1;
-      setSource(null);
       setPreviews([]);
       setMessage("");
     }
@@ -70,78 +54,64 @@ export function ImageInput({ id, name, kind, accept, multiple, required, onFile 
     return () => form.removeEventListener("reset", clear);
   }, []);
 
-  async function apply(area: PixelArea) {
-    runRef.current += 1;
-    const ticket = runRef.current;
-    const input = inputRef.current;
-    const loading = imageRef.current;
-    if (!input || !loading) return;
-    try {
-      const img = await loading;
-      const file = await cropToFile(img, area, preset.aspect, preset.maxPx, cropQuality, nameRef.current);
-      if (ticket !== runRef.current) return;
-      putFiles(input, [file]);
-      onFile?.(file);
-      setMessage(`Ready to upload: ${Math.max(1, Math.round(file.size / 1024))} KB. Drag to move, slide to zoom.`);
-    } catch {
-      if (ticket === runRef.current) setMessage(readError);
-    }
-  }
-
   async function handleChange(event: ChangeEvent<HTMLInputElement>) {
     const input = event.currentTarget;
-    inputRef.current = input;
     const files = Array.from(input.files ?? []);
     runRef.current += 1;
     const run = runRef.current;
-    setSource(null);
     setPreviews([]);
     if (files.length === 0) {
       onFile?.(null);
       setMessage("");
       return;
     }
-    setMessage("Preparing image...");
+    setMessage("");
 
+    const out: File[] = [];
     try {
-      if (multiple) {
-        const out: File[] = [];
-        for (const file of files) {
+      for (const [index, file] of files.entries()) {
+        const picked = await ask(file, {
+          maxPx: preset.maxPx,
+          quality: cropQuality,
+          type: "jpeg",
+          aspect: preset.aspect,
+          note: files.length > 1 ? `Image ${index + 1} of ${files.length}` : undefined,
+        });
+        if (run !== runRef.current) return;
+        if (!picked) continue;
+        if (picked === file) {
           const url = URL.createObjectURL(file);
           try {
             const img = await loadImage(url);
-            const area = centerArea(img.naturalWidth, img.naturalHeight, preset.aspect);
-            out.push(await cropToFile(img, area, preset.aspect, preset.maxPx, cropQuality, jpgName(file.name)));
+            out.push(await resizeToFile(img, preset.maxPx, cropQuality, file.name));
           } finally {
             URL.revokeObjectURL(url);
           }
+        } else {
+          out.push(picked);
         }
-        if (run !== runRef.current) return;
-        putFiles(input, out);
-        setPreviews(out.map((file) => URL.createObjectURL(file)));
-        setMessage(`${out.length} image(s) ready. Each one is cropped to the centre and resized.`);
-        return;
       }
-
-      const url = URL.createObjectURL(files[0]);
-      nameRef.current = jpgName(files[0].name);
-      imageRef.current = loadImage(url);
-      const img = await imageRef.current;
-      if (run !== runRef.current) {
-        URL.revokeObjectURL(url);
-        return;
-      }
-      setCrop({ x: 0, y: 0 });
-      setZoom(1);
-      setSource(url);
-      await apply(centerArea(img.naturalWidth, img.naturalHeight, preset.aspect));
     } catch {
       if (run === runRef.current) {
         input.value = "";
         onFile?.(null);
         setMessage(readError);
       }
+      return;
     }
+    if (run !== runRef.current) return;
+
+    if (out.length === 0) {
+      input.value = "";
+      onFile?.(null);
+      setMessage("No image chosen.");
+      return;
+    }
+    putFiles(input, out);
+    if (!multiple) onFile?.(out[0]);
+    setPreviews(out.map((file) => URL.createObjectURL(file)));
+    const kb = Math.max(1, Math.round(out.reduce((sum, file) => sum + file.size, 0) / 1024));
+    setMessage(`${out.length} image${out.length === 1 ? "" : "s"} ready to upload: ${kb} KB.`);
   }
 
   return (
@@ -155,45 +125,15 @@ export function ImageInput({ id, name, kind, accept, multiple, required, onFile 
         required={required}
         onChange={handleChange}
       />
-
-      {source && (
-        <>
-          <div className="ink-border relative h-72 w-full overflow-hidden rounded-md bg-ink">
-            <Cropper
-              image={source}
-              crop={crop}
-              zoom={zoom}
-              aspect={preset.aspect}
-              showGrid
-              onCropChange={setCrop}
-              onZoomChange={setZoom}
-              onCropComplete={(_area: Area, pixels: Area) => {
-                void apply(pixels);
-              }}
-            />
-          </div>
-          <label className="flex items-center gap-3 font-mono text-xs uppercase tracking-widest text-ink-soft">
-            Zoom
-            <input
-              type="range"
-              min={1}
-              max={3}
-              step={0.01}
-              value={zoom}
-              onChange={(event) => setZoom(Number(event.target.value))}
-              className="w-full accent-accent"
-            />
-          </label>
-        </>
-      )}
+      {dialog}
 
       {previews.length > 0 && (
         <ul className="grid grid-cols-3 gap-2">
           {previews.map((url) => (
             <li
               key={url}
-              className="ink-border rounded-sm bg-cover bg-center"
-              style={{ aspectRatio: preset.aspect, backgroundImage: `url(${url})` }}
+              className="ink-border aspect-square rounded-sm bg-contain bg-center bg-no-repeat"
+              style={{ backgroundImage: `url(${url})` }}
             />
           ))}
         </ul>

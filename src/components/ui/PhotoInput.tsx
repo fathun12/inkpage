@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, type ChangeEvent } from "react";
+import { useCrop } from "@/components/ui/CropDialog";
 import { Input } from "@/components/ui/Field";
 import { Notice } from "@/components/ui/Notice";
 import { mediaConfig } from "@/config/media";
@@ -27,6 +28,7 @@ export function PhotoInput({ id, name, sign, onFile }: Props) {
   const runRef = useRef(0);
   const [path, setPath] = useState("");
   const [note, setNote] = useState<Note>(null);
+  const { ask, dialog } = useCrop();
 
   function lockSave(locked: boolean) {
     const form = wrapRef.current?.closest("form");
@@ -64,22 +66,38 @@ export function PhotoInput({ id, name, sign, onFile }: Props) {
       return fail(input, `This photo is ${(file.size / MB).toFixed(1)} MB. The limit is ${photo.maxMb} MB.`);
     }
 
+    const picked = await ask(file, { maxPx: 8000, quality: 0.95, type: "webp" });
+    if (run !== runRef.current) return;
+    if (!picked) {
+      input.value = "";
+      onFile?.(null);
+      setNote(null);
+      return;
+    }
+    const original = picked === file;
+    if (picked.size > photo.maxMb * MB) {
+      return fail(input, `The cropped photo is ${(picked.size / MB).toFixed(1)} MB. The limit is ${photo.maxMb} MB.`);
+    }
+
     lockSave(true);
     try {
-      setNote({ tone: "info", text: "Uploading the original photo... keep this page open." });
-      const signed = await sign({ name: file.name, type: file.type, size: file.size });
+      setNote({
+        tone: "info",
+        text: `Uploading the ${original ? "original" : "cropped"} photo... keep this page open.`,
+      });
+      const signed = await sign({ name: picked.name, type: picked.type, size: picked.size });
       if (run !== runRef.current) return;
       if ("error" in signed) return fail(input, signed.error);
 
-      const failure = await uploadToSignedPath(mediaConfig.bucket, signed.path, signed.token, file);
+      const failure = await uploadToSignedPath(mediaConfig.bucket, signed.path, signed.token, picked);
       if (run !== runRef.current) return;
       if (failure) return fail(input, `Upload failed: ${failure}`);
 
       setPath(signed.path);
-      onFile?.(file);
+      onFile?.(picked);
       setNote({
         tone: "info",
-        text: `Uploaded (${(file.size / MB).toFixed(1)} MB, original quality). Now press Save changes to use it.`,
+        text: `Uploaded (${(picked.size / MB).toFixed(1)} MB${original ? ", original quality" : ""}). Now press Save changes to use it.`,
       });
       lockSave(false);
     } catch {
@@ -90,6 +108,7 @@ export function PhotoInput({ id, name, sign, onFile }: Props) {
   return (
     <div ref={wrapRef} className="flex flex-col gap-2">
       <Input id={id} type="file" accept={photo.accept} onChange={handleChange} />
+      {dialog}
       <input type="hidden" name={name} value={path} />
       {note?.tone === "error" && <Notice>{note.text}</Notice>}
       {note?.tone === "info" && (

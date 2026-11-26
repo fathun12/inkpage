@@ -47,13 +47,15 @@ export function HomeCountdown({ title, description, target, start }: Props) {
         {description && (
           <p className="mx-auto mt-4 max-w-md whitespace-pre-line text-ink-soft">{description}</p>
         )}
-        <div role="timer" className="mx-auto mt-10 grid max-w-xl grid-cols-2 gap-y-8 sm:grid-cols-4">
+        <div role="timer" className="mx-auto mt-10 grid max-w-xl grid-cols-4">
           {parts.map(([label, value]) => (
-            <div key={label} className="border-l border-line px-2 odd:border-l-0 sm:odd:border-l sm:first:border-l-0">
-              <p className="font-voice text-5xl tabular-nums leading-none sm:text-6xl">
+            <div key={label} className="min-w-0 border-l border-line px-1 first:border-l-0 sm:px-2">
+              <p className="font-voice text-[clamp(1.75rem,9.5vw,3.75rem)] tabular-nums leading-none">
                 {ready ? String(value).padStart(2, "0") : "--"}
               </p>
-              <p className="mt-2 font-mono text-[11px] uppercase tracking-[0.2em] text-ink-soft">{label}</p>
+              <p className="mt-2 font-mono text-[clamp(7px,2.2vw,11px)] uppercase tracking-[0.1em] text-ink-soft sm:tracking-[0.2em]">
+                {label}
+              </p>
             </div>
           ))}
         </div>

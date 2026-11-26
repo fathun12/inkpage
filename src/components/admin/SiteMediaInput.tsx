@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, type ChangeEvent } from "react";
+import { useCrop } from "@/components/ui/CropDialog";
 import { Input, Select } from "@/components/ui/Field";
 import { Img } from "@/components/ui/Img";
 import { itemLimits, ratioLabels } from "@/config/item-data";
@@ -48,6 +49,7 @@ function Thumb({ src, kind }: { src: string; kind: MediaKind }) {
 // and "Remove" boxes tell the server which saved files to drop.
 export function SiteMediaInput({ slot, current, max, sign, credits, files, inputId, noCredit }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
+  const { ask, dialog } = useCrop();
   const item = files !== undefined;
   const [removed, setRemoved] = useState<string[]>([]);
   const [added, setAdded] = useState<Added[]>([]);
@@ -104,8 +106,17 @@ export function SiteMediaInput({ slot, current, max, sign, credits, files, input
           problems.push(`${file.name} is ${(file.size / MB).toFixed(1)} MB. The limit is ${rules.maxMb} MB.`);
           continue;
         }
+        // Still pictures open the crop window. A GIF or a video comes back at once. Cancel skips this file.
+        const chosen = await ask(file, {
+          maxPx: rules.maxPx,
+          quality: rules.quality,
+          type: "webp",
+          aspect: slot === "product" ? 1 : undefined,
+          note: picked.length > 1 ? `Image ${picked.indexOf(file) + 1} of ${picked.length}` : undefined,
+        });
+        if (!chosen) continue;
         setNote({ tone: "info", text: `Preparing ${file.name}...` });
-        const ready = await prepareSiteImage(file);
+        const ready = chosen === file ? await prepareSiteImage(file) : chosen;
         setNote({ tone: "info", text: `Uploading ${file.name}... keep this page open.` });
         const signed = await sign({ name: ready.name, type: ready.type, size: ready.size });
         if ("error" in signed) {
@@ -149,6 +160,7 @@ export function SiteMediaInput({ slot, current, max, sign, credits, files, input
       setAdded((list) => (single ? [done[done.length - 1]] : [...list, ...done]));
     }
     if (problems.length > 0) setNote({ tone: "error", text: problems.join(" ") });
+    else if (done.length === 0) setNote(null);
     else {
       const smaller = shrunk.length > 0 ? ` Made smaller: ${shrunk.join(" ")}` : "";
       setNote({
@@ -174,7 +186,10 @@ export function SiteMediaInput({ slot, current, max, sign, credits, files, input
   }
 
   const picker = (
-    <Input id={inputId ?? `site-${slot}`} type="file" accept={accept} multiple={!single} onChange={handleChange} />
+    <>
+      <Input id={inputId ?? `site-${slot}`} type="file" accept={accept} multiple={!single} onChange={handleChange} />
+      {dialog}
+    </>
   );
   const message = note && (
     <p role="status" className={note.tone === "error" ? "text-xs text-accent" : "font-mono text-xs text-ink-soft"}>

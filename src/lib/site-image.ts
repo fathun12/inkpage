@@ -5,7 +5,7 @@ const stills = ["image/jpeg", "image/png", "image/webp"];
 
 // An animated WebP would turn into one still picture on a canvas, so it is left as it is.
 // The WebP header tells: bytes 8 to 15 are "WEBPVP8X" and bit 2 of byte 20 means "animation".
-async function isAnimatedWebp(file: File): Promise<boolean> {
+export async function isAnimatedWebp(file: File): Promise<boolean> {
   const head = new Uint8Array(await file.slice(0, 32).arrayBuffer());
   const text = (from: number, to: number) =>
     Array.from(head.subarray(from, to), (c) => String.fromCharCode(c)).join("");

@@ -51,8 +51,9 @@ function MediaField({ id, current, sign }: { id: string; current: string[]; sign
     <>
       <p className="text-xs text-ink-soft">
         JPG, PNG, WebP, GIF, MP4 or WebM, up to {mediaConfig.siteMedia.maxMb} MB each, up to {L.media} files. The first
-        one is the cover. To change the cover, remove files and add them again in the order you want. A file uploads as
-        soon as you pick it, then press Save.
+        one is the cover. To change the cover, remove files and add them again in the order you want. Photos open a
+        crop window, square (1:1) by default. GIFs and videos are not cropped: the shop shows them cut to a square. A
+        file uploads as soon as you pick it, then press Save.
       </p>
       <SiteMediaInput
         slot="product"

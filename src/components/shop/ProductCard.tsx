@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { shopConfig } from "@/config/shop";
+import { productCrop } from "@/config/crops";
 import { productState } from "@/lib/shop-status";
 import type { Product } from "@/types/shop";
 import { ProductMedia } from "./ProductMedia";
@@ -13,9 +13,9 @@ export function ProductCard({ product, open, href, eager = false }: Props) {
   return (
     <Link href={href} className="group flex h-full flex-col gap-4">
       {cover ? (
-        <ProductMedia url={cover} alt={product.title} aspect={shopConfig.cardAspect} eager={eager} />
+        <ProductMedia url={cover} alt={product.title} aspect={productCrop.css} eager={eager} />
       ) : (
-        <div aria-hidden className="w-full border border-line" style={{ aspectRatio: shopConfig.cardAspect }} />
+        <div aria-hidden className="w-full border border-line" style={{ aspectRatio: productCrop.css }} />
       )}
       <div className="flex flex-col gap-1">
         <h3 className="font-display text-2xl leading-tight underline-offset-4 group-hover:underline">{product.title}</h3>

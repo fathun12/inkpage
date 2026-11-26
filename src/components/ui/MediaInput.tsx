@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ChangeEvent } from "react";
+import { useCrop } from "@/components/ui/CropDialog";
 import { Input } from "@/components/ui/Field";
 import { Img } from "@/components/ui/Img";
 import { mediaConfig } from "@/config/media";
@@ -28,6 +29,7 @@ export function MediaInput({ id, name, allowGif }: Props) {
   const runRef = useRef(0);
   const [preview, setPreview] = useState<string | null>(null);
   const [status, setStatus] = useState<Status | null>(null);
+  const { ask, dialog } = useCrop();
 
   useEffect(() => {
     return () => {
@@ -85,11 +87,19 @@ export function MediaInput({ id, name, allowGif }: Props) {
       return reject(`This image is too large to prepare. Use one under ${cm.maxSourceMb} MB.`);
     }
 
+    const picked = await ask(file, { maxPx: cm.maxPx, quality: cm.quality, type: "webp" });
+    if (run !== runRef.current) return;
+    if (!picked) {
+      input.value = "";
+      setStatus(null);
+      return;
+    }
+
     setStatus({ text: "Preparing image...", error: false });
     const url = URL.createObjectURL(file);
     try {
       const img = await loadImage(url);
-      const out = await resizeToFile(img, cm.maxPx, cm.quality, file.name);
+      const out = picked === file ? await resizeToFile(img, cm.maxPx, cm.quality, file.name) : picked;
       if (run !== runRef.current) return;
       if (out.size > cm.maxImageMb * MB) {
         return reject(
@@ -109,6 +119,7 @@ export function MediaInput({ id, name, allowGif }: Props) {
   return (
     <div ref={wrapRef} className="flex flex-col gap-3">
       <Input id={id} name={name} type="file" accept={cm.accept} onChange={handleChange} />
+      {dialog}
       {preview && (
         <Img src={preview} className="ink-border h-24 w-auto max-w-full self-start rounded-sm bg-surface object-contain" />
       )}
