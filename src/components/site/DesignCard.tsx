@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { Img } from "@/components/ui/Img";
 import type { DesignProject } from "@/types/designs";
 import { DesignStrip } from "./DesignStrip";
@@ -19,29 +20,33 @@ export function DesignCard({
 }) {
   return (
     <a href={project.href} target="_blank" rel="noopener noreferrer" className="group block">
-      <span className="relative block overflow-hidden transition-transform duration-(--dur-base) group-hover:-translate-y-1">
-        {project.cover ? (
-          <Img
-            src={project.cover}
-            alt={`Cover of ${project.title}`}
-            className="site-media-reveal aspect-[4/3] w-full object-cover"
-          />
-        ) : (
-          <span className="flex aspect-[4/3] w-full items-end bg-surface p-3 font-display text-xl leading-tight">
-            {project.title}
+      <span className="site-media-pop block">
+        <span className="relative block overflow-hidden transition-transform duration-(--dur-base) group-hover:-translate-y-1">
+          {project.cover ? (
+            <Img
+              src={project.cover}
+              alt={`Cover of ${project.title}`}
+              className="aspect-[4/3] w-full object-cover"
+            />
+          ) : (
+            <span className="flex aspect-[4/3] w-full items-end bg-surface p-3 font-display text-xl leading-tight">
+              {project.title}
+            </span>
+          )}
+          <span className="absolute left-2 top-2 bg-bg px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-ink">
+            {kindLabel[project.kind]}
           </span>
-        )}
-        <span className="absolute left-2 top-2 bg-bg px-2 py-1 font-mono text-[10px] uppercase tracking-widest text-ink">
-          {kindLabel[project.kind]}
         </span>
       </span>
-      <DesignStrip
-        photos={project.photos}
-        alt={`Documentation of ${project.title}`}
-        seconds={seconds}
-        autoplay={autoplay}
-        offset={offset}
-      />
+      <span className="site-media-pop block" style={{ "--pop-delay": "120ms" } as CSSProperties}>
+        <DesignStrip
+          photos={project.photos}
+          alt={`Documentation of ${project.title}`}
+          seconds={seconds}
+          autoplay={autoplay}
+          offset={offset}
+        />
+      </span>
       <span className="mt-3 block font-display text-lg leading-tight underline-offset-4 group-hover:underline">
         {project.title}
       </span>

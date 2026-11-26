@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { Img } from "@/components/ui/Img";
 import { projectLayout, ratioAspect } from "@/config/item-data";
 import { routes } from "@/config/site";
@@ -23,14 +24,24 @@ type Props = {
 };
 
 // One media: the frame follows the Ratio of the file. No border, no shadow, sharp corners.
-export function ItemMedia({ file, eager, height }: { file: ProjectFile; eager: boolean; height?: number }) {
+export function ItemMedia({
+  file,
+  eager,
+  height,
+  index = 0,
+}: {
+  file: ProjectFile;
+  eager: boolean;
+  height?: number;
+  // Position among the media shown together: each one starts 120 ms after the one before it.
+  index?: number;
+}) {
   const fill =
-    "site-media-reveal absolute inset-0 size-full object-cover transition-[scale] duration-500 ease-out group-hover/media:scale-105 motion-reduce:transition-none motion-reduce:group-hover/media:scale-100";
+    "absolute inset-0 size-full object-cover transition-[scale] duration-500 ease-out group-hover/media:scale-105 motion-reduce:transition-none motion-reduce:group-hover/media:scale-100";
+  const base: CSSProperties = height ? { height: `${height}rem` } : { aspectRatio: ratioAspect[file.ratio] };
+  const frame = { ...base, "--pop-delay": `${index * 120}ms` } as CSSProperties;
   return (
-    <div
-      className="group/media relative w-full overflow-hidden bg-surface"
-      style={height ? { height: `${height}rem` } : { aspectRatio: ratioAspect[file.ratio] }}
-    >
+    <div className="site-media-pop group/media relative w-full overflow-hidden bg-surface" style={frame}>
       {file.kind === "video" ? (
         <video
           src={file.url}
@@ -92,7 +103,7 @@ export function ProjectCard({
         {hasMedia && (
           <Reveal variant="still" className={side ? "grid grid-cols-2 gap-3" : "flex flex-col gap-3"}>
             {shown.map((file, i) => (
-              <ItemMedia key={file.url} file={file} eager={first && i === 0} height={mediaHeight} />
+              <ItemMedia key={file.url} file={file} eager={first && i === 0} height={mediaHeight} index={i} />
             ))}
           </Reveal>
         )}

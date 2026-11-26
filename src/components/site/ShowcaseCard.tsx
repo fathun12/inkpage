@@ -45,9 +45,9 @@ export function ShowcaseCard({ block, first = false }: { block: Block; first?: b
       {photos.length > 0 && (
         <Reveal variant="still">
           <ul className={`grid items-start gap-3 ${photoColumns[photos.length]}`}>
-            {photos.map((file) => (
+            {photos.map((file, i) => (
               <li key={file.url}>
-                <ItemMedia file={file} eager={false} />
+                <ItemMedia file={file} eager={false} index={i} />
               </li>
             ))}
           </ul>
