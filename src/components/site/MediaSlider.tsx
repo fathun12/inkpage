@@ -2,12 +2,19 @@
 
 import { useCallback, useEffect, useRef, type ReactNode } from "react";
 
-type Props = { count: number; seconds: number; autoplay: boolean; children: ReactNode };
+type Props = {
+  count: number;
+  seconds: number;
+  autoplay: boolean;
+  // Full width use: the arrows and the first photo keep the side space of the page.
+  inset?: boolean;
+  children: ReactNode;
+};
 
 // The row of extra media under a project on the Projects page. It slides by itself, stops while the pointer
 // is over it, and can be swiped or moved with the arrows. Same behavior as the Writing cards on Home.
 // The tiles come in as children (made on the server), so this file stays small.
-export function MediaSlider({ count, seconds, autoplay, children }: Props) {
+export function MediaSlider({ count, seconds, autoplay, inset = false, children }: Props) {
   const track = useRef<HTMLUListElement>(null);
   const paused = useRef(false);
 
@@ -53,7 +60,7 @@ export function MediaSlider({ count, seconds, autoplay, children }: Props) {
   return (
     <div onPointerEnter={pause} onPointerLeave={resume} onFocus={pause} onBlur={resume}>
       {count > 1 && (
-        <div className="mb-3 flex justify-end gap-2">
+        <div className={`mb-3 flex justify-end gap-2${inset ? " px-5 sm:px-8" : ""}`}>
           <button type="button" aria-label="Previous" onClick={() => step(-1)} className={arrow}>
             ←
           </button>
@@ -64,7 +71,9 @@ export function MediaSlider({ count, seconds, autoplay, children }: Props) {
       )}
       <ul
         ref={track}
-        className="site-cards-track relative flex snap-x snap-mandatory gap-3 overflow-x-auto [--slide-h:13rem] sm:[--slide-h:16rem]"
+        className={`site-cards-track relative flex snap-x snap-mandatory gap-3 overflow-x-auto [--slide-h:13rem] sm:[--slide-h:16rem]${
+          inset ? " px-5 sm:px-8 scroll-px-5 sm:scroll-px-8" : ""
+        }`}
       >
         {children}
       </ul>

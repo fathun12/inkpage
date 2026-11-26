@@ -214,7 +214,9 @@ export default async function HomePage({ params }: Props) {
           href={site.designsUrl}
           seconds={style.gallerySeconds}
           autoplay={autoplay}
+          mode={style.designMode}
           view={style.designView}
+          wideView={style.designWideView}
           size={style.designSize}
           mediaHeight={style.designMedia}
           slide={{ seconds: style.heroSeconds, autoplay }}

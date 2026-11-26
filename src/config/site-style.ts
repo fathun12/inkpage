@@ -6,8 +6,10 @@ import { hexColor, luminance } from "@/config/background";
 import {
   countdownViews,
   densityModes,
+  designModes,
   designSizes,
   designViews,
+  designWideViews,
   layoutDefaults,
   projectSizes,
   projectViews,
@@ -18,8 +20,10 @@ import {
   sectionIds,
   type CountdownView,
   type DensityMode,
+  type DesignMode,
   type DesignSize,
   type DesignView,
+  type DesignWideView,
   type ProjectSize,
   type ProjectView,
   type SectionId,
@@ -50,7 +54,7 @@ export const styleRanges = {
   indexZoom: { min: 100, max: 250, step: 5 },
   seconds: { min: 3, max: 15, step: 1 },
   projectMedia: { min: 0, max: 40, step: 2 },
-  designMedia: { min: 0, max: 40, step: 2 },
+  designMedia: { min: 0, max: 60, step: 2 },
   designCount: { min: 3, max: 6, step: 1 },
 } as const satisfies Record<string, Range>;
 
@@ -70,6 +74,8 @@ export type SiteStyle = {
   countdownView: CountdownView;
   designSize: DesignSize;
   designView: DesignView;
+  designMode: DesignMode;
+  designWideView: DesignWideView;
   designMedia: number;
   designCount: number;
   sections: SectionSettings;
@@ -100,6 +106,8 @@ export const siteStyleDefaults: SiteStyle = {
   countdownView: layoutDefaults.countdownView,
   designSize: layoutDefaults.designSize,
   designView: layoutDefaults.designView,
+  designMode: layoutDefaults.designMode,
+  designWideView: layoutDefaults.designWideView,
   designMedia: layoutDefaults.designMedia,
   designCount: layoutDefaults.designCount,
   sections: sectionDefaults,
@@ -140,6 +148,8 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     countdownView: readChoice(r.countdownView, countdownViews, d.countdownView),
     designSize: readChoice(r.designSize, designSizes, d.designSize),
     designView: readChoice(r.designView, designViews, d.designView),
+    designMode: readChoice(r.designMode, designModes, d.designMode),
+    designWideView: readChoice(r.designWideView, designWideViews, d.designWideView),
     designMedia: num(r.designMedia, styleRanges.designMedia, d.designMedia),
     designCount: num(r.designCount, styleRanges.designCount, d.designCount),
     sections: readSections(r.sections),

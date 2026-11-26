@@ -1,6 +1,7 @@
-import type { DesignSize, DesignView } from "@/config/layout";
+import type { DesignMode, DesignSize, DesignView, DesignWideView } from "@/config/layout";
 import type { DesignsData } from "@/types/designs";
 import { DesignCard } from "./DesignCard";
+import { DesignWide } from "./DesignWide";
 import { MediaSlider } from "./MediaSlider";
 import { Reveal } from "./Reveal";
 
@@ -17,23 +18,28 @@ type Props = {
   href: string | null;
   seconds: number;
   autoplay: boolean;
-  // Chosen in Customize (Sections, Design projects). Left out = the original grid.
+  // Chosen in Customize (Sections, Design projects). Left out = the original centered grid.
+  mode?: DesignMode;
   view?: DesignView;
+  wideView?: DesignWideView;
   size?: DesignSize;
-  // Height of each cover in rem. 0 = the 4:3 shape.
+  // Height of each cover in rem. 0 = the shape that suits the layout.
   mediaHeight?: number;
-  // The slider layout slides by itself with these.
+  // The slider layouts slide by themselves with these.
   slide?: { seconds: number; autoplay: boolean };
 };
 
 // The design projects section of Home: random projects from House Showcase. It only appears when that site answered.
+// Centered = inside the page margins (Grid, List, Slider). Full width = edge to edge (DesignWide).
 export function HomeDesigns({
   data,
   title,
   href,
   seconds,
   autoplay,
+  mode = "centered",
   view = "grid",
+  wideView = "stack",
   size = "large",
   mediaHeight = 0,
   slide,
@@ -41,9 +47,12 @@ export function HomeDesigns({
   if (data.projects.length === 0) return null;
   const run = slide ?? { seconds: 5, autoplay: true };
   const last = data.projects.length - 1;
+  const wide = mode === "full";
   return (
     <section id="designs" aria-label={title} className="site-pt">
-      <div className="mx-auto flex max-w-5xl items-end justify-between gap-4 px-5 pb-8 sm:px-8">
+      <div
+        className={`flex items-end justify-between gap-4 px-5 pb-8 sm:px-8 ${wide ? "" : "mx-auto max-w-5xl"}`}
+      >
         <Reveal>
           <h2 className="font-mono text-xs uppercase tracking-widest opacity-70">{title}</h2>
         </Reveal>
@@ -59,7 +68,13 @@ export function HomeDesigns({
         )}
       </div>
 
-      {view === "grid" && (
+      {wide && (
+        <div className="site-pb">
+          <DesignWide view={wideView} projects={data.projects} height={mediaHeight} slide={run} />
+        </div>
+      )}
+
+      {!wide && view === "grid" && (
         <ul className={`mx-auto grid max-w-5xl gap-x-5 gap-y-12 px-5 sm:px-8 site-pb ${gridColumns[size]}`}>
           {data.projects.map((project, i) => (
             <li key={project.slug}>
@@ -77,7 +92,7 @@ export function HomeDesigns({
         </ul>
       )}
 
-      {view === "list" && (
+      {!wide && view === "list" && (
         <ul className="mx-auto flex max-w-5xl flex-col px-5 sm:px-8 site-pb">
           {data.projects.map((project, i) => (
             <li
@@ -100,7 +115,7 @@ export function HomeDesigns({
         </ul>
       )}
 
-      {view === "slider" && (
+      {!wide && view === "slider" && (
         <div className="mx-auto max-w-5xl px-5 sm:px-8 site-pb">
           <MediaSlider count={data.projects.length} seconds={run.seconds} autoplay={run.autoplay}>
             {data.projects.map((project, i) => (

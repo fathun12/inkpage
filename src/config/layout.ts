@@ -78,6 +78,40 @@ export const designSizeHints: Record<DesignSize, string> = {
   large: "The original size: three cards per row on a wide screen.",
 };
 
+// Design projects on Home: inside the page margins (Centered, the original) or edge to edge (Full width).
+export const designModes = ["centered", "full"] as const;
+export type DesignMode = (typeof designModes)[number];
+
+export const designModeLabels: Record<DesignMode, string> = {
+  centered: "Centered",
+  full: "Full width",
+};
+
+export const designModeHints: Record<DesignMode, string> = {
+  centered: "Inside the page margins, clean on the left and right (the original).",
+  full: "Edge to edge, like the hero and the gallery.",
+};
+
+// The Full width forms.
+export const designWideViews = ["stack", "split", "sheet", "mosaic", "filmstrip"] as const;
+export type DesignWideView = (typeof designWideViews)[number];
+
+export const designWideViewLabels: Record<DesignWideView, string> = {
+  stack: "Stack",
+  split: "Split",
+  sheet: "Contact sheet",
+  mosaic: "Mosaic",
+  filmstrip: "Filmstrip",
+};
+
+export const designWideViewHints: Record<DesignWideView, string> = {
+  stack: "One project per row: a photo across the whole screen, a tight row of photos, then the title.",
+  split: "Two columns edge to edge with tall photos.",
+  sheet: "Square photos touching each other, like a contact sheet. The title shows on hover.",
+  mosaic: "Photos of different sizes in one tight grid.",
+  filmstrip: "One row of tall photos that slides sideways, with arrows.",
+};
+
 // How the Countdown section looks.
 export const countdownViews = ["section", "strip"] as const;
 export type CountdownView = (typeof countdownViews)[number];
@@ -101,6 +135,8 @@ export const layoutDefaults: {
   countdownView: CountdownView;
   designSize: DesignSize;
   designView: DesignView;
+  designMode: DesignMode;
+  designWideView: DesignWideView;
   designMedia: number;
   designCount: number;
 } = {
@@ -111,6 +147,8 @@ export const layoutDefaults: {
   countdownView: "section",
   designSize: "large",
   designView: "grid",
+  designMode: "centered",
+  designWideView: "stack",
   designMedia: 0,
   designCount: 3,
 };

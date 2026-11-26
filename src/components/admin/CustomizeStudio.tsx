@@ -50,12 +50,18 @@ import {
   densityHints,
   densityLabels,
   densityModes,
+  designModeHints,
+  designModeLabels,
+  designModes,
   designSizeHints,
   designSizeLabels,
   designSizes,
   designViewHints,
   designViewLabels,
   designViews,
+  designWideViewHints,
+  designWideViewLabels,
+  designWideViews,
   projectSizeHints,
   projectSizeLabels,
   projectSizes,
@@ -525,7 +531,9 @@ export function CustomizeStudio({
           href={site.designsUrl}
           seconds={draft.style.gallerySeconds}
           autoplay={autoplay}
+          mode={draft.style.designMode}
           view={draft.style.designView}
+          wideView={draft.style.designWideView}
           size={draft.style.designSize}
           mediaHeight={draft.style.designMedia}
           slide={{ seconds: draft.style.heroSeconds, autoplay }}
@@ -617,51 +625,93 @@ export function CustomizeStudio({
       <p className="text-xs text-ink-soft">{countdownViewHints[draft.style.countdownView]}</p>
     </div>
   );
+  const designWide = draft.style.designMode === "full";
   const designControls = (
     <>
       <div className="flex flex-col gap-2">
-        <span className="text-sm font-medium text-ink-soft">Layout on Home</span>
+        <span className="text-sm font-medium text-ink-soft">Mode on Home</span>
         <div className="flex flex-wrap gap-2">
-          {designViews.map((m) => (
+          {designModes.map((m) => (
             <label key={m} className={pill}>
               <input
                 type="radio"
                 value={m}
-                checked={draft.style.designView === m}
-                onChange={() => setStyle({ designView: m })}
+                checked={draft.style.designMode === m}
+                onChange={() => setStyle({ designMode: m })}
                 className="sr-only"
               />
-              {designViewLabels[m]}
+              {designModeLabels[m]}
             </label>
           ))}
         </div>
-        <p className="text-xs text-ink-soft">{designViewHints[draft.style.designView]}</p>
+        <p className="text-xs text-ink-soft">{designModeHints[draft.style.designMode]}</p>
       </div>
       <div className="flex flex-col gap-2">
-        <span className="text-sm font-medium text-ink-soft">Size on Home</span>
+        <span className="text-sm font-medium text-ink-soft">Layout on Home</span>
         <div className="flex flex-wrap gap-2">
-          {designSizes.map((m) => (
-            <label key={m} className={pill}>
-              <input
-                type="radio"
-                value={m}
-                checked={draft.style.designSize === m}
-                onChange={() => setStyle({ designSize: m })}
-                className="sr-only"
-              />
-              {designSizeLabels[m]}
-            </label>
-          ))}
+          {designWide
+            ? designWideViews.map((m) => (
+                <label key={m} className={pill}>
+                  <input
+                    type="radio"
+                    value={m}
+                    checked={draft.style.designWideView === m}
+                    onChange={() => setStyle({ designWideView: m })}
+                    className="sr-only"
+                  />
+                  {designWideViewLabels[m]}
+                </label>
+              ))
+            : designViews.map((m) => (
+                <label key={m} className={pill}>
+                  <input
+                    type="radio"
+                    value={m}
+                    checked={draft.style.designView === m}
+                    onChange={() => setStyle({ designView: m })}
+                    className="sr-only"
+                  />
+                  {designViewLabels[m]}
+                </label>
+              ))}
         </div>
-        <p className="text-xs text-ink-soft">{designSizeHints[draft.style.designSize]}</p>
+        <p className="text-xs text-ink-soft">
+          {designWide
+            ? designWideViewHints[draft.style.designWideView]
+            : designViewHints[draft.style.designView]}
+        </p>
       </div>
+      {!designWide && (
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Size on Home</span>
+          <div className="flex flex-wrap gap-2">
+            {designSizes.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.designSize === m}
+                  onChange={() => setStyle({ designSize: m })}
+                  className="sr-only"
+                />
+                {designSizeLabels[m]}
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-ink-soft">{designSizeHints[draft.style.designSize]}</p>
+        </div>
+      )}
       <Slider
         id="ui_design_media"
         label="Cover photo height"
         value={draft.style.designMedia}
         range={styleRanges.designMedia}
         format={(v) => (v === 0 ? "Auto" : `${v} rem`)}
-        hint="Height of the big photo of each project. Auto keeps the 4:3 shape."
+        hint={
+          designWide
+            ? "Height of the big photos. Auto uses the shape that suits the layout."
+            : "Height of the big photo of each project. Auto keeps the 4:3 shape."
+        }
         onChange={(designMedia) => setStyle({ designMedia })}
       />
       <Slider
@@ -703,6 +753,8 @@ export function CustomizeStudio({
       <input type="hidden" name="site_design_view" value={draft.style.designView} />
       <input type="hidden" name="site_design_media" value={draft.style.designMedia} />
       <input type="hidden" name="site_design_count" value={draft.style.designCount} />
+      <input type="hidden" name="site_design_mode" value={draft.style.designMode} />
+      <input type="hidden" name="site_design_wide_view" value={draft.style.designWideView} />
       {draft.style.heroGray && <input type="hidden" name="site_hero_gray" value="on" />}
 
       <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line px-5 py-3">
@@ -791,6 +843,8 @@ export function CustomizeStudio({
                 designView: siteStyleDefaults.designView,
                 designMedia: siteStyleDefaults.designMedia,
                 designCount: siteStyleDefaults.designCount,
+                designMode: siteStyleDefaults.designMode,
+                designWideView: siteStyleDefaults.designWideView,
               })
             }
           >
