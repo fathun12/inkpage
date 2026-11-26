@@ -65,7 +65,7 @@ export function IndexSection({ blocks, mediaUrl, tone = "dark", credit }: Props)
         </>
       )}
       <ul
-        className={`relative mx-auto flex max-w-5xl flex-col px-5 sm:px-8 ${dark ? "py-20 sm:py-28" : "pb-24 pt-4"}`}
+        className={`relative mx-auto flex max-w-5xl flex-col px-5 sm:px-8 ${dark ? "site-index-pad" : "pb-24 pt-4"}`}
       >
         {items.map(({ block, number }, index) => {
           if (number === null) {

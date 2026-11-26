@@ -481,23 +481,52 @@ a:focus-visible .site-sweep {
     --sec-xs: 5rem;
   }
 }
+/* --sec-m = the smaller space under the article list (3rem in Comfortable). */
+.site-root {
+  --sec-m: 3rem;
+}
+.site-root[data-density="compact"] {
+  --sec-m: 1.5rem;
+}
+.site-root[data-density="airy"] {
+  --sec-m: 4.5rem;
+}
+
+/* Extra space of one section (Customize, "Sections"): SectionBox sets --off-top and --off-bottom around it.
+   Without them the offset is 0, so these are the same values as before. */
 .site-pt {
-  padding-top: var(--sec);
+  padding-top: max(0rem, calc(var(--sec) + var(--off-top, 0rem)));
 }
 .site-pb {
-  padding-bottom: var(--sec);
+  padding-bottom: max(0rem, calc(var(--sec) + var(--off-bottom, 0rem)));
+}
+.site-pb-m {
+  padding-bottom: max(0rem, calc(var(--sec-m) + var(--off-bottom, 0rem)));
 }
 .site-py {
-  padding-block: var(--sec);
+  padding-top: max(0rem, calc(var(--sec) + var(--off-top, 0rem)));
+  padding-bottom: max(0rem, calc(var(--sec) + var(--off-bottom, 0rem)));
 }
 .site-mt {
   margin-top: var(--sec);
 }
 .site-pt-s {
-  padding-top: var(--sec-s);
+  padding-top: max(0rem, calc(var(--sec-s) + var(--off-top, 0rem)));
 }
 .site-py-xs {
-  padding-block: var(--sec-xs);
+  padding-top: var(--sec-xs);
+  padding-bottom: max(0rem, calc(var(--sec-xs) + var(--off-bottom, 0rem)));
+}
+/* The list of links over a media (5rem, 7rem on a wide screen: the original padding). */
+.site-index-pad {
+  padding-top: max(0rem, calc(5rem + var(--off-top, 0rem)));
+  padding-bottom: max(0rem, calc(5rem + var(--off-bottom, 0rem)));
+}
+@media (min-width: 40rem) {
+  .site-index-pad {
+    padding-top: max(0rem, calc(7rem + var(--off-top, 0rem)));
+    padding-bottom: max(0rem, calc(7rem + var(--off-bottom, 0rem)));
+  }
 }
 
 /* Project size, Home only (data-project-size is on the page wrapper, data-project-mode on the list).

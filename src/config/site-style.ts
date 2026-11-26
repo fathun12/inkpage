@@ -8,8 +8,11 @@ import {
   layoutDefaults,
   projectSizes,
   readChoice,
+  readSections,
+  sectionDefaults,
   type DensityMode,
   type ProjectSize,
+  type SectionSettings,
 } from "@/config/layout";
 
 export const motionModes = ["full", "subtle", "off"] as const;
@@ -48,6 +51,7 @@ export type SiteStyle = {
   heroGray: boolean;
   density: DensityMode;
   projectSize: ProjectSize;
+  sections: SectionSettings;
   colorBg: string;
   colorInk: string;
   colorAccent: string;
@@ -69,6 +73,7 @@ export const siteStyleDefaults: SiteStyle = {
   heroGray: false,
   density: layoutDefaults.density,
   projectSize: layoutDefaults.projectSize,
+  sections: sectionDefaults,
   colorBg: "#ffffff",
   colorInk: "#000000",
   colorAccent: "#b5532f",
@@ -100,6 +105,7 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     heroGray: typeof r.heroGray === "boolean" ? r.heroGray : d.heroGray,
     density: readChoice(r.density, densityModes, d.density),
     projectSize: readChoice(r.projectSize, projectSizes, d.projectSize),
+    sections: readSections(r.sections),
     colorBg: color(r.colorBg, d.colorBg),
     colorInk: color(r.colorInk, d.colorInk),
     colorAccent: color(r.colorAccent, d.colorAccent),

@@ -10,6 +10,7 @@ import { readSiteStyle } from "@/config/site-style";
 import { routes } from "@/config/site";
 import { shopConfig } from "@/config/shop";
 import { updateAppearanceAction } from "@/features/appearance/actions";
+import { getPublicArticles } from "@/features/articles/queries";
 import { requireUser } from "@/features/auth/queries";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileById } from "@/features/profile/queries";
@@ -44,11 +45,12 @@ export default async function CustomizePage({ searchParams }: Props) {
   const base = routes.profile(profile.username);
 
   // The same data as Home, so the preview shows the same sections.
-  const [biblia, designs, github, shop] = await Promise.all([
+  const [biblia, designs, github, shop, articles] = await Promise.all([
     fetchBiblia(site.bibliaUrl, 6),
     fetchDesigns(site.designsUrl, 3),
     fetchGithub(site.githubUser),
     getPublicShop(profile.id),
+    getPublicArticles(profile.id),
   ]);
   const shopItems = shop.products.filter((p) => p.show_on_home).slice(0, shopConfig.homeMax);
   const shopTitle = shop.settings.home_title ?? "Shop";
@@ -61,7 +63,9 @@ export default async function CustomizePage({ searchParams }: Props) {
   const media = resolveHomeMedia(site, readBackground(profile), blocks);
 
   const contents = [
+    countdown && { id: "countdown", label: "Countdown" },
     writing.length > 0 && { id: "writing", label: site.cardsTitle ?? site.writing.title ?? "Writing" },
+    articles.length > 0 && { id: "articles", label: site.articles.title ?? "Articles" },
     projects.length > 0 && { id: "projects", label: site.projects.title ?? "Projects" },
     biblia && biblia.books.length > 0 && { id: "biblia", label: site.bibliaTitle ?? "Biblia" },
     github && { id: "github", label: site.githubTitle ?? "GitHub" },
@@ -93,6 +97,7 @@ export default async function CustomizePage({ searchParams }: Props) {
       projects={projects.slice(0, 6)}
       showcase={showcase}
       countdown={countdown}
+      articles={articles}
       cards={writing.slice(0, 6)}
       socials={socialsOf(blocks)}
       nav={buildNav(base, site)}

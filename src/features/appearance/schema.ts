@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { hexColor } from "@/config/background";
 import { fontIds } from "@/config/font-choices";
-import { densityModes, projectSizes } from "@/config/layout";
+import { densityModes, projectSizes, sectionSpace } from "@/config/layout";
 import { motionModes, styleRanges } from "@/config/site-style";
 
 const color = z
@@ -17,6 +17,30 @@ function whole(label: string, range: { min: number; max: number }) {
     .min(range.min, `${label} is out of range.`)
     .max(range.max, `${label} is out of range.`);
 }
+
+const sectionSpaceNumber = z
+  .number({ error: "Section space must be a number." })
+  .min(sectionSpace.min, "Section space is out of range.")
+  .max(sectionSpace.max, "Section space is out of range.")
+  .multipleOf(sectionSpace.step, "Section space must move in steps of 0.5.");
+
+// The studio sends all section settings as one JSON text.
+const sectionsJson = z
+  .string()
+  .transform((raw, ctx) => {
+    try {
+      return JSON.parse(raw) as unknown;
+    } catch {
+      ctx.addIssue({ code: "custom", message: "The section settings are not valid." });
+      return z.NEVER;
+    }
+  })
+  .pipe(
+    z.record(
+      z.string(),
+      z.object({ hidden: z.boolean(), top: sectionSpaceNumber, bottom: sectionSpaceNumber }),
+    ),
+  );
 
 export const appearanceSchema = z.object({
   font_heading: z.enum(fontIds, { error: "Pick a heading font." }),
@@ -36,4 +60,5 @@ export const appearanceSchema = z.object({
   site_hero_gray: z.boolean(),
   site_density: z.enum(densityModes, { error: "Pick a spacing." }),
   site_project_size: z.enum(projectSizes, { error: "Pick a project size." }),
+  site_sections: sectionsJson,
 });

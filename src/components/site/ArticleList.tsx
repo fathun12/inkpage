@@ -17,7 +17,7 @@ type Props = {
 // Articles written inside inkpage. Newest first (the query sorts).
 export function ArticleList({ articles, username, previews = false, covers = false }: Props) {
   return (
-    <ul className="mx-auto flex max-w-5xl flex-col px-5 pb-12 pt-4 sm:px-8">
+    <ul className="mx-auto flex max-w-5xl flex-col px-5 pt-4 sm:px-8 site-pb-m">
       {articles.map((article, index) => {
         if (!article.slug) return null;
         const meta = [formatArticleDate(article.published_at), `${article.reading_minutes} min read`]

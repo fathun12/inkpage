@@ -6,7 +6,7 @@ type Props = { products: Product[]; open: boolean; base: string };
 
 export function ProductGrid({ products, open, base }: Props) {
   return (
-    <ul className="mx-auto grid max-w-5xl gap-x-8 gap-y-12 px-5 pb-16 sm:grid-cols-2 sm:px-8 sm:pb-24 lg:grid-cols-3">
+    <ul className="mx-auto grid max-w-5xl gap-x-8 gap-y-12 px-5 sm:grid-cols-2 sm:px-8 lg:grid-cols-3 site-pb">
       {products.map((product, i) => (
         <li key={product.id}>
           <Reveal delay={(i % 3) * 80} className="h-full">
