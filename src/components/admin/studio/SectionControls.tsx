@@ -38,6 +38,8 @@ const pill =
 type Props = {
   order: SectionId[];
   sections: SectionSettings;
+  // The section picked in the preview (inspect mode). Its row gets an outline.
+  selected?: SectionId | null;
   onOrder: (order: SectionId[]) => void;
   onSection: (id: SectionId, patch: Partial<SectionSetting>) => void;
 };
@@ -76,6 +78,7 @@ function Row({
   index,
   count,
   setting,
+  selected,
   onSection,
   onMove,
 }: {
@@ -83,6 +86,7 @@ function Row({
   index: number;
   count: number;
   setting: SectionSetting;
+  selected: boolean;
   onSection: (id: SectionId, patch: Partial<SectionSetting>) => void;
   onMove: (from: number, to: number) => void;
 }) {
@@ -107,6 +111,7 @@ function Row({
 
   return (
     <li
+      id={`studio-row-${id}`}
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
       className={cn("flex items-start gap-1", isDragging && "relative z-10 opacity-80")}
@@ -122,7 +127,12 @@ function Row({
         ::
       </button>
       {sectionHasSpace[id] ? (
-        <details className="ink-border min-w-0 flex-1 rounded-md">
+        <details
+          className={cn(
+            "ink-border min-w-0 flex-1 rounded-md",
+            selected && "outline-2 outline-offset-2 outline-accent",
+          )}
+        >
           <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 [&::-webkit-details-marker]:hidden">
             {head}
           </summary>
@@ -172,7 +182,12 @@ function Row({
           </div>
         </details>
       ) : (
-        <div className="ink-border flex min-w-0 flex-1 items-center justify-between gap-3 rounded-md px-3 py-2">
+        <div
+          className={cn(
+            "ink-border flex min-w-0 flex-1 items-center justify-between gap-3 rounded-md px-3 py-2",
+            selected && "outline-2 outline-offset-2 outline-accent",
+          )}
+        >
           {head}
         </div>
       )}
@@ -201,7 +216,7 @@ function Row({
 }
 
 // The list of Home sections in the Customize studio: drag to reorder, Show tick, extra space per section.
-export function SectionControls({ order, sections, onOrder, onSection }: Props) {
+export function SectionControls({ order, sections, selected = null, onOrder, onSection }: Props) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -232,6 +247,7 @@ export function SectionControls({ order, sections, onOrder, onSection }: Props) 
               index={index}
               count={order.length}
               setting={sections[id]}
+              selected={selected === id}
               onSection={onSection}
               onMove={move}
             />

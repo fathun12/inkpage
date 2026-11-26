@@ -1,7 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { Fragment, useState, type ComponentProps, type MouseEvent, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ComponentProps,
+  type MouseEvent,
+  type ReactNode,
+} from "react";
 import { SectionControls } from "@/components/admin/studio/SectionControls";
 import { HomeShop } from "@/components/shop/HomeShop";
 import { CardSlider } from "@/components/site/CardSlider";
@@ -48,6 +56,7 @@ import {
   projectViewHints,
   projectViewLabels,
   projectViews,
+  sectionLabels,
   type SectionId,
   type SectionSetting,
 } from "@/config/layout";
@@ -108,6 +117,50 @@ const colorInput = "ink-border h-10 w-20 cursor-pointer rounded-md bg-surface p-
 const resetButton =
   "self-start font-mono text-xs uppercase tracking-widest text-ink-soft underline underline-offset-4 hover:text-ink";
 
+// The area of one section in the preview: every box inside its marker (the marker itself has no box).
+function sectionArea(marker: Element) {
+  const area = { top: Infinity, bottom: -Infinity };
+  const walk = (parent: Element) => {
+    for (const child of Array.from(parent.children)) {
+      if (getComputedStyle(child).display === "contents") {
+        walk(child);
+        continue;
+      }
+      const rect = child.getBoundingClientRect();
+      if (rect.height < 1) continue;
+      area.top = Math.min(area.top, rect.top);
+      area.bottom = Math.max(area.bottom, rect.bottom);
+    }
+  };
+  walk(marker);
+  return Number.isFinite(area.top) ? area : null;
+}
+
+// Puts a highlight box over one section of the preview, or hides it.
+function place(
+  box: HTMLDivElement | null,
+  tag: HTMLSpanElement | null,
+  id: SectionId | null,
+  scroll: HTMLElement,
+  frame: HTMLElement,
+) {
+  if (!box) return;
+  const marker = id ? scroll.querySelector(`[data-studio-section="${id}"]`) : null;
+  const area = marker ? sectionArea(marker) : null;
+  if (!id || !area) {
+    box.style.display = "none";
+    return;
+  }
+  const frameRect = frame.getBoundingClientRect();
+  const scrollRect = scroll.getBoundingClientRect();
+  box.style.display = "block";
+  box.style.top = `${area.top - frameRect.top}px`;
+  box.style.left = `${scrollRect.left - frameRect.left}px`;
+  box.style.width = `${scroll.clientWidth}px`;
+  box.style.height = `${area.bottom - area.top}px`;
+  if (tag) tag.textContent = sectionLabels[id];
+}
+
 // Shown in the preview when no link is on Home yet.
 function sampleRows(): Block[] {
   return ["Your first project", "An article you wrote", "A download"].map(
@@ -132,18 +185,20 @@ function sampleRows(): Block[] {
 }
 
 function Section({
+  id,
   title,
   open,
   onReset,
   children,
 }: {
+  id?: string;
   title: string;
   open?: boolean;
   onReset?: () => void;
   children: ReactNode;
 }) {
   return (
-    <details open={open} className="group border-b border-line">
+    <details id={id} open={open} className="group border-b border-line">
       <summary className="flex cursor-pointer list-none items-center justify-between px-5 py-4 font-medium [&::-webkit-details-marker]:hidden">
         {title}
         <span aria-hidden className="font-mono text-xs text-ink-soft transition-transform group-open:rotate-90">
@@ -278,6 +333,70 @@ export function CustomizeStudio({
   // System / Light / Dark inside the preview box only. Not saved.
   const [previewMode, setPreviewMode] = useState<Mode>("system");
 
+  // Inspect mode in the preview, like the inspector of a browser: hover shows a section, click selects it.
+  // The two highlight boxes are moved by hand (no state), so moving the mouse does not render the studio again.
+  const [picked, setPicked] = useState<SectionId | null>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const hoverBox = useRef<HTMLDivElement>(null);
+  const hoverTag = useRef<HTMLSpanElement>(null);
+  const pickBox = useRef<HTMLDivElement>(null);
+  const hoverId = useRef<SectionId | null>(null);
+  const pickedId = useRef<SectionId | null>(null);
+
+  const paint = useCallback(() => {
+    const frame = frameRef.current;
+    const scroll = scrollRef.current;
+    if (!frame || !scroll) return;
+    const hover = hoverId.current === pickedId.current ? null : hoverId.current;
+    place(hoverBox.current, hoverTag.current, hover, scroll, frame);
+    place(pickBox.current, null, pickedId.current, scroll, frame);
+  }, []);
+
+  // Keeps the boxes on their sections when anything changes (settings, device, size of the page).
+  useEffect(() => {
+    paint();
+  });
+  useEffect(() => {
+    const frame = frameRef.current;
+    const page = scrollRef.current?.firstElementChild;
+    if (!frame) return;
+    const observer = new ResizeObserver(() => paint());
+    observer.observe(frame);
+    if (page) observer.observe(page);
+    return () => observer.disconnect();
+  }, [paint]);
+
+  function sectionAt(target: EventTarget): SectionId | null {
+    if (!(target instanceof Element)) return null;
+    const id = target.closest("[data-studio-section]")?.getAttribute("data-studio-section");
+    return draft.style.order.find((s) => s === id) ?? null;
+  }
+  function hoverMove(event: MouseEvent<HTMLDivElement>) {
+    const id = sectionAt(event.target);
+    if (id !== hoverId.current) {
+      hoverId.current = id;
+      paint();
+    }
+  }
+  function hoverLeave() {
+    hoverId.current = null;
+    paint();
+  }
+  // Selects a section: opens the Sections panel and the row of that section, and scrolls to it.
+  function pick(id: SectionId) {
+    pickedId.current = id;
+    setPicked(id);
+    paint();
+    const panel = document.getElementById("studio-sections");
+    if (panel instanceof HTMLDetailsElement) panel.open = true;
+    const row = document.getElementById(`studio-row-${id}`);
+    const details = row?.querySelector("details");
+    if (details) details.open = true;
+    const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    row?.scrollIntoView({ block: "center", behavior: calm ? "auto" : "smooth" });
+  }
+
   function set<K extends keyof Draft>(key: K, value: Draft[K]) {
     setDraft((d) => ({ ...d, [key]: value }));
   }
@@ -310,9 +429,11 @@ export function CustomizeStudio({
   const writingAt = sequence.indexOf("writing");
   const joined = writingAt >= 0 && sequence[writingAt + 1] === "articles";
 
-  // Links in the preview must not leave the studio.
-  function stopLinks(event: MouseEvent<HTMLDivElement>) {
+  // A click in the preview: links must not leave the studio, and the section under the mouse is selected.
+  function previewClick(event: MouseEvent<HTMLDivElement>) {
     if ((event.target as HTMLElement).closest("a")) event.preventDefault();
+    const id = sectionAt(event.target);
+    if (id) pick(id);
   }
 
   // Each section of Home, ready to place. The order comes from the draft (Sections panel).
@@ -585,6 +706,7 @@ export function CustomizeStudio({
           </Section>
           <Section
             title="Sections"
+            id="studio-sections"
             onReset={() => setStyle({ sections: siteStyleDefaults.sections, order: siteStyleDefaults.order })}
           >
             <p className="text-xs text-ink-soft">
@@ -595,6 +717,7 @@ export function CustomizeStudio({
             <SectionControls
               order={draft.style.order}
               sections={sec}
+              selected={picked}
               onOrder={(order) => setStyle({ order })}
               onSection={setSection}
             />
@@ -794,10 +917,18 @@ export function CustomizeStudio({
         >
           {/* translateZ(0) keeps everything of the page inside this box. */}
           <div
+            ref={frameRef}
             className="relative mx-auto h-full overflow-hidden border border-line [transform:translateZ(0)]"
             style={{ maxWidth: device === "phone" ? phoneWidth : undefined }}
           >
-            <div className="absolute inset-0 overflow-y-auto" onClickCapture={stopLinks}>
+            <div
+              ref={scrollRef}
+              className="absolute inset-0 overflow-y-auto"
+              onClickCapture={previewClick}
+              onMouseMove={hoverMove}
+              onMouseLeave={hoverLeave}
+              onScroll={paint}
+            >
               <SiteFrame
                 fonts={{ heading: draft.fontHeading, body: draft.fontBody }}
                 style={draft.style}
@@ -826,9 +957,13 @@ export function CustomizeStudio({
                   )}
                   <HeroContents items={shownContents} />
                 </Hero>
-                {draft.style.order.map((id) => (
-                  <Fragment key={id}>{parts[id]}</Fragment>
-                ))}
+                {draft.style.order.map((id) =>
+                  parts[id] ? (
+                    <div key={id} data-studio-section={id} className="contents">
+                      {parts[id]}
+                    </div>
+                  ) : null,
+                )}
                 <SiteFooter
                   brand={profile.username}
                   note={site.footerNote}
@@ -846,6 +981,21 @@ export function CustomizeStudio({
                   }}
                 />
               </SiteFrame>
+            </div>
+            <div
+              ref={pickBox}
+              aria-hidden
+              className="pointer-events-none absolute z-10 hidden border-2 border-accent"
+            />
+            <div
+              ref={hoverBox}
+              aria-hidden
+              className="pointer-events-none absolute z-20 hidden border border-accent bg-accent/15"
+            >
+              <span
+                ref={hoverTag}
+                className="absolute left-0 top-0 bg-accent px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-accent-ink"
+              />
             </div>
           </div>
         </section>
