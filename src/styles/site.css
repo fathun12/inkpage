@@ -279,13 +279,13 @@
   animation: site-intro-rise 1.2s var(--ease-out) both;
 }
 .site-intro-line[data-n="1"] {
-  animation-delay: 300ms;
+  animation-delay: 900ms;
 }
 .site-intro-line[data-n="2"] {
-  animation-delay: 480ms;
+  animation-delay: 1080ms;
 }
 .site-intro-line[data-n="3"] {
-  animation-delay: 680ms;
+  animation-delay: 1280ms;
 }
 @keyframes site-intro-rise {
   from {
@@ -471,9 +471,40 @@ a:focus-visible .site-sweep {
 
 /* Entrance of the top of Home (hero, news bar, brand, tabs). Plays once per visit: SiteHeader sets
    data-entered on .site-root after 3 s. "backwards" keeps the natural style afterwards (opacity 0.7 of tabs). */
-@keyframes site-hero-appear {
+/* Home: the hero falls as a whole from above and touches the top edge (first 60%). Then the news bar falls
+   from above and pushes it down to its place (last 40%), on the same curve, so no gap opens between them.
+   --lag delays brand, tabs and intro on Home until the hero is down. */
+.site-root {
+  --bar-h: 0px;
+  --lag: 0ms;
+}
+.site-root:has(.site-bar-in) {
+  --bar-h: calc(2.25rem + 1px);
+}
+.site-root:has(.site-hero) {
+  --lag: 700ms;
+}
+@keyframes site-hero-drop {
   from {
-    opacity: 0.01;
+    translate: 0 calc(-100% - var(--bar-h));
+    animation-timing-function: var(--ease-out);
+  }
+  60% {
+    translate: 0 calc(0px - var(--bar-h));
+    animation-timing-function: var(--ease-out);
+  }
+  to {
+    translate: 0 0;
+  }
+}
+@keyframes site-bar-drop {
+  from,
+  60% {
+    translate: 0 -100%;
+    animation-timing-function: var(--ease-out);
+  }
+  to {
+    translate: 0 0;
   }
 }
 @keyframes site-drop {
@@ -493,26 +524,26 @@ a:focus-visible .site-sweep {
     opacity: 0;
   }
 }
-.site-root:not([data-entered])[data-motion="full"] .site-bar-in {
-  animation: site-fade-in 500ms var(--ease-out) backwards;
+.site-root:not([data-entered])[data-motion="full"] .site-hero {
+  animation: site-hero-drop 1000ms backwards;
 }
-.site-root:not([data-entered])[data-motion="full"] .site-hero-track {
-  animation: site-hero-appear 800ms var(--ease-out) 500ms backwards;
+.site-root:has(.site-hero):not([data-entered])[data-motion="full"] .site-bar-in {
+  animation: site-bar-drop 1000ms backwards;
 }
 .site-root:not([data-entered])[data-motion="full"] .site-brand {
-  animation: site-drop 900ms var(--ease-out) 560ms backwards;
+  animation: site-drop 900ms var(--ease-out) calc(450ms + var(--lag)) backwards;
 }
 .site-root:not([data-entered])[data-motion="full"] .site-nav-item {
-  animation: site-slide-in 800ms var(--ease-out) calc(640ms + var(--i, 0) * 70ms) backwards;
+  animation: site-slide-in 800ms var(--ease-out) calc(350ms + var(--lag) + var(--i, 0) * 80ms) backwards;
 }
-.site-root:not([data-entered])[data-motion="subtle"] .site-hero-track,
+.site-root:not([data-entered])[data-motion="subtle"] .site-hero,
 .site-root:not([data-entered])[data-motion="subtle"] .site-bar-in,
 .site-root:not([data-entered])[data-motion="subtle"] .site-brand,
 .site-root:not([data-entered])[data-motion="subtle"] .site-nav-item {
   animation: site-fade-in 600ms var(--ease-out) 150ms backwards;
 }
 @media (prefers-reduced-motion: reduce) {
-  .site-hero-track,
+  .site-hero,
   .site-bar-in,
   .site-brand,
   .site-nav-item {
