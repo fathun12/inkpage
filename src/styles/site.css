@@ -442,3 +442,107 @@ a:focus-visible .site-sweep {
     transition-duration: 0.01ms;
   }
 }
+
+/* Density (Customize, Layout): the space between the sections of the website. data-density is on the page wrapper.
+   Comfortable is the original look. --sec = a normal section, --sec-s = top of the countdown, --sec-xs = inside it. */
+.site-root {
+  --sec: 4rem;
+  --sec-s: 3.5rem;
+  --sec-xs: 3rem;
+}
+@media (min-width: 40rem) {
+  .site-root {
+    --sec: 6rem;
+    --sec-s: 5rem;
+    --sec-xs: 4rem;
+  }
+}
+.site-root[data-density="compact"] {
+  --sec: 2rem;
+  --sec-s: 1.75rem;
+  --sec-xs: 1.5rem;
+}
+@media (min-width: 40rem) {
+  .site-root[data-density="compact"] {
+    --sec: 3rem;
+    --sec-s: 2.5rem;
+    --sec-xs: 2rem;
+  }
+}
+.site-root[data-density="airy"] {
+  --sec: 5rem;
+  --sec-s: 4.5rem;
+  --sec-xs: 3.5rem;
+}
+@media (min-width: 40rem) {
+  .site-root[data-density="airy"] {
+    --sec: 8rem;
+    --sec-s: 7rem;
+    --sec-xs: 5rem;
+  }
+}
+.site-pt {
+  padding-top: var(--sec);
+}
+.site-pb {
+  padding-bottom: var(--sec);
+}
+.site-py {
+  padding-block: var(--sec);
+}
+.site-mt {
+  margin-top: var(--sec);
+}
+.site-pt-s {
+  padding-top: var(--sec-s);
+}
+.site-py-xs {
+  padding-block: var(--sec-xs);
+}
+
+/* Project size, Home only (data-project-size is on the page wrapper, data-project-mode on the list).
+   Large = the original look, so it has no rules here. */
+[data-project-size="medium"] [data-project-mode="home"] .site-proj-grid {
+  gap: 1.5rem;
+}
+[data-project-size="small"] [data-project-mode="home"] .site-proj-grid {
+  gap: 1.25rem;
+}
+@media (min-width: 48rem) {
+  [data-project-size="medium"] [data-project-mode="home"] .site-proj-grid {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+  }
+  [data-project-size="small"] [data-project-mode="home"] .site-proj-grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 19fr);
+  }
+}
+[data-project-size="medium"] [data-project-mode="home"] .site-proj-title {
+  font-size: 1.5rem;
+}
+[data-project-size="small"] [data-project-mode="home"] .site-proj-title {
+  font-size: 1.25rem;
+}
+[data-project-size="medium"] [data-project-mode="home"] .site-proj-item {
+  margin-bottom: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+[data-project-size="small"] [data-project-mode="home"] .site-proj-item {
+  margin-bottom: 1.75rem;
+  padding-bottom: 1.75rem;
+}
+@media (min-width: 40rem) {
+  [data-project-size="medium"] [data-project-mode="home"] .site-proj-title {
+    font-size: 2.25rem;
+  }
+  [data-project-size="small"] [data-project-mode="home"] .site-proj-title {
+    font-size: 1.75rem;
+  }
+  [data-project-size="medium"] [data-project-mode="home"] .site-proj-item {
+    margin-bottom: 3.5rem;
+    padding-bottom: 3.5rem;
+  }
+  [data-project-size="small"] [data-project-mode="home"] .site-proj-item {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2.5rem;
+  }
+}

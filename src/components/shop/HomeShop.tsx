@@ -9,7 +9,7 @@ type Props = { products: Product[]; open: boolean; title: string; base: string }
 export function HomeShop({ products, open, title, base }: Props) {
   if (products.length === 0) return null;
   return (
-    <section id="shop" aria-label={title} className="pt-16 sm:pt-24">
+    <section id="shop" aria-label={title} className="site-pt">
       <div className="mx-auto flex max-w-5xl items-baseline justify-between gap-4 px-5 pb-8 sm:px-8">
         <Reveal>
           <h2 className="font-mono text-xs uppercase tracking-widest opacity-70">{title}</h2>

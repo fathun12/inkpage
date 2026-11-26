@@ -20,6 +20,7 @@ import { fetchGithub } from "@/features/site/github";
 import { savedText } from "@/lib/flash";
 import {
   buildNav,
+  homeCountdown,
   homeProjects,
   homeShowcase,
   homeWriting,
@@ -56,6 +57,7 @@ export default async function CustomizePage({ searchParams }: Props) {
   const projects = homeProjects(blocks);
   const writing = homeWriting(blocks);
   const showcase = homeShowcase(blocks);
+  const countdown = homeCountdown(blocks);
   const media = resolveHomeMedia(site, readBackground(profile), blocks);
 
   const contents = [
@@ -90,6 +92,7 @@ export default async function CustomizePage({ searchParams }: Props) {
       rows={rows.slice(0, 6)}
       projects={projects.slice(0, 6)}
       showcase={showcase}
+      countdown={countdown}
       cards={writing.slice(0, 6)}
       socials={socialsOf(blocks)}
       nav={buildNav(base, site)}

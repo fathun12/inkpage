@@ -60,14 +60,14 @@ export function ProjectCard({ block, mode, first = false, total = 1, slide = { s
   const hasMedia = shown.length > 0;
 
   const title = (
-    <h3 className="font-display text-3xl font-medium leading-tight sm:text-5xl">
+    <h3 className="site-proj-title font-display text-3xl font-medium leading-tight sm:text-5xl">
       <span className="site-sweep">{item.title}</span>
     </h3>
   );
 
   return (
     <div className="flex flex-col gap-10">
-      <div className={hasMedia ? `grid gap-8 ${projectLayout.grid}` : "grid"}>
+      <div className={hasMedia ? `site-proj-grid grid gap-8 ${projectLayout.grid}` : "grid"}>
         {hasMedia && (
           <Reveal variant="still" className={side ? "grid grid-cols-2 gap-3" : "flex flex-col gap-3"}>
             {shown.map((file, i) => (

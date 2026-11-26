@@ -7,7 +7,7 @@ import { Reveal } from "./Reveal";
 export function HomeBiblia({ data, title, seeAll }: { data: BibliaData; title: string; seeAll: string }) {
   if (data.books.length === 0) return null;
   return (
-    <section id="biblia" aria-label={title} className="pt-16 sm:pt-24">
+    <section id="biblia" aria-label={title} className="site-pt">
       <div className="mx-auto flex max-w-5xl items-end justify-between gap-4 px-5 pb-8 sm:px-8">
         <Reveal>
           <h2 className="font-mono text-xs uppercase tracking-widest opacity-70">{title}</h2>
@@ -19,7 +19,7 @@ export function HomeBiblia({ data, title, seeAll }: { data: BibliaData; title: s
           See all {data.titles} →
         </Link>
       </div>
-      <BibliaGrid books={data.books} bottom="pb-16 sm:pb-24" />
+      <BibliaGrid books={data.books} bottom="site-pb" />
     </section>
   );
 }

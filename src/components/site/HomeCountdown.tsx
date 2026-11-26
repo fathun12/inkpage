@@ -37,8 +37,8 @@ export function HomeCountdown({ title, description, target, start }: Props) {
   ];
 
   return (
-    <section id="countdown" aria-label={title} className="px-5 pt-14 sm:px-8 sm:pt-20">
-      <div className="mx-auto max-w-5xl border-b-2 border-tertiary px-4 py-12 text-center sm:py-16">
+    <section id="countdown" aria-label={title} className="px-5 site-pt-s sm:px-8">
+      <div className="mx-auto max-w-5xl border-b-2 border-tertiary px-4 site-py-xs text-center">
         <p className="inline-flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.22em] text-accent">
           <span aria-hidden className="size-1.5 rounded-full bg-accent" />
           <span>{countdownConfig.messages[stage]}</span>

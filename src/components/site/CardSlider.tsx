@@ -9,7 +9,7 @@ type Props = { items: Block[]; title: string | null; seconds: number; autoplay: 
 
 // The sliding row of cards on Home. It slides by itself, stops while the pointer is over it,
 // and can be dragged, swiped or moved with the arrows.
-export function CardSlider({ items, title, seconds, autoplay, spacing = "py-16 sm:py-24" }: Props) {
+export function CardSlider({ items, title, seconds, autoplay, spacing = "site-py" }: Props) {
   const track = useRef<HTMLUListElement>(null);
   const paused = useRef(false);
   const count = items.length;

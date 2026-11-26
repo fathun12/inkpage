@@ -6,7 +6,7 @@ import { Reveal } from "./Reveal";
 export function HomeProjects({ items, title }: { items: Block[]; title: string }) {
   if (items.length === 0) return null;
   return (
-    <section id="projects" aria-label={title} className="pt-16 sm:pt-24">
+    <section id="projects" aria-label={title} className="site-pt">
       <div className="mx-auto max-w-5xl px-5 pb-8 sm:px-8">
         <Reveal>
           <h2 className="font-mono text-xs uppercase tracking-widest opacity-70">{title}</h2>

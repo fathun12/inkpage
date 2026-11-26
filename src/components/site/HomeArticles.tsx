@@ -20,7 +20,7 @@ export function HomeArticles({
   const shown = articles.filter((article) => article.slug).slice(0, 3);
   if (shown.length === 0) return null;
   return (
-    <section id="articles" aria-label={title} className={joined ? undefined : "pt-16 sm:pt-24"}>
+    <section id="articles" aria-label={title} className={joined ? undefined : "site-pt"}>
       <div className="mx-auto flex max-w-5xl items-baseline justify-between gap-4 px-5 pb-4 sm:px-8">
         <Reveal>
           <h2 className="font-mono text-xs uppercase tracking-widest opacity-70">{title}</h2>

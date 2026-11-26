@@ -8,6 +8,7 @@ import { FadeGallery } from "@/components/site/FadeGallery";
 import { Hero } from "@/components/site/Hero";
 import { HeroContents, type ContentsItem } from "@/components/site/HeroContents";
 import { HomeBiblia } from "@/components/site/HomeBiblia";
+import { HomeCountdown } from "@/components/site/HomeCountdown";
 import { HomeDesigns } from "@/components/site/HomeDesigns";
 import { HomeGithub } from "@/components/site/HomeGithub";
 import { HomeProjects } from "@/components/site/HomeProjects";
@@ -31,6 +32,14 @@ import {
   type FontPair,
 } from "@/config/font-choices";
 import { resolveGreetings } from "@/config/intro";
+import {
+  densityHints,
+  densityLabels,
+  densityModes,
+  projectSizeHints,
+  projectSizeLabels,
+  projectSizes,
+} from "@/config/layout";
 import type { SiteSettings } from "@/config/site-content";
 import {
   motionHints,
@@ -57,6 +66,7 @@ type Props = {
   rows: Block[];
   projects: Block[];
   showcase: Block[];
+  countdown: Block | null;
   cards: Block[];
   socials: SocialItem[];
   nav: { label: string; href: string }[];
@@ -229,6 +239,7 @@ export function CustomizeStudio({
   rows,
   projects,
   showcase,
+  countdown,
   cards,
   socials,
   nav,
@@ -286,6 +297,8 @@ export function CustomizeStudio({
       <input type="hidden" name="site_index_veil" value={draft.style.indexVeil} />
       <input type="hidden" name="site_hero_zoom" value={draft.style.heroZoom} />
       <input type="hidden" name="site_index_zoom" value={draft.style.indexZoom} />
+      <input type="hidden" name="site_density" value={draft.style.density} />
+      <input type="hidden" name="site_project_size" value={draft.style.projectSize} />
       {draft.style.heroGray && <input type="hidden" name="site_hero_gray" value="on" />}
 
       <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line px-5 py-3">
@@ -335,6 +348,50 @@ export function CustomizeStudio({
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         <aside className="relative order-2 min-h-0 flex-1 overflow-y-auto border-t border-line lg:order-1 lg:w-[360px] lg:flex-none lg:border-r lg:border-t-0">
+          <Section
+            title="Layout"
+            open
+            onReset={() =>
+              setStyle({ density: siteStyleDefaults.density, projectSize: siteStyleDefaults.projectSize })
+            }
+          >
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-medium text-ink-soft">Space between sections</span>
+              <div className="flex flex-wrap gap-2">
+                {densityModes.map((m) => (
+                  <label key={m} className={pill}>
+                    <input
+                      type="radio"
+                      value={m}
+                      checked={draft.style.density === m}
+                      onChange={() => setStyle({ density: m })}
+                      className="sr-only"
+                    />
+                    {densityLabels[m]}
+                  </label>
+                ))}
+              </div>
+              <p className="text-xs text-ink-soft">{densityHints[draft.style.density]}</p>
+            </div>
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-medium text-ink-soft">Projects size on Home</span>
+              <div className="flex flex-wrap gap-2">
+                {projectSizes.map((m) => (
+                  <label key={m} className={pill}>
+                    <input
+                      type="radio"
+                      value={m}
+                      checked={draft.style.projectSize === m}
+                      onChange={() => setStyle({ projectSize: m })}
+                      className="sr-only"
+                    />
+                    {projectSizeLabels[m]}
+                  </label>
+                ))}
+              </div>
+              <p className="text-xs text-ink-soft">{projectSizeHints[draft.style.projectSize]}</p>
+            </div>
+          </Section>
           <Section
             title="Colors"
             open
@@ -562,6 +619,14 @@ export function CustomizeStudio({
                   )}
                   <HeroContents items={contents} />
                 </Hero>
+                {countdown && (
+                  <HomeCountdown
+                    title={countdown.title}
+                    description={countdown.body}
+                    target={countdown.data.target ?? ""}
+                    start={countdown.created_at}
+                  />
+                )}
                 {cards.length > 0 && (
                   <CardSlider
                     items={cards}

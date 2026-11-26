@@ -9,13 +9,13 @@ const button =
 export function VisitCards({ items, title }: { items: VisitItem[]; title: string }) {
   if (items.length === 0) return null;
   return (
-    <section id="visit" aria-label={title} className="pt-16 sm:pt-24">
+    <section id="visit" aria-label={title} className="site-pt">
       <div className="mx-auto max-w-5xl px-5 pb-8 sm:px-8">
         <Reveal>
           <h2 className="font-mono text-xs uppercase tracking-widest opacity-70">{title}</h2>
         </Reveal>
       </div>
-      <ul className="mx-auto grid max-w-5xl gap-x-8 gap-y-10 px-5 pb-16 sm:grid-cols-2 sm:px-8 sm:pb-24 lg:grid-cols-3">
+      <ul className="mx-auto grid max-w-5xl gap-x-8 gap-y-10 px-5 sm:grid-cols-2 sm:px-8 lg:grid-cols-3 site-pb">
         {items.map((item, i) => (
           <li key={`${item.url}-${i}`} className="border-t border-line pt-6">
             <Reveal variant="still" className="flex h-full flex-col items-start">

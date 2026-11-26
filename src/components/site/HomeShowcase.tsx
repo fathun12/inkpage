@@ -6,13 +6,13 @@ import { ShowcaseCard } from "./ShowcaseCard";
 export function HomeShowcase({ items, title }: { items: Block[]; title: string }) {
   if (items.length === 0) return null;
   return (
-    <section id="showcase" aria-label={title} className="pt-16 sm:pt-24">
+    <section id="showcase" aria-label={title} className="site-pt">
       <div className="mx-auto max-w-5xl px-5 pb-8 sm:px-8">
         <Reveal>
           <h2 className="font-mono text-xs uppercase tracking-widest opacity-70">{title}</h2>
         </Reveal>
       </div>
-      <ul className="mx-auto flex max-w-5xl flex-col gap-24 px-5 pb-16 pt-4 sm:gap-32 sm:px-8 sm:pb-24">
+      <ul className="mx-auto flex max-w-5xl flex-col gap-24 px-5 pt-4 sm:gap-32 sm:px-8 site-pb">
         {items.map((block, index) => (
           <li key={block.id}>
             <ShowcaseCard block={block} first={index === 0} />

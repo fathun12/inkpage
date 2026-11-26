@@ -3,6 +3,14 @@
 
 import type { CSSProperties } from "react";
 import { hexColor, luminance } from "@/config/background";
+import {
+  densityModes,
+  layoutDefaults,
+  projectSizes,
+  readChoice,
+  type DensityMode,
+  type ProjectSize,
+} from "@/config/layout";
 
 export const motionModes = ["full", "subtle", "off"] as const;
 export type MotionMode = (typeof motionModes)[number];
@@ -38,6 +46,8 @@ export type SiteStyle = {
   indexZoom: number;
   indexVeil: number;
   heroGray: boolean;
+  density: DensityMode;
+  projectSize: ProjectSize;
   colorBg: string;
   colorInk: string;
   colorAccent: string;
@@ -57,6 +67,8 @@ export const siteStyleDefaults: SiteStyle = {
   indexZoom: 140,
   indexVeil: 62,
   heroGray: false,
+  density: layoutDefaults.density,
+  projectSize: layoutDefaults.projectSize,
   colorBg: "#ffffff",
   colorInk: "#000000",
   colorAccent: "#b5532f",
@@ -86,6 +98,8 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     indexZoom: num(r.indexZoom, styleRanges.indexZoom, d.indexZoom),
     indexVeil: num(r.indexVeil, styleRanges.indexVeil, d.indexVeil),
     heroGray: typeof r.heroGray === "boolean" ? r.heroGray : d.heroGray,
+    density: readChoice(r.density, densityModes, d.density),
+    projectSize: readChoice(r.projectSize, projectSizes, d.projectSize),
     colorBg: color(r.colorBg, d.colorBg),
     colorInk: color(r.colorInk, d.colorInk),
     colorAccent: color(r.colorAccent, d.colorAccent),

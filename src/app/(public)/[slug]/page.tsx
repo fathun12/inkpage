@@ -133,7 +133,7 @@ export default async function HomePage({ params }: Props) {
           title={site.cardsTitle ?? site.writing.title ?? "Writing"}
           seconds={style.heroSeconds}
           autoplay={autoplay}
-          spacing={articles.length > 0 ? "pt-16 pb-6 sm:pt-24 sm:pb-8" : undefined}
+         spacing={articles.length > 0 ? "site-pt pb-6 sm:pb-8" : undefined}
         />
       )}
       <HomeArticles

@@ -12,13 +12,13 @@ export function HomeGithub({ data, title }: { data: GithubData; title: string })
   const active = data.status === "active";
   const max = Math.max(1, ...data.days);
   return (
-    <section id="github" aria-label={title} className="mt-16 bg-band pt-16 text-band-ink sm:mt-24 sm:pt-24">
+    <section id="github" aria-label={title} className="site-mt bg-band site-pt text-band-ink">
       <div className="mx-auto max-w-5xl px-5 pb-8 sm:px-8">
         <Reveal>
           <h2 className="font-mono text-xs uppercase tracking-widest opacity-70">{title}</h2>
         </Reveal>
       </div>
-      <div className="mx-auto grid max-w-5xl gap-10 px-5 pb-16 sm:px-8 sm:pb-24 lg:grid-cols-12 lg:gap-12">
+      <div className="mx-auto grid max-w-5xl gap-10 px-5 sm:px-8 site-pb lg:grid-cols-12 lg:gap-12">
         <div className="lg:col-span-4">
           <Reveal variant="still">
             <Img src={data.avatar} alt={`Avatar of ${data.login}`} className="size-24 object-cover" />

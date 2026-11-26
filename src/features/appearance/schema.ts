@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { hexColor } from "@/config/background";
 import { fontIds } from "@/config/font-choices";
+import { densityModes, projectSizes } from "@/config/layout";
 import { motionModes, styleRanges } from "@/config/site-style";
 
 const color = z
@@ -33,4 +34,6 @@ export const appearanceSchema = z.object({
   site_hero_zoom: whole("Scroll zoom", styleRanges.heroZoom),
   site_index_zoom: whole("Link list zoom", styleRanges.indexZoom),
   site_hero_gray: z.boolean(),
+  site_density: z.enum(densityModes, { error: "Pick a spacing." }),
+  site_project_size: z.enum(projectSizes, { error: "Pick a project size." }),
 });

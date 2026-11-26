@@ -33,6 +33,8 @@ export function SiteFrame({
   return (
     <div
       data-motion={style.motion}
+      data-density={style.density}
+      data-project-size={style.projectSize}
       data-mode={mode}
       style={{ ...fontStyle(fonts), ...vars }}
       className="site-root min-h-screen bg-bg font-body text-ink [font-synthesis-weight:none]"
