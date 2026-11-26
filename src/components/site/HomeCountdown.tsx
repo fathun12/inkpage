@@ -44,7 +44,7 @@ export function HomeCountdown({ title, description, target, start, variant = "se
     const time = `${days > 0 ? `${days}d ` : ""}${pad(Math.floor((left % 86400) / 3600))}:${pad(Math.floor((left % 3600) / 60))}:${pad(left % 60)}`;
     return (
       <section id="countdown" aria-label={title} className="site-strip-pt px-5 sm:px-8">
-        <div className="mx-auto flex max-w-5xl items-baseline justify-between gap-4 border-b-2 border-tertiary pt-4 site-strip-pb">
+        <div className="site-media-pop mx-auto flex max-w-5xl items-baseline justify-between gap-4 border-b-2 border-tertiary pt-4 site-strip-pb">
           <p className="flex min-w-0 items-center gap-2.5 font-mono text-xs uppercase tracking-[0.22em]">
             <span aria-hidden className="size-1.5 shrink-0 rounded-full bg-accent" />
             <span className="truncate">{title}</span>
@@ -59,7 +59,7 @@ export function HomeCountdown({ title, description, target, start, variant = "se
 
   return (
     <section id="countdown" aria-label={title} className="px-5 site-pt-s sm:px-8">
-      <div className="mx-auto max-w-5xl border-b-2 border-tertiary px-4 site-py-xs text-center">
+      <div className="site-media-pop mx-auto max-w-5xl border-b-2 border-tertiary px-4 site-py-xs text-center">
         <p className="inline-flex items-center gap-2.5 font-mono text-xs uppercase tracking-[0.22em] text-accent">
           <span aria-hidden className="size-1.5 rounded-full bg-accent" />
           <span>{countdownConfig.messages[stage]}</span>

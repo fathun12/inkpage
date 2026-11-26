@@ -162,7 +162,7 @@ export function NewsBar({ items, seconds, autoplay, showClock = false, countdown
   if (phone.length === 0) return null;
 
   return (
-    <div role="region" aria-label="News" className="relative z-40 border-b border-band-line bg-band text-xs text-band-ink">
+    <div role="region" aria-label="News" className="site-bar-in relative z-40 border-b border-band-line bg-band text-xs text-band-ink">
       <div className="mx-auto hidden h-9 max-w-6xl items-center gap-3 px-3 sm:flex">
         {showClock && <Clock />}
         <Slides slides={news} seconds={seconds} autoplay={autoplay} small={live !== null} />

@@ -72,11 +72,13 @@ export function CardSlider({ items, title, seconds, autoplay, spacing = "site-py
       </div>
       <ul
         ref={track}
-        className="site-cards-track mx-auto flex max-w-6xl snap-x snap-mandatory scroll-px-5 gap-6 overflow-x-auto px-5 pb-2 sm:scroll-px-8 sm:px-8"
+        className="site-cards-track -mb-4 mx-auto flex max-w-6xl snap-x snap-mandatory scroll-px-5 gap-6 overflow-x-auto px-5 pb-6 sm:scroll-px-8 sm:px-8"
       >
-        {items.map((block) => (
+        {items.map((block, index) => (
           <li key={block.id} className="shrink-0 basis-[78%] snap-start sm:basis-[24rem]">
-            <WritingCard block={block} />
+            <Reveal delay={Math.min(index, 4) * 80}>
+              <WritingCard block={block} />
+            </Reveal>
           </li>
         ))}
       </ul>

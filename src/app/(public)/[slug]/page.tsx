@@ -16,6 +16,7 @@ import { HomeGithub } from "@/components/site/HomeGithub";
 import { HomeProjects } from "@/components/site/HomeProjects";
 import { HomeShowcase } from "@/components/site/HomeShowcase";
 import { IndexSection } from "@/components/site/IndexSection";
+import { Reveal } from "@/components/site/Reveal";
 import { SectionBox } from "@/components/site/SectionBox";
 import { VisitCards } from "@/components/site/VisitCards";
 import { readBackground } from "@/config/background";
@@ -128,13 +129,15 @@ export default async function HomePage({ params }: Props) {
   const parts: Record<SectionId, ReactNode> = {
     countdown: countdown && on("countdown") && (
       <SectionBox setting={sec.countdown}>
-        <HomeCountdown
-          title={countdown.title}
-          description={countdown.body}
-          target={countdown.data.target ?? ""}
-          start={countdown.created_at}
-          variant={style.countdownView}
-        />
+        <Reveal variant="still">
+          <HomeCountdown
+            title={countdown.title}
+            description={countdown.body}
+            target={countdown.data.target ?? ""}
+            start={countdown.created_at}
+            variant={style.countdownView}
+          />
+        </Reveal>
       </SectionBox>
     ),
     writing: writing.length > 0 && on("writing") && (

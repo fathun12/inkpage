@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 type Props = {
   brand: string;
@@ -35,6 +35,14 @@ export function SiteHeader({ brand, home, items, overlay }: Props) {
     return () => observer.disconnect();
   }, [onHome]);
 
+  // The entrance motion plays once per visit: after it is over, the page wrapper is marked.
+  useEffect(() => {
+    const root = sentinel.current?.closest(".site-root");
+    if (!root) return;
+    const id = window.setTimeout(() => root.setAttribute("data-entered", ""), 3000);
+    return () => window.clearTimeout(id);
+  }, []);
+
   return (
     <>
       <div ref={sentinel} aria-hidden className="pointer-events-none absolute left-0 top-0 h-10 w-px" />
@@ -48,14 +56,15 @@ export function SiteHeader({ brand, home, items, overlay }: Props) {
         </Link>
         {items.length > 1 && (
           <nav aria-label="Pages" className="site-nav">
-            {items.map((item) => {
+            {items.map((item, i) => {
               const active = here === clean(item.href);
               return (
                 <Link
                   key={item.href}
                   href={item.href}
                   aria-current={active ? "page" : undefined}
-                  className={`border-b pb-0.5 transition-opacity duration-(--dur-base) ${
+                  style={{ "--i": i } as CSSProperties}
+                  className={`site-nav-item border-b pb-0.5 transition-opacity duration-(--dur-base) ${
                     active ? "border-accent" : "border-transparent opacity-70 hover:opacity-100"
                   }`}
                 >

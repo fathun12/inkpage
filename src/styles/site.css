@@ -469,6 +469,60 @@ a:focus-visible .site-sweep {
   }
 }
 
+/* Entrance of the top of Home (hero, news bar, brand, tabs). Plays once per visit: SiteHeader sets
+   data-entered on .site-root after 3 s. "backwards" keeps the natural style afterwards (opacity 0.7 of tabs). */
+@keyframes site-curtain {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+@keyframes site-drop {
+  from {
+    opacity: 0;
+    translate: 0 -14px;
+  }
+}
+@keyframes site-slide-in {
+  from {
+    opacity: 0;
+    translate: 24px 0;
+  }
+}
+@keyframes site-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+.site-root:not([data-entered])[data-motion="full"] .site-hero-in {
+  animation: site-curtain 700ms var(--ease-out) backwards;
+}
+.site-root:not([data-entered])[data-motion="full"] .site-bar-in {
+  animation: site-curtain 600ms var(--ease-out) 280ms backwards;
+}
+.site-root:not([data-entered])[data-motion="full"] .site-brand {
+  animation: site-drop 900ms var(--ease-out) 560ms backwards;
+}
+.site-root:not([data-entered])[data-motion="full"] .site-nav-item {
+  animation: site-slide-in 800ms var(--ease-out) calc(640ms + var(--i, 0) * 70ms) backwards;
+}
+.site-root:not([data-entered])[data-motion="subtle"] .site-hero-in,
+.site-root:not([data-entered])[data-motion="subtle"] .site-bar-in,
+.site-root:not([data-entered])[data-motion="subtle"] .site-brand,
+.site-root:not([data-entered])[data-motion="subtle"] .site-nav-item {
+  animation: site-fade-in 600ms var(--ease-out) 150ms backwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-hero-in,
+  .site-bar-in,
+  .site-brand,
+  .site-nav-item {
+    animation: none !important;
+  }
+}
+
 /* Density (Customize, Layout): the space between the sections of the website. data-density is on the page wrapper.
    Comfortable is the original look. --sec = a normal section, --sec-s = top of the countdown, --sec-xs = inside it. */
 .site-root {
