@@ -50,12 +50,20 @@ import {
   densityHints,
   densityLabels,
   densityModes,
+  designIntroSizeLabels,
+  designIntroSizes,
   designModeHints,
   designModeLabels,
   designModes,
   designSizeHints,
   designSizeLabels,
   designSizes,
+  designTextFonts,
+  designTitleAlignHints,
+  designTitleAlignLabels,
+  designTitleAligns,
+  designTitleSizeLabels,
+  designTitleSizes,
   designViewHints,
   designViewLabels,
   designViews,
@@ -69,6 +77,7 @@ import {
   projectViewLabels,
   projectViews,
   sectionLabels,
+  type DesignFont,
   type SectionId,
   type SectionSetting,
 } from "@/config/layout";
@@ -260,6 +269,38 @@ function Slider({
         onChange={(e) => onChange(Number(e.target.value))}
         className="w-full accent-accent"
       />
+    </Field>
+  );
+}
+
+// A short list of fonts for one piece of text. Default keeps the font the text already has.
+function TextFontSelect({
+  id,
+  label,
+  value,
+  hint,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  value: DesignFont;
+  hint?: string;
+  onChange: (value: DesignFont) => void;
+}) {
+  return (
+    <Field label={label} htmlFor={id} hint={hint}>
+      <select
+        id={id}
+        value={value}
+        onChange={(e) => onChange(e.target.value as DesignFont)}
+        className="ink-border w-full rounded-md bg-surface px-3 py-2 text-sm"
+      >
+        {designTextFonts.map((f) => (
+          <option key={f} value={f}>
+            {f === "default" ? "Default" : fontChoices[f].label}
+          </option>
+        ))}
+      </select>
     </Field>
   );
 }
@@ -534,6 +575,12 @@ export function CustomizeStudio({
           mode={draft.style.designMode}
           view={draft.style.designView}
           wideView={draft.style.designWideView}
+          intro={site.designsIntro}
+          titleAlign={draft.style.designTitleAlign}
+          titleFont={draft.style.designTitleFont}
+          titleSize={draft.style.designTitleSize}
+          introFont={draft.style.designIntroFont}
+          introSize={draft.style.designIntroSize}
           size={draft.style.designSize}
           mediaHeight={draft.style.designMedia}
           slide={{ seconds: draft.style.heroSeconds, autoplay }}
@@ -722,6 +769,86 @@ export function CustomizeStudio({
         hint="Picked at random from House Showcase on each visit."
         onChange={(designCount) => setStyle({ designCount })}
       />
+      <div className="flex flex-col gap-4 border-t border-line pt-4">
+        <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">Title</span>
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Place</span>
+          <div className="flex flex-wrap gap-2">
+            {designTitleAligns.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.designTitleAlign === m}
+                  onChange={() => setStyle({ designTitleAlign: m })}
+                  className="sr-only"
+                />
+                {designTitleAlignLabels[m]}
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-ink-soft">{designTitleAlignHints[draft.style.designTitleAlign]}</p>
+        </div>
+        <TextFontSelect
+          id="ui_design_title_font"
+          label="Font"
+          value={draft.style.designTitleFont}
+          hint="Default is the small label. Pick a font or a size to turn the title into a big heading."
+          onChange={(designTitleFont) => setStyle({ designTitleFont })}
+        />
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Size</span>
+          <div className="flex flex-wrap gap-2">
+            {designTitleSizes.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.designTitleSize === m}
+                  onChange={() => setStyle({ designTitleSize: m })}
+                  className="sr-only"
+                />
+                {designTitleSizeLabels[m]}
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-col gap-4 border-t border-line pt-4">
+        <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">Text under the title</span>
+        <TextFontSelect
+          id="ui_design_intro_font"
+          label="Font"
+          value={draft.style.designIntroFont}
+          hint="Default is the font of the site."
+          onChange={(designIntroFont) => setStyle({ designIntroFont })}
+        />
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Size</span>
+          <div className="flex flex-wrap gap-2">
+            {designIntroSizes.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.designIntroSize === m}
+                  onChange={() => setStyle({ designIntroSize: m })}
+                  className="sr-only"
+                />
+                {designIntroSizeLabels[m]}
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-ink-soft">Auto follows the size of the title.</p>
+        </div>
+        <p className="text-xs text-ink-soft">
+          The text itself is written in{" "}
+          <Link href={routes.pages} className="underline underline-offset-4">
+            Pages
+          </Link>
+          , Home tab, Design projects. Nothing shows until you write it.
+        </p>
+      </div>
     </>
   );
 
@@ -755,6 +882,11 @@ export function CustomizeStudio({
       <input type="hidden" name="site_design_count" value={draft.style.designCount} />
       <input type="hidden" name="site_design_mode" value={draft.style.designMode} />
       <input type="hidden" name="site_design_wide_view" value={draft.style.designWideView} />
+      <input type="hidden" name="site_design_title_align" value={draft.style.designTitleAlign} />
+      <input type="hidden" name="site_design_title_font" value={draft.style.designTitleFont} />
+      <input type="hidden" name="site_design_title_size" value={draft.style.designTitleSize} />
+      <input type="hidden" name="site_design_intro_font" value={draft.style.designIntroFont} />
+      <input type="hidden" name="site_design_intro_size" value={draft.style.designIntroSize} />
       {draft.style.heroGray && <input type="hidden" name="site_hero_gray" value="on" />}
 
       <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line px-5 py-3">
@@ -845,6 +977,11 @@ export function CustomizeStudio({
                 designCount: siteStyleDefaults.designCount,
                 designMode: siteStyleDefaults.designMode,
                 designWideView: siteStyleDefaults.designWideView,
+                designTitleAlign: siteStyleDefaults.designTitleAlign,
+                designTitleFont: siteStyleDefaults.designTitleFont,
+                designTitleSize: siteStyleDefaults.designTitleSize,
+                designIntroFont: siteStyleDefaults.designIntroFont,
+                designIntroSize: siteStyleDefaults.designIntroSize,
               })
             }
           >

@@ -61,6 +61,7 @@ const textSchema = z.object({
   biblia_title: text("The Biblia label", siteLimits.title),
   biblia_intro: text("The Biblia text", siteLimits.intro),
   designs_title: text("The design projects label", siteLimits.title),
+  designs_intro: text("The design projects text", siteLimits.intro),
   github_title: text("The GitHub label", siteLimits.title),
   visit_title: text("The Visit website label", siteLimits.title),
   projects_title: text("The Projects title", siteLimits.title),
@@ -170,6 +171,7 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     biblia_title: field(formData, "biblia_title"),
     biblia_intro: field(formData, "biblia_intro"),
     designs_title: field(formData, "designs_title"),
+    designs_intro: field(formData, "designs_intro"),
     github_title: field(formData, "github_title"),
     visit_title: field(formData, "visit_title"),
     projects_title: field(formData, "projects_title"),
@@ -221,6 +223,7 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     if (designs && !isHttpUrl(designs)) return abort("The House Showcase address must start with http:// or https://");
     next.designsUrl = designs ? designs.replace(/\/+$/, "") : null;
     next.designsTitle = v.designs_title ?? null;
+    next.designsIntro = v.designs_intro ?? null;
     // A pasted address or an @ is accepted: only the username is kept.
     const gh = field(formData, "github_user")
       ?.replace(/^https?:\/\/(www\.)?github\.com\//i, "")

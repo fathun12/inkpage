@@ -217,6 +217,12 @@ export default async function HomePage({ params }: Props) {
           mode={style.designMode}
           view={style.designView}
           wideView={style.designWideView}
+          intro={site.designsIntro}
+          titleAlign={style.designTitleAlign}
+          titleFont={style.designTitleFont}
+          titleSize={style.designTitleSize}
+          introFont={style.designIntroFont}
+          introSize={style.designIntroSize}
           size={style.designSize}
           mediaHeight={style.designMedia}
           slide={{ seconds: style.heroSeconds, autoplay }}

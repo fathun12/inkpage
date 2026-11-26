@@ -86,9 +86,10 @@ export type SiteSettings = {
   bibliaUrl: string | null;
   bibliaTitle: string | null;
   bibliaIntro: string | null;
-  // Address of the House Showcase website (empty = no design section) and its label.
+  // Address of the House Showcase website (empty = no design section), its label and the text under the label.
   designsUrl: string | null;
   designsTitle: string | null;
+  designsIntro: string | null;
   // GitHub username (empty = no GitHub section) and its label.
   githubUser: string | null;
   githubTitle: string | null;
@@ -234,6 +235,7 @@ export function readSite(raw: unknown): SiteSettings {
     bibliaIntro: text(r.bibliaIntro, siteLimits.intro),
     designsUrl: link(r.designsUrl),
     designsTitle: text(r.designsTitle, siteLimits.title),
+    designsIntro: text(r.designsIntro, siteLimits.intro),
     githubUser: githubName(r.githubUser),
     githubTitle: text(r.githubTitle, siteLimits.title),
     musicUrl: link(r.musicUrl),

@@ -141,6 +141,13 @@ export function HomeForm({ action, sign, site }: WithMedia) {
         <Field label="Label" htmlFor="designs_title" hint="Optional. Default: Design.">
           <Input id="designs_title" name="designs_title" defaultValue={site.designsTitle ?? ""} maxLength={siteLimits.title} />
         </Field>
+        <Field
+          label="Text under the title"
+          htmlFor="designs_intro"
+          hint="Optional. Its font, size and place are set in Customize, Sections, Design projects. Up to 400 characters."
+        >
+          <Textarea id="designs_intro" name="designs_intro" defaultValue={site.designsIntro ?? ""} rows={3} maxLength={siteLimits.intro} />
+        </Field>
       </Section>
 
       <Section title="GitHub" hint="Your profile, newest repositories and activity, shown below Biblia.">

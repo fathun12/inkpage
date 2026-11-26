@@ -6,8 +6,12 @@ import { hexColor, luminance } from "@/config/background";
 import {
   countdownViews,
   densityModes,
+  designIntroSizes,
   designModes,
   designSizes,
+  designTextFonts,
+  designTitleAligns,
+  designTitleSizes,
   designViews,
   designWideViews,
   layoutDefaults,
@@ -20,8 +24,12 @@ import {
   sectionIds,
   type CountdownView,
   type DensityMode,
+  type DesignFont,
+  type DesignIntroSize,
   type DesignMode,
   type DesignSize,
+  type DesignTitleAlign,
+  type DesignTitleSize,
   type DesignView,
   type DesignWideView,
   type ProjectSize,
@@ -78,6 +86,11 @@ export type SiteStyle = {
   designWideView: DesignWideView;
   designMedia: number;
   designCount: number;
+  designTitleAlign: DesignTitleAlign;
+  designTitleFont: DesignFont;
+  designTitleSize: DesignTitleSize;
+  designIntroFont: DesignFont;
+  designIntroSize: DesignIntroSize;
   sections: SectionSettings;
   order: SectionId[];
   colorBg: string;
@@ -110,6 +123,11 @@ export const siteStyleDefaults: SiteStyle = {
   designWideView: layoutDefaults.designWideView,
   designMedia: layoutDefaults.designMedia,
   designCount: layoutDefaults.designCount,
+  designTitleAlign: layoutDefaults.designTitleAlign,
+  designTitleFont: layoutDefaults.designTitleFont,
+  designTitleSize: layoutDefaults.designTitleSize,
+  designIntroFont: layoutDefaults.designIntroFont,
+  designIntroSize: layoutDefaults.designIntroSize,
   sections: sectionDefaults,
   order: [...sectionIds],
   colorBg: "#ffffff",
@@ -150,6 +168,11 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     designView: readChoice(r.designView, designViews, d.designView),
     designMode: readChoice(r.designMode, designModes, d.designMode),
     designWideView: readChoice(r.designWideView, designWideViews, d.designWideView),
+    designTitleAlign: readChoice(r.designTitleAlign, designTitleAligns, d.designTitleAlign),
+    designTitleFont: readChoice(r.designTitleFont, designTextFonts, d.designTitleFont),
+    designTitleSize: readChoice(r.designTitleSize, designTitleSizes, d.designTitleSize),
+    designIntroFont: readChoice(r.designIntroFont, designTextFonts, d.designIntroFont),
+    designIntroSize: readChoice(r.designIntroSize, designIntroSizes, d.designIntroSize),
     designMedia: num(r.designMedia, styleRanges.designMedia, d.designMedia),
     designCount: num(r.designCount, styleRanges.designCount, d.designCount),
     sections: readSections(r.sections),

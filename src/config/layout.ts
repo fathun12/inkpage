@@ -1,6 +1,8 @@
 // Layout settings of the public website (Customize studio, "Layout"). Plain data: no database and no React here.
 // Only the names live here. The sizes (rem) are in styles/site.css (--sec and the .site-proj-* rules).
 
+import { fontIds } from "@/config/font-choices";
+
 export const densityModes = ["compact", "comfortable", "airy"] as const;
 export type DensityMode = (typeof densityModes)[number];
 
@@ -112,6 +114,51 @@ export const designWideViewHints: Record<DesignWideView, string> = {
   filmstrip: "One row of tall photos that slides sideways, with arrows.",
 };
 
+// The title of the Design projects section and the text under it (Customize, Sections, Design projects).
+// The text itself is written in Pages (Home tab). The default look is the small label, as before.
+export const designTitleAligns = ["full", "center", "left", "right"] as const;
+export type DesignTitleAlign = (typeof designTitleAligns)[number];
+
+export const designTitleAlignLabels: Record<DesignTitleAlign, string> = {
+  full: "Full",
+  center: "Centered",
+  left: "Left edge",
+  right: "Right edge",
+};
+
+export const designTitleAlignHints: Record<DesignTitleAlign, string> = {
+  full: "One full row: the title at the left edge of the screen, the text at the right edge.",
+  center: "Inside the page margins (the original).",
+  left: "Stuck to the left edge of the screen.",
+  right: "Stuck to the right edge of the screen.",
+};
+
+// "default" = the font the text already has (for the title at Auto size: the small label).
+export const designTextFonts = ["default", ...fontIds] as const;
+export type DesignFont = (typeof designTextFonts)[number];
+
+export const designTitleSizes = ["auto", "small", "medium", "large", "huge", "giant"] as const;
+export type DesignTitleSize = (typeof designTitleSizes)[number];
+
+export const designTitleSizeLabels: Record<DesignTitleSize, string> = {
+  auto: "Auto",
+  small: "Small",
+  medium: "Medium",
+  large: "Large",
+  huge: "Huge",
+  giant: "Giant",
+};
+
+export const designIntroSizes = ["auto", "small", "medium", "large"] as const;
+export type DesignIntroSize = (typeof designIntroSizes)[number];
+
+export const designIntroSizeLabels: Record<DesignIntroSize, string> = {
+  auto: "Auto",
+  small: "Small",
+  medium: "Medium",
+  large: "Large",
+};
+
 // How the Countdown section looks.
 export const countdownViews = ["section", "strip"] as const;
 export type CountdownView = (typeof countdownViews)[number];
@@ -139,6 +186,11 @@ export const layoutDefaults: {
   designWideView: DesignWideView;
   designMedia: number;
   designCount: number;
+  designTitleAlign: DesignTitleAlign;
+  designTitleFont: DesignFont;
+  designTitleSize: DesignTitleSize;
+  designIntroFont: DesignFont;
+  designIntroSize: DesignIntroSize;
 } = {
   density: "comfortable",
   projectSize: "large",
@@ -151,6 +203,11 @@ export const layoutDefaults: {
   designWideView: "stack",
   designMedia: 0,
   designCount: 3,
+  designTitleAlign: "center",
+  designTitleFont: "default",
+  designTitleSize: "auto",
+  designIntroFont: "default",
+  designIntroSize: "auto",
 };
 
 // Safe reader: an unknown or missing value falls back to the default.

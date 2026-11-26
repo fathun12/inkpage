@@ -1,6 +1,16 @@
-import type { DesignMode, DesignSize, DesignView, DesignWideView } from "@/config/layout";
+import type {
+  DesignFont,
+  DesignIntroSize,
+  DesignMode,
+  DesignSize,
+  DesignTitleAlign,
+  DesignTitleSize,
+  DesignView,
+  DesignWideView,
+} from "@/config/layout";
 import type { DesignsData } from "@/types/designs";
 import { DesignCard } from "./DesignCard";
+import { DesignHeading } from "./DesignHeading";
 import { DesignWide } from "./DesignWide";
 import { MediaSlider } from "./MediaSlider";
 import { Reveal } from "./Reveal";
@@ -27,6 +37,13 @@ type Props = {
   mediaHeight?: number;
   // The slider layouts slide by themselves with these.
   slide?: { seconds: number; autoplay: boolean };
+  // The text under the title (written in Pages) and the look of the title and of that text (Customize).
+  intro?: string | null;
+  titleAlign?: DesignTitleAlign;
+  titleFont?: DesignFont;
+  titleSize?: DesignTitleSize;
+  introFont?: DesignFont;
+  introSize?: DesignIntroSize;
 };
 
 // The design projects section of Home: random projects from House Showcase. It only appears when that site answered.
@@ -43,6 +60,12 @@ export function HomeDesigns({
   size = "large",
   mediaHeight = 0,
   slide,
+  intro = null,
+  titleAlign = "center",
+  titleFont = "default",
+  titleSize = "auto",
+  introFont = "default",
+  introSize = "auto",
 }: Props) {
   if (data.projects.length === 0) return null;
   const run = slide ?? { seconds: 5, autoplay: true };
@@ -50,23 +73,16 @@ export function HomeDesigns({
   const wide = mode === "full";
   return (
     <section id="designs" aria-label={title} className="site-pt">
-      <div
-        className={`flex items-end justify-between gap-4 px-5 pb-8 sm:px-8 ${wide ? "" : "mx-auto max-w-5xl"}`}
-      >
-        <Reveal>
-          <h2 className="font-mono text-xs uppercase tracking-widest opacity-70">{title}</h2>
-        </Reveal>
-        {href && (
-          <a
-            href={href}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-mono text-xs uppercase tracking-widest underline decoration-accent decoration-1 underline-offset-4 transition-colors duration-(--dur-base) hover:text-accent"
-          >
-            Visit website ↗
-          </a>
-        )}
-      </div>
+      <DesignHeading
+        title={title}
+        href={href}
+        intro={intro}
+        align={titleAlign}
+        font={titleFont}
+        size={titleSize}
+        introFont={introFont}
+        introSize={introSize}
+      />
 
       {wide && (
         <div className="site-pb">
