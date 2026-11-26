@@ -164,6 +164,7 @@ export default async function HomePage({ params }: Props) {
         <HomeProjects
           items={projects}
           title={site.projects.title ?? "Projects"}
+          seeAll={routes.section(profile.username, "projects")}
           view={style.projectView}
           mediaHeight={style.projectMedia}
           slide={{ seconds: style.heroSeconds, autoplay }}

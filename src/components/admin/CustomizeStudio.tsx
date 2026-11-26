@@ -475,6 +475,7 @@ export function CustomizeStudio({
         <HomeProjects
           items={projects}
           title={site.projects.title ?? "Projects"}
+          seeAll={routes.section(profile.username, "projects")}
           view={draft.style.projectView}
           mediaHeight={draft.style.projectMedia}
           slide={{ seconds: draft.style.heroSeconds, autoplay }}
