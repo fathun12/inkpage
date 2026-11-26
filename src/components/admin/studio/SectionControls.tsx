@@ -20,13 +20,20 @@ import { CSS } from "@dnd-kit/utilities";
 import { Field } from "@/components/ui/Field";
 import {
   sectionHasSpace,
+  sectionHasSurface,
   sectionLabels,
   sectionSpace,
+  sectionSurfaceHints,
+  sectionSurfaceLabels,
+  sectionSurfaces,
   type SectionId,
   type SectionSetting,
   type SectionSettings,
 } from "@/config/layout";
 import { cn } from "@/lib/utils";
+
+const pill =
+  "ink-border cursor-pointer rounded-full px-3 py-1.5 text-sm has-checked:bg-ink has-checked:text-bg has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink";
 
 type Props = {
   order: SectionId[];
@@ -133,6 +140,35 @@ function Row({
               value={setting.bottom}
               onChange={(bottom) => onSection(id, { bottom })}
             />
+            {sectionHasSurface[id] && (
+              <div className="flex flex-col gap-2">
+                <span className="text-sm font-medium text-ink-soft">Background</span>
+                <div className="flex flex-wrap gap-2">
+                  {sectionSurfaces.map((s) => (
+                    <label key={s} className={pill}>
+                      <input
+                        type="radio"
+                        value={s}
+                        checked={setting.surface === s}
+                        onChange={() => onSection(id, { surface: s })}
+                        className="sr-only"
+                      />
+                      {sectionSurfaceLabels[s]}
+                    </label>
+                  ))}
+                </div>
+                <p className="text-xs text-ink-soft">{sectionSurfaceHints[setting.surface]}</p>
+              </div>
+            )}
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={setting.line}
+                onChange={(e) => onSection(id, { line: e.target.checked })}
+                className="accent-accent"
+              />
+              Divider line above
+            </label>
           </div>
         </details>
       ) : (

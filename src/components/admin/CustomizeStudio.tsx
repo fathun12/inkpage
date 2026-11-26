@@ -588,9 +588,9 @@ export function CustomizeStudio({
             onReset={() => setStyle({ sections: siteStyleDefaults.sections, order: siteStyleDefaults.order })}
           >
             <p className="text-xs text-ink-soft">
-              Drag :: or use the arrows to change the order. Untick Show to hide a section. Click a name to give it
-              more or less space (added to the Spacing choice above). A section with nothing to show stays hidden
-              anyway. The hero is always first and the footer always last.
+              Drag :: or use the arrows to change the order. Untick Show to hide a section. Click a name to change
+              its space (added to the Spacing choice above), its background and its divider line. A section with
+              nothing to show stays hidden anyway. The hero is always first and the footer always last.
             </p>
             <SectionControls
               order={draft.style.order}

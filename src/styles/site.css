@@ -529,6 +529,36 @@ a:focus-visible .site-sweep {
   }
 }
 
+/* Background and divider line of one section (Customize, "Sections"). SectionBox puts .site-box around the
+   section. flow-root keeps the margins of the section inside the colored box. Inside a Tertiary or Secondary
+   box the theme variables are replaced, so text, thin lines and cards use the colors of that box. */
+.site-box {
+  display: flow-root;
+}
+.site-box-line {
+  border-top: 1px solid var(--c-line);
+}
+.site-box[data-surface="tertiary"] {
+  --c-bg: var(--c-tertiary);
+  --c-surface: var(--c-tertiary);
+  --c-ink: var(--c-tertiary-ink);
+  --c-ink-soft: color-mix(in srgb, var(--c-tertiary-ink) 62%, var(--c-tertiary));
+  --c-line: color-mix(in srgb, var(--c-tertiary-ink) 18%, var(--c-tertiary));
+  --c-highlight: color-mix(in srgb, var(--c-tertiary-ink) 8%, var(--c-tertiary));
+  background: var(--c-bg);
+  color: var(--c-ink);
+}
+.site-box[data-surface="band"] {
+  --c-bg: var(--c-band);
+  --c-surface: var(--c-band);
+  --c-ink: var(--c-band-ink);
+  --c-ink-soft: color-mix(in srgb, var(--c-band-ink) 62%, var(--c-band));
+  --c-line: var(--c-band-line);
+  --c-highlight: color-mix(in srgb, var(--c-band-ink) 8%, var(--c-band));
+  background: var(--c-bg);
+  color: var(--c-ink);
+}
+
 /* Countdown as a thin strip (Customize, Layout). It sits close to what is above it: only the extra space is
    added on top. Inside, 1rem below the text before the Tertiary line. */
 .site-strip-pt {

@@ -134,10 +134,48 @@ export const sectionHasSpace: Record<SectionId, boolean> = {
 // Extra space (rem) added to, or taken from, the Spacing choice. 0 = unchanged.
 export const sectionSpace = { min: -6, max: 6, step: 0.5 } as const;
 
-export type SectionSetting = { hidden: boolean; top: number; bottom: number };
+// Background of one section: the Page color (as now), the Tertiary color, or the Secondary color.
+export const sectionSurfaces = ["page", "tertiary", "band"] as const;
+export type SectionSurface = (typeof sectionSurfaces)[number];
+
+export const sectionSurfaceLabels: Record<SectionSurface, string> = {
+  page: "Page",
+  tertiary: "Tertiary",
+  band: "Secondary",
+};
+
+export const sectionSurfaceHints: Record<SectionSurface, string> = {
+  page: "The page color (as now).",
+  tertiary: "The Tertiary color, like the top of the footer.",
+  band: "The Secondary color, like the news bar and the bottom of the footer.",
+};
+
+// GitHub and Links paint their own black background, so a Background choice would not show there.
+export const sectionHasSurface: Record<SectionId, boolean> = {
+  countdown: true,
+  writing: true,
+  articles: true,
+  projects: true,
+  biblia: true,
+  github: false,
+  shop: true,
+  links: false,
+  showcase: true,
+  designs: true,
+  visit: true,
+  gallery: false,
+};
+
+export type SectionSetting = {
+  hidden: boolean;
+  top: number;
+  bottom: number;
+  surface: SectionSurface;
+  line: boolean;
+};
 export type SectionSettings = Record<SectionId, SectionSetting>;
 
-const none = (): SectionSetting => ({ hidden: false, top: 0, bottom: 0 });
+const none = (): SectionSetting => ({ hidden: false, top: 0, bottom: 0, surface: "page", line: false });
 
 export const sectionDefaults: SectionSettings = {
   countdown: none(),
@@ -167,7 +205,13 @@ export function readSections(raw: unknown): SectionSettings {
   for (const id of sectionIds) {
     const e = all[id];
     const o = typeof e === "object" && e !== null && !Array.isArray(e) ? (e as Record<string, unknown>) : {};
-    out[id] = { hidden: o.hidden === true, top: space(o.top), bottom: space(o.bottom) };
+    out[id] = {
+      hidden: o.hidden === true,
+      top: space(o.top),
+      bottom: space(o.bottom),
+      surface: sectionHasSurface[id] ? readChoice(o.surface, sectionSurfaces, "page") : "page",
+      line: sectionHasSpace[id] && o.line === true,
+    };
   }
   return out;
 }

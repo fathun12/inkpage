@@ -1,7 +1,14 @@
 import { z } from "zod";
 import { hexColor } from "@/config/background";
 import { fontIds } from "@/config/font-choices";
-import { countdownViews, densityModes, projectSizes, projectViews, sectionSpace } from "@/config/layout";
+import {
+  countdownViews,
+  densityModes,
+  projectSizes,
+  projectViews,
+  sectionSpace,
+  sectionSurfaces,
+} from "@/config/layout";
 import { motionModes, styleRanges } from "@/config/site-style";
 
 const color = z
@@ -38,7 +45,13 @@ const sectionsJson = z
   .pipe(
     z.record(
       z.string(),
-      z.object({ hidden: z.boolean(), top: sectionSpaceNumber, bottom: sectionSpaceNumber }),
+      z.object({
+        hidden: z.boolean(),
+        top: sectionSpaceNumber,
+        bottom: sectionSpaceNumber,
+        surface: z.enum(sectionSurfaces, { error: "Pick a section background." }),
+        line: z.boolean(),
+      }),
     ),
   );
 
