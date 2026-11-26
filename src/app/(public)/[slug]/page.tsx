@@ -203,7 +203,22 @@ export default async function HomePage({ params }: Props) {
     showcase: on("showcase") && (
       <SectionBox setting={sec.showcase}>
         {showcase.length > 0 && <span id="showcase" className="block" />}
-        <HomeShowcase items={showcase} title={site.showcaseTitle ?? "Showcase"} />
+        <HomeShowcase
+          items={showcase}
+          title={site.showcaseTitle ?? "Showcase"}
+          mode={style.showcaseMode}
+          view={style.showcaseView}
+          wideView={style.showcaseWideView}
+          size={style.showcaseSize}
+          mediaHeight={style.showcaseMedia}
+          slide={{ seconds: style.heroSeconds, autoplay }}
+          intro={site.showcaseIntro}
+          titleAlign={style.showcaseTitleAlign}
+          titleFont={style.showcaseTitleFont}
+          titleSize={style.showcaseTitleSize}
+          introFont={style.showcaseIntroFont}
+          introSize={style.showcaseIntroSize}
+        />
       </SectionBox>
     ),
     designs: designs && on("designs") && (

@@ -107,6 +107,13 @@ export function HomeForm({ action, sign, site }: WithMedia) {
         <Field label="Showcase" htmlFor="showcase_title" hint="Above the Showcase section.">
           <Input id="showcase_title" name="showcase_title" defaultValue={site.showcaseTitle ?? ""} maxLength={siteLimits.title} />
         </Field>
+        <Field
+          label="Showcase text under the title"
+          htmlFor="showcase_intro"
+          hint="Optional. Its font, size and place are set in Customize, Sections, Showcase. Up to 400 characters."
+        >
+          <Textarea id="showcase_intro" name="showcase_intro" defaultValue={site.showcaseIntro ?? ""} rows={3} maxLength={siteLimits.intro} />
+        </Field>
         <p className="text-xs text-ink-soft">The label of the Projects section is the title of the Projects page (Projects tab).</p>
       </Section>
 

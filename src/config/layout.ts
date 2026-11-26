@@ -159,6 +159,57 @@ export const designIntroSizeLabels: Record<DesignIntroSize, string> = {
   large: "Large",
 };
 
+// The Showcase section of Home (the detailed projects ticked "Show as Showcase"). List is the original look.
+// Mode (Centered or Full width), the title place, the fonts and the title sizes reuse the Design names above.
+export const showcaseViews = ["list", "grid", "slider"] as const;
+export type ShowcaseView = (typeof showcaseViews)[number];
+
+export const showcaseViewLabels: Record<ShowcaseView, string> = {
+  list: "List",
+  grid: "Grid",
+  slider: "Slider",
+};
+
+export const showcaseViewHints: Record<ShowcaseView, string> = {
+  list: "One project per row: main photo on the left, text on the right, photos below (the original).",
+  grid: "Cards side by side: main photo on top, text below. One column on a phone.",
+  slider: "One project at a time. It slides by itself and has arrows.",
+};
+
+export const showcaseSizes = ["small", "medium", "large"] as const;
+export type ShowcaseSize = (typeof showcaseSizes)[number];
+
+export const showcaseSizeLabels: Record<ShowcaseSize, string> = {
+  small: "Small",
+  medium: "Medium",
+  large: "Large",
+};
+
+export const showcaseSizeHints: Record<ShowcaseSize, string> = {
+  small: "Grid: four cards per row. List and Slider: the narrowest photo column and the smallest title.",
+  medium: "Grid: three cards per row. List and Slider: a narrower photo column and a smaller title.",
+  large: "The original size: two cards per row in Grid, the original photo column in List.",
+};
+
+export const showcaseWideViews = ["stack", "split", "filmstrip", "sheet", "mosaic"] as const;
+export type ShowcaseWideView = (typeof showcaseWideViews)[number];
+
+export const showcaseWideViewLabels: Record<ShowcaseWideView, string> = {
+  stack: "Stack",
+  split: "Split",
+  filmstrip: "Filmstrip",
+  sheet: "Contact sheet",
+  mosaic: "Mosaic",
+};
+
+export const showcaseWideViewHints: Record<ShowcaseWideView, string> = {
+  stack: "One project per row: the main photo across the whole screen, a tight row of photos, then title and buttons.",
+  split: "Photo on one half of the screen, text on the other half. The sides swap on each project.",
+  filmstrip: "One row of tall panels that slides sideways, with arrows.",
+  sheet: "Square photos touching each other. Only the title shows, on hover.",
+  mosaic: "Photos of different sizes in one tight grid. Only the title shows.",
+};
+
 // How the Countdown section looks.
 export const countdownViews = ["section", "strip"] as const;
 export type CountdownView = (typeof countdownViews)[number];
@@ -191,6 +242,16 @@ export const layoutDefaults: {
   designTitleSize: DesignTitleSize;
   designIntroFont: DesignFont;
   designIntroSize: DesignIntroSize;
+  showcaseSize: ShowcaseSize;
+  showcaseView: ShowcaseView;
+  showcaseMode: DesignMode;
+  showcaseWideView: ShowcaseWideView;
+  showcaseMedia: number;
+  showcaseTitleAlign: DesignTitleAlign;
+  showcaseTitleFont: DesignFont;
+  showcaseTitleSize: DesignTitleSize;
+  showcaseIntroFont: DesignFont;
+  showcaseIntroSize: DesignIntroSize;
 } = {
   density: "comfortable",
   projectSize: "large",
@@ -208,6 +269,16 @@ export const layoutDefaults: {
   designTitleSize: "auto",
   designIntroFont: "default",
   designIntroSize: "auto",
+  showcaseSize: "large",
+  showcaseView: "list",
+  showcaseMode: "centered",
+  showcaseWideView: "stack",
+  showcaseMedia: 0,
+  showcaseTitleAlign: "center",
+  showcaseTitleFont: "default",
+  showcaseTitleSize: "auto",
+  showcaseIntroFont: "default",
+  showcaseIntroSize: "auto",
 };
 
 // Safe reader: an unknown or missing value falls back to the default.

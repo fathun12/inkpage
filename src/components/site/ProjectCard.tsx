@@ -29,19 +29,29 @@ export function ItemMedia({
   eager,
   height,
   index = 0,
+  inFrame = false,
 }: {
   file: ProjectFile;
   eager: boolean;
   height?: number;
   // Position among the media shown together: each one starts 120 ms after the one before it.
   index?: number;
+  // The parent box (position: relative, with its own size) gives the frame: the media fills that box.
+  inFrame?: boolean;
 }) {
   const fill =
     "absolute inset-0 size-full object-cover transition-[scale] duration-500 ease-out group-hover/media:scale-105 motion-reduce:transition-none motion-reduce:group-hover/media:scale-100";
-  const base: CSSProperties = height ? { height: `${height}rem` } : { aspectRatio: ratioAspect[file.ratio] };
+  const base: CSSProperties = inFrame
+    ? {}
+    : height
+      ? { height: `${height}rem` }
+      : { aspectRatio: ratioAspect[file.ratio] };
   const frame = { ...base, "--pop-delay": `${index * 120}ms` } as CSSProperties;
   return (
-    <div className="site-media-pop group/media relative w-full overflow-hidden bg-surface" style={frame}>
+    <div
+      className={`site-media-pop group/media overflow-hidden bg-surface ${inFrame ? "absolute inset-0" : "relative w-full"}`}
+      style={frame}
+    >
       {file.kind === "video" ? (
         <video
           src={file.url}

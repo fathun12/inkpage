@@ -14,6 +14,9 @@ import {
   designTitleSizes,
   designViews,
   designWideViews,
+  showcaseSizes,
+  showcaseViews,
+  showcaseWideViews,
   layoutDefaults,
   projectSizes,
   projectViews,
@@ -32,6 +35,9 @@ import {
   type DesignTitleSize,
   type DesignView,
   type DesignWideView,
+  type ShowcaseSize,
+  type ShowcaseView,
+  type ShowcaseWideView,
   type ProjectSize,
   type ProjectView,
   type SectionId,
@@ -64,6 +70,7 @@ export const styleRanges = {
   projectMedia: { min: 0, max: 40, step: 2 },
   designMedia: { min: 0, max: 60, step: 2 },
   designCount: { min: 3, max: 6, step: 1 },
+  showcaseMedia: { min: 0, max: 60, step: 2 },
 } as const satisfies Record<string, Range>;
 
 export type SiteStyle = {
@@ -91,6 +98,16 @@ export type SiteStyle = {
   designTitleSize: DesignTitleSize;
   designIntroFont: DesignFont;
   designIntroSize: DesignIntroSize;
+  showcaseSize: ShowcaseSize;
+  showcaseView: ShowcaseView;
+  showcaseMode: DesignMode;
+  showcaseWideView: ShowcaseWideView;
+  showcaseMedia: number;
+  showcaseTitleAlign: DesignTitleAlign;
+  showcaseTitleFont: DesignFont;
+  showcaseTitleSize: DesignTitleSize;
+  showcaseIntroFont: DesignFont;
+  showcaseIntroSize: DesignIntroSize;
   sections: SectionSettings;
   order: SectionId[];
   colorBg: string;
@@ -128,6 +145,16 @@ export const siteStyleDefaults: SiteStyle = {
   designTitleSize: layoutDefaults.designTitleSize,
   designIntroFont: layoutDefaults.designIntroFont,
   designIntroSize: layoutDefaults.designIntroSize,
+  showcaseSize: layoutDefaults.showcaseSize,
+  showcaseView: layoutDefaults.showcaseView,
+  showcaseMode: layoutDefaults.showcaseMode,
+  showcaseWideView: layoutDefaults.showcaseWideView,
+  showcaseMedia: layoutDefaults.showcaseMedia,
+  showcaseTitleAlign: layoutDefaults.showcaseTitleAlign,
+  showcaseTitleFont: layoutDefaults.showcaseTitleFont,
+  showcaseTitleSize: layoutDefaults.showcaseTitleSize,
+  showcaseIntroFont: layoutDefaults.showcaseIntroFont,
+  showcaseIntroSize: layoutDefaults.showcaseIntroSize,
   sections: sectionDefaults,
   order: [...sectionIds],
   colorBg: "#ffffff",
@@ -173,6 +200,16 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     designTitleSize: readChoice(r.designTitleSize, designTitleSizes, d.designTitleSize),
     designIntroFont: readChoice(r.designIntroFont, designTextFonts, d.designIntroFont),
     designIntroSize: readChoice(r.designIntroSize, designIntroSizes, d.designIntroSize),
+    showcaseSize: readChoice(r.showcaseSize, showcaseSizes, d.showcaseSize),
+    showcaseView: readChoice(r.showcaseView, showcaseViews, d.showcaseView),
+    showcaseMode: readChoice(r.showcaseMode, designModes, d.showcaseMode),
+    showcaseWideView: readChoice(r.showcaseWideView, showcaseWideViews, d.showcaseWideView),
+    showcaseMedia: num(r.showcaseMedia, styleRanges.showcaseMedia, d.showcaseMedia),
+    showcaseTitleAlign: readChoice(r.showcaseTitleAlign, designTitleAligns, d.showcaseTitleAlign),
+    showcaseTitleFont: readChoice(r.showcaseTitleFont, designTextFonts, d.showcaseTitleFont),
+    showcaseTitleSize: readChoice(r.showcaseTitleSize, designTitleSizes, d.showcaseTitleSize),
+    showcaseIntroFont: readChoice(r.showcaseIntroFont, designTextFonts, d.showcaseIntroFont),
+    showcaseIntroSize: readChoice(r.showcaseIntroSize, designIntroSizes, d.showcaseIntroSize),
     designMedia: num(r.designMedia, styleRanges.designMedia, d.designMedia),
     designCount: num(r.designCount, styleRanges.designCount, d.designCount),
     sections: readSections(r.sections),

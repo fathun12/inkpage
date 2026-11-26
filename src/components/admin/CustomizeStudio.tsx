@@ -77,6 +77,15 @@ import {
   projectViewLabels,
   projectViews,
   sectionLabels,
+  showcaseSizeHints,
+  showcaseSizeLabels,
+  showcaseSizes,
+  showcaseViewHints,
+  showcaseViewLabels,
+  showcaseViews,
+  showcaseWideViewHints,
+  showcaseWideViewLabels,
+  showcaseWideViews,
   type DesignFont,
   type SectionId,
   type SectionSetting,
@@ -561,7 +570,22 @@ export function CustomizeStudio({
     ),
     showcase: on("showcase") && (
       <SectionBox setting={sec.showcase}>
-        <HomeShowcase items={showcase} title={site.showcaseTitle ?? "Showcase"} />
+        <HomeShowcase
+          items={showcase}
+          title={site.showcaseTitle ?? "Showcase"}
+          mode={draft.style.showcaseMode}
+          view={draft.style.showcaseView}
+          wideView={draft.style.showcaseWideView}
+          size={draft.style.showcaseSize}
+          mediaHeight={draft.style.showcaseMedia}
+          slide={{ seconds: draft.style.heroSeconds, autoplay }}
+          intro={site.showcaseIntro}
+          titleAlign={draft.style.showcaseTitleAlign}
+          titleFont={draft.style.showcaseTitleFont}
+          titleSize={draft.style.showcaseTitleSize}
+          introFont={draft.style.showcaseIntroFont}
+          introSize={draft.style.showcaseIntroSize}
+        />
       </SectionBox>
     ),
     designs: designs && on("designs") && (
@@ -852,6 +876,178 @@ export function CustomizeStudio({
     </>
   );
 
+  const showcaseWide = draft.style.showcaseMode === "full";
+  const showcaseControls = (
+    <>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-ink-soft">Mode on Home</span>
+        <div className="flex flex-wrap gap-2">
+          {designModes.map((m) => (
+            <label key={m} className={pill}>
+              <input
+                type="radio"
+                value={m}
+                checked={draft.style.showcaseMode === m}
+                onChange={() => setStyle({ showcaseMode: m })}
+                className="sr-only"
+              />
+              {designModeLabels[m]}
+            </label>
+          ))}
+        </div>
+        <p className="text-xs text-ink-soft">{designModeHints[draft.style.showcaseMode]}</p>
+      </div>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-ink-soft">Layout on Home</span>
+        <div className="flex flex-wrap gap-2">
+          {showcaseWide
+            ? showcaseWideViews.map((m) => (
+                <label key={m} className={pill}>
+                  <input
+                    type="radio"
+                    value={m}
+                    checked={draft.style.showcaseWideView === m}
+                    onChange={() => setStyle({ showcaseWideView: m })}
+                    className="sr-only"
+                  />
+                  {showcaseWideViewLabels[m]}
+                </label>
+              ))
+            : showcaseViews.map((m) => (
+                <label key={m} className={pill}>
+                  <input
+                    type="radio"
+                    value={m}
+                    checked={draft.style.showcaseView === m}
+                    onChange={() => setStyle({ showcaseView: m })}
+                    className="sr-only"
+                  />
+                  {showcaseViewLabels[m]}
+                </label>
+              ))}
+        </div>
+        <p className="text-xs text-ink-soft">
+          {showcaseWide
+            ? showcaseWideViewHints[draft.style.showcaseWideView]
+            : showcaseViewHints[draft.style.showcaseView]}
+        </p>
+      </div>
+      {!showcaseWide && (
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Size on Home</span>
+          <div className="flex flex-wrap gap-2">
+            {showcaseSizes.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.showcaseSize === m}
+                  onChange={() => setStyle({ showcaseSize: m })}
+                  className="sr-only"
+                />
+                {showcaseSizeLabels[m]}
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-ink-soft">{showcaseSizeHints[draft.style.showcaseSize]}</p>
+        </div>
+      )}
+      <Slider
+        id="ui_showcase_media"
+        label="Main photo height"
+        value={draft.style.showcaseMedia}
+        range={styleRanges.showcaseMedia}
+        format={(v) => (v === 0 ? "Auto" : `${v} rem`)}
+        hint={
+          showcaseWide
+            ? "Height of the main photo or video. Auto uses the shape that suits the layout."
+            : "Height of the main photo or video of each project. Auto keeps the shape of the file."
+        }
+        onChange={(showcaseMedia) => setStyle({ showcaseMedia })}
+      />
+      <div className="flex flex-col gap-4 border-t border-line pt-4">
+        <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">Title</span>
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Place</span>
+          <div className="flex flex-wrap gap-2">
+            {designTitleAligns.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.showcaseTitleAlign === m}
+                  onChange={() => setStyle({ showcaseTitleAlign: m })}
+                  className="sr-only"
+                />
+                {designTitleAlignLabels[m]}
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-ink-soft">{designTitleAlignHints[draft.style.showcaseTitleAlign]}</p>
+        </div>
+        <TextFontSelect
+          id="ui_showcase_title_font"
+          label="Font"
+          value={draft.style.showcaseTitleFont}
+          hint="Default is the small label. Pick a font or a size to turn the title into a big heading."
+          onChange={(showcaseTitleFont) => setStyle({ showcaseTitleFont })}
+        />
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Size</span>
+          <div className="flex flex-wrap gap-2">
+            {designTitleSizes.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.showcaseTitleSize === m}
+                  onChange={() => setStyle({ showcaseTitleSize: m })}
+                  className="sr-only"
+                />
+                {designTitleSizeLabels[m]}
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-col gap-4 border-t border-line pt-4">
+        <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">Text under the title</span>
+        <TextFontSelect
+          id="ui_showcase_intro_font"
+          label="Font"
+          value={draft.style.showcaseIntroFont}
+          hint="Default is the font of the site."
+          onChange={(showcaseIntroFont) => setStyle({ showcaseIntroFont })}
+        />
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Size</span>
+          <div className="flex flex-wrap gap-2">
+            {designIntroSizes.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.showcaseIntroSize === m}
+                  onChange={() => setStyle({ showcaseIntroSize: m })}
+                  className="sr-only"
+                />
+                {designIntroSizeLabels[m]}
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-ink-soft">Auto follows the size of the title.</p>
+        </div>
+        <p className="text-xs text-ink-soft">
+          The text itself is written in{" "}
+          <Link href={routes.pages} className="underline underline-offset-4">
+            Pages
+          </Link>
+          , Home tab, Section titles, under Showcase. Nothing shows until you write it.
+        </p>
+      </div>
+    </>
+  );
+
   return (
     <form action={action} className="fixed inset-0 z-40 flex flex-col overflow-hidden bg-bg">
       {/* The sidebar controls have no name. These hidden inputs are what the server receives. */}
@@ -887,6 +1083,16 @@ export function CustomizeStudio({
       <input type="hidden" name="site_design_title_size" value={draft.style.designTitleSize} />
       <input type="hidden" name="site_design_intro_font" value={draft.style.designIntroFont} />
       <input type="hidden" name="site_design_intro_size" value={draft.style.designIntroSize} />
+      <input type="hidden" name="site_showcase_size" value={draft.style.showcaseSize} />
+      <input type="hidden" name="site_showcase_view" value={draft.style.showcaseView} />
+      <input type="hidden" name="site_showcase_mode" value={draft.style.showcaseMode} />
+      <input type="hidden" name="site_showcase_wide_view" value={draft.style.showcaseWideView} />
+      <input type="hidden" name="site_showcase_media" value={draft.style.showcaseMedia} />
+      <input type="hidden" name="site_showcase_title_align" value={draft.style.showcaseTitleAlign} />
+      <input type="hidden" name="site_showcase_title_font" value={draft.style.showcaseTitleFont} />
+      <input type="hidden" name="site_showcase_title_size" value={draft.style.showcaseTitleSize} />
+      <input type="hidden" name="site_showcase_intro_font" value={draft.style.showcaseIntroFont} />
+      <input type="hidden" name="site_showcase_intro_size" value={draft.style.showcaseIntroSize} />
       {draft.style.heroGray && <input type="hidden" name="site_hero_gray" value="on" />}
 
       <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line px-5 py-3">
@@ -982,6 +1188,16 @@ export function CustomizeStudio({
                 designTitleSize: siteStyleDefaults.designTitleSize,
                 designIntroFont: siteStyleDefaults.designIntroFont,
                 designIntroSize: siteStyleDefaults.designIntroSize,
+                showcaseSize: siteStyleDefaults.showcaseSize,
+                showcaseView: siteStyleDefaults.showcaseView,
+                showcaseMode: siteStyleDefaults.showcaseMode,
+                showcaseWideView: siteStyleDefaults.showcaseWideView,
+                showcaseMedia: siteStyleDefaults.showcaseMedia,
+                showcaseTitleAlign: siteStyleDefaults.showcaseTitleAlign,
+                showcaseTitleFont: siteStyleDefaults.showcaseTitleFont,
+                showcaseTitleSize: siteStyleDefaults.showcaseTitleSize,
+                showcaseIntroFont: siteStyleDefaults.showcaseIntroFont,
+                showcaseIntroSize: siteStyleDefaults.showcaseIntroSize,
               })
             }
           >
@@ -995,7 +1211,12 @@ export function CustomizeStudio({
               order={draft.style.order}
               sections={sec}
               selected={picked}
-              extra={{ projects: projectControls, countdown: countdownControls, designs: designControls }}
+              extra={{
+                projects: projectControls,
+                countdown: countdownControls,
+                showcase: showcaseControls,
+                designs: designControls,
+              }}
               onOrder={(order) => setStyle({ order })}
               onSection={setSection}
             />

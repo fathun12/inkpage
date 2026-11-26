@@ -82,6 +82,8 @@ export type SiteSettings = {
   cardsTitle: string | null;
   highlightsTitle: string | null;
   showcaseTitle: string | null;
+  // The text under the Showcase label.
+  showcaseIntro: string | null;
   // Address of the Biblia library (empty = no Biblia section) and its label.
   bibliaUrl: string | null;
   bibliaTitle: string | null;
@@ -230,6 +232,7 @@ export function readSite(raw: unknown): SiteSettings {
     cardsTitle: text(r.cardsTitle, siteLimits.title),
     highlightsTitle: text(r.highlightsTitle, siteLimits.title),
     showcaseTitle: text(r.showcaseTitle, siteLimits.title),
+    showcaseIntro: text(r.showcaseIntro, siteLimits.intro),
     bibliaUrl: link(r.bibliaUrl),
     bibliaTitle: text(r.bibliaTitle, siteLimits.title),
     bibliaIntro: text(r.bibliaIntro, siteLimits.intro),
