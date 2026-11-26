@@ -31,5 +31,6 @@ export const appearanceSchema = z.object({
   site_hero_overlay: whole("Hero overlay", styleRanges.heroOverlay),
   site_index_veil: whole("List overlay", styleRanges.indexVeil),
   site_hero_zoom: whole("Scroll zoom", styleRanges.heroZoom),
+  site_index_zoom: whole("Link list zoom", styleRanges.indexZoom),
   site_hero_gray: z.boolean(),
 });

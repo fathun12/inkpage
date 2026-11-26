@@ -25,6 +25,7 @@ export const styleRanges = {
   heroOverlay: { min: 0, max: 80, step: 5 },
   indexVeil: { min: 0, max: 90, step: 5 },
   heroZoom: { min: 100, max: 250, step: 5 },
+  indexZoom: { min: 100, max: 250, step: 5 },
   seconds: { min: 3, max: 15, step: 1 },
 } as const satisfies Record<string, Range>;
 
@@ -34,6 +35,7 @@ export type SiteStyle = {
   gallerySeconds: number;
   heroOverlay: number;
   heroZoom: number;
+  indexZoom: number;
   indexVeil: number;
   heroGray: boolean;
   colorBg: string;
@@ -52,6 +54,7 @@ export const siteStyleDefaults: SiteStyle = {
   gallerySeconds: 6,
   heroOverlay: 25,
   heroZoom: 140,
+  indexZoom: 140,
   indexVeil: 62,
   heroGray: false,
   colorBg: "#ffffff",
@@ -80,6 +83,7 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     gallerySeconds: num(r.gallerySeconds, styleRanges.seconds, d.gallerySeconds),
     heroOverlay: num(r.heroOverlay, styleRanges.heroOverlay, d.heroOverlay),
     heroZoom: num(r.heroZoom, styleRanges.heroZoom, d.heroZoom),
+    indexZoom: num(r.indexZoom, styleRanges.indexZoom, d.indexZoom),
     indexVeil: num(r.indexVeil, styleRanges.indexVeil, d.indexVeil),
     heroGray: typeof r.heroGray === "boolean" ? r.heroGray : d.heroGray,
     colorBg: color(r.colorBg, d.colorBg),

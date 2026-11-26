@@ -51,6 +51,7 @@ type Props = {
   username: string;
   backHref: string;
   viewHref: string | null;
+  previewHref: string;
   save: SaveArticleAction;
   signImage: SignArticleImageAction;
   publish: FormAction;
@@ -105,7 +106,7 @@ function AutoTextarea({ value, onChange, onEnter }: AutoProps) {
   );
 }
 
-export function ArticleEditor({ initial, username, backHref, viewHref, save, signImage, publish, unpublish, remove, notice }: Props) {
+export function ArticleEditor({ initial, username, backHref, viewHref, previewHref, save, signImage, publish, unpublish, remove, notice }: Props) {
   const published = initial.status === "published";
   const [title, setTitle] = useState(initial.title);
   const [subtitle, setSubtitle] = useState(initial.subtitle);
@@ -342,6 +343,21 @@ export function ArticleEditor({ initial, username, backHref, viewHref, save, sig
     schedule();
   }
 
+  // A draft is saved first, then shown. A published article is NOT saved here (only Update does that),
+  // so its preview is the saved version.
+  async function openPreview() {
+    const win = window.open("", "_blank");
+    if (!win) {
+      setImageStatus({ text: "Allow pop-ups to see the preview.", error: true });
+      return;
+    }
+    if (!published) {
+      if (timer.current) clearTimeout(timer.current);
+      await flush();
+    }
+    win.location.href = previewHref;
+  }
+
   function openDrawer() {
     if (!editor) return;
     setDrawer({ title, subtitle, content: JSON.stringify(docOf(editor)) });
@@ -401,6 +417,14 @@ export function ArticleEditor({ initial, username, backHref, viewHref, save, sig
                 Retry
               </Button>
             )}
+            <button
+              type="button"
+              onClick={() => void openPreview()}
+              title={published ? "Shows the saved version, not unsaved changes" : "Saves, then opens the preview"}
+              className="underline underline-offset-4"
+            >
+              Preview
+            </button>
             {viewHref && (
               <a href={viewHref} target="_blank" rel="noopener noreferrer" className="underline underline-offset-4">
                 View

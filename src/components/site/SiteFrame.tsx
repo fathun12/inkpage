@@ -25,6 +25,7 @@ export function SiteFrame({
     ...siteDarkPalette(style),
     "--site-hero-overlay": String(style.heroOverlay / 100),
     "--site-hero-zoom": String(style.heroZoom / 100),
+    "--site-index-zoom": String(style.indexZoom / 100),
     "--site-veil": `${style.indexVeil}%`,
     ...(viewportHeight ? { "--site-vh": viewportHeight } : {}),
   } as CSSProperties;

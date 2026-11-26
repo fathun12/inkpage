@@ -51,6 +51,7 @@ export default async function WriteEditPage({ params, searchParams }: Props) {
       username={profile.username}
       backHref={routes.write}
       viewHref={article.state === "live" && article.slug ? routes.article(profile.username, article.slug) : null}
+      previewHref={routes.articlePreview(profile.username, article.id)}
       save={saveArticleAction.bind(null, article.id)}
       signImage={signArticleImageAction.bind(null, article.id)}
       publish={publishArticleAction.bind(null, article.id)}

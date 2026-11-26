@@ -225,7 +225,7 @@
 @keyframes site-index-zoom {
   0%,
   100% {
-    transform: scale(var(--site-hero-zoom, 1.4));
+    transform: scale(var(--site-index-zoom, 1.4));
   }
   50% {
     transform: scale(1);

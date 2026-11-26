@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArticleView } from "@/components/article/ArticleView";
-import { readSite } from "@/config/site-content";
 import { routes } from "@/config/site";
 import { getPublicArticle } from "@/features/articles/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
@@ -30,7 +29,6 @@ export default async function ArticlePage({ params }: Props) {
   const found = await load(slug, articleSlug);
   if (!found) notFound();
   const { profile, article } = found;
-  const site = readSite(profile.site);
 
   return (
     <ArticleView
@@ -40,8 +38,8 @@ export default async function ArticlePage({ params }: Props) {
       minutes={article.reading_minutes}
       cover={article.cover_url}
       doc={article.content}
-      back={routes.section(profile.username, "writing")}
-      backLabel={site.writing.title ?? "Writing"}
+      back={routes.section(profile.username, "articles")}
+      backLabel="Articles"
     />
   );
 }

@@ -285,6 +285,7 @@ export function CustomizeStudio({
       <input type="hidden" name="site_hero_overlay" value={draft.style.heroOverlay} />
       <input type="hidden" name="site_index_veil" value={draft.style.indexVeil} />
       <input type="hidden" name="site_hero_zoom" value={draft.style.heroZoom} />
+      <input type="hidden" name="site_index_zoom" value={draft.style.indexZoom} />
       {draft.style.heroGray && <input type="hidden" name="site_hero_gray" value="on" />}
 
       <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line px-5 py-3">
@@ -438,6 +439,7 @@ export function CustomizeStudio({
                 heroSeconds: siteStyleDefaults.heroSeconds,
                 heroOverlay: siteStyleDefaults.heroOverlay,
                 heroZoom: siteStyleDefaults.heroZoom,
+                indexZoom: siteStyleDefaults.indexZoom,
                 heroGray: siteStyleDefaults.heroGray,
               })
             }
@@ -468,6 +470,15 @@ export function CustomizeStudio({
               range={styleRanges.heroZoom}
               hint="How far the hero media zooms in while you scroll down. Seen in Chrome and Edge."
               onChange={(heroZoom) => setStyle({ heroZoom })}
+            />
+            <Slider
+              id="ui_index_zoom"
+              label="Link list zoom"
+              unit="%"
+              value={draft.style.indexZoom}
+              range={styleRanges.indexZoom}
+              hint="The media behind the link list is normal in the middle of the screen and zooms in this far when it moves up or down. Seen in Chrome and Edge."
+              onChange={(indexZoom) => setStyle({ indexZoom })}
             />
             <label className="flex items-center gap-2 text-sm">
               <input
