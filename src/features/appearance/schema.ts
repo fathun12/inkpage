@@ -42,6 +42,19 @@ const sectionsJson = z
     ),
   );
 
+// The studio sends the order of the sections as one JSON text, a list of ids.
+const orderJson = z
+  .string()
+  .transform((raw, ctx) => {
+    try {
+      return JSON.parse(raw) as unknown;
+    } catch {
+      ctx.addIssue({ code: "custom", message: "The section order is not valid." });
+      return z.NEVER;
+    }
+  })
+  .pipe(z.array(z.string()).max(30, "The section order is not valid."));
+
 export const appearanceSchema = z.object({
   font_heading: z.enum(fontIds, { error: "Pick a heading font." }),
   font_body: z.enum(fontIds, { error: "Pick a body font." }),
@@ -61,4 +74,5 @@ export const appearanceSchema = z.object({
   site_density: z.enum(densityModes, { error: "Pick a spacing." }),
   site_project_size: z.enum(projectSizes, { error: "Pick a project size." }),
   site_sections: sectionsJson,
+  site_order: orderJson,
 });

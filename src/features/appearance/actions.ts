@@ -1,6 +1,6 @@
 "use server";
 
-import { readSections } from "@/config/layout";
+import { readOrder, readSections } from "@/config/layout";
 import { routes } from "@/config/site";
 import { requireUser } from "@/features/auth/queries";
 import { redirectWithError, redirectWithSaved } from "@/lib/flash";
@@ -33,6 +33,7 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
     site_density: field(formData, "site_density"),
     site_project_size: field(formData, "site_project_size"),
     site_sections: field(formData, "site_sections"),
+    site_order: field(formData, "site_order"),
   });
   if (!parsed.success) return redirectWithError(back, firstError(parsed.error));
   const v = parsed.data;
@@ -55,6 +56,7 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
         density: v.site_density,
         projectSize: v.site_project_size,
         sections: readSections(v.site_sections),
+        order: readOrder(v.site_order),
         colorBg: v.site_color_bg,
         colorInk: v.site_color_ink,
         colorAccent: v.site_color_accent,

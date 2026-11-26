@@ -8,10 +8,13 @@ import {
   layoutDefaults,
   projectSizes,
   readChoice,
+  readOrder,
   readSections,
   sectionDefaults,
+  sectionIds,
   type DensityMode,
   type ProjectSize,
+  type SectionId,
   type SectionSettings,
 } from "@/config/layout";
 
@@ -52,6 +55,7 @@ export type SiteStyle = {
   density: DensityMode;
   projectSize: ProjectSize;
   sections: SectionSettings;
+  order: SectionId[];
   colorBg: string;
   colorInk: string;
   colorAccent: string;
@@ -74,6 +78,7 @@ export const siteStyleDefaults: SiteStyle = {
   density: layoutDefaults.density,
   projectSize: layoutDefaults.projectSize,
   sections: sectionDefaults,
+  order: [...sectionIds],
   colorBg: "#ffffff",
   colorInk: "#000000",
   colorAccent: "#b5532f",
@@ -106,6 +111,7 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     density: readChoice(r.density, densityModes, d.density),
     projectSize: readChoice(r.projectSize, projectSizes, d.projectSize),
     sections: readSections(r.sections),
+    order: readOrder(r.order),
     colorBg: color(r.colorBg, d.colorBg),
     colorInk: color(r.colorInk, d.colorInk),
     colorAccent: color(r.colorAccent, d.colorAccent),

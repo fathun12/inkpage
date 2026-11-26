@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type ComponentProps, type MouseEvent, type ReactNode } from "react";
+import { Fragment, useState, type ComponentProps, type MouseEvent, type ReactNode } from "react";
+import { SectionControls } from "@/components/admin/studio/SectionControls";
 import { HomeShop } from "@/components/shop/HomeShop";
 import { CardSlider } from "@/components/site/CardSlider";
 import { FadeGallery } from "@/components/site/FadeGallery";
@@ -41,10 +42,6 @@ import {
   projectSizeHints,
   projectSizeLabels,
   projectSizes,
-  sectionHasSpace,
-  sectionIds,
-  sectionLabels,
-  sectionSpace,
   type SectionId,
   type SectionSetting,
 } from "@/config/layout";
@@ -295,14 +292,113 @@ export function CustomizeStudio({
   const base = routes.profile(profile.username);
   const sec = draft.style.sections;
   const on = (id: SectionId) => !sec[id].hidden;
-  const showArticles = articles.length > 0 && on("articles");
-  // The table of contents follows what is hidden.
-  const shownContents = contents.filter((item) => !sec[item.id as SectionId]?.hidden);
+  // Sections that have something to show and are not hidden, in the order of the draft.
+  const withData = new Set(contents.map((item) => item.id));
+  const sequence = draft.style.order.filter((id) => on(id) && withData.has(id));
+  const shownContents = sequence
+    .map((id) => contents.find((item) => item.id === id))
+    .filter((item): item is ContentsItem => Boolean(item));
+  // Writing and Articles touch only when Articles comes right after Writing.
+  const writingAt = sequence.indexOf("writing");
+  const joined = writingAt >= 0 && sequence[writingAt + 1] === "articles";
 
   // Links in the preview must not leave the studio.
   function stopLinks(event: MouseEvent<HTMLDivElement>) {
     if ((event.target as HTMLElement).closest("a")) event.preventDefault();
   }
+
+  // Each section of Home, ready to place. The order comes from the draft (Sections panel).
+  const parts: Record<SectionId, ReactNode> = {
+    countdown: countdown && on("countdown") && (
+      <SectionBox setting={sec.countdown}>
+        <HomeCountdown
+          title={countdown.title}
+          description={countdown.body}
+          target={countdown.data.target ?? ""}
+          start={countdown.created_at}
+        />
+      </SectionBox>
+    ),
+    writing: cards.length > 0 && on("writing") && (
+      <SectionBox setting={sec.writing}>
+        <CardSlider
+          items={cards}
+          title={site.cardsTitle ?? site.writing.title ?? "Writing"}
+          seconds={draft.style.heroSeconds}
+          autoplay={autoplay}
+          spacing={joined ? "site-pt pb-6 sm:pb-8" : undefined}
+        />
+      </SectionBox>
+    ),
+    articles: on("articles") && (
+      <SectionBox setting={sec.articles}>
+        <HomeArticles
+          articles={articles}
+          username={profile.username}
+          title={site.articles.title ?? "Articles"}
+          joined={joined}
+        />
+      </SectionBox>
+    ),
+    projects: on("projects") && (
+      <SectionBox setting={sec.projects}>
+        <HomeProjects items={projects} title={site.projects.title ?? "Projects"} />
+      </SectionBox>
+    ),
+    biblia: biblia && on("biblia") && (
+      <SectionBox setting={sec.biblia}>
+        <HomeBiblia data={biblia} title={site.bibliaTitle ?? "Biblia"} seeAll={`${base}/biblia`} />
+      </SectionBox>
+    ),
+    github: github && on("github") && (
+      <SectionBox setting={sec.github}>
+        <HomeGithub data={github} title={site.githubTitle ?? "GitHub"} />
+      </SectionBox>
+    ),
+    shop: on("shop") && (
+      <SectionBox setting={sec.shop}>
+        <HomeShop products={shopItems} open={shopOpen} title={shopTitle} base={shopBase} />
+      </SectionBox>
+    ),
+    links: on("links") && (
+      <SectionBox setting={sec.links}>
+        <IndexSection
+          blocks={previewRows}
+          mediaUrl={media.indexMedia}
+          credit={creditOf(site.credits, media.indexMedia)}
+        />
+      </SectionBox>
+    ),
+    showcase: on("showcase") && (
+      <SectionBox setting={sec.showcase}>
+        <HomeShowcase items={showcase} title={site.showcaseTitle ?? "Showcase"} />
+      </SectionBox>
+    ),
+    designs: designs && on("designs") && (
+      <SectionBox setting={sec.designs}>
+        <HomeDesigns
+          data={designs}
+          title={site.designsTitle ?? "Design"}
+          href={site.designsUrl}
+          seconds={draft.style.gallerySeconds}
+          autoplay={autoplay}
+        />
+      </SectionBox>
+    ),
+    visit: on("visit") && (
+      <SectionBox setting={sec.visit}>
+        <VisitCards items={site.visits} title={site.visitTitle ?? "Visit website"} />
+      </SectionBox>
+    ),
+    gallery: on("gallery") && (
+      <FadeGallery
+        images={media.gallery}
+        seconds={draft.style.gallerySeconds}
+        autoplay={autoplay}
+        credits={site.credits}
+      />
+    ),
+  };
 
   return (
     <form action={action} className="fixed inset-0 z-40 flex flex-col overflow-hidden bg-bg">
@@ -324,6 +420,7 @@ export function CustomizeStudio({
       <input type="hidden" name="site_density" value={draft.style.density} />
       <input type="hidden" name="site_project_size" value={draft.style.projectSize} />
       <input type="hidden" name="site_sections" value={JSON.stringify(draft.style.sections)} />
+      <input type="hidden" name="site_order" value={JSON.stringify(draft.style.order)} />
       {draft.style.heroGray && <input type="hidden" name="site_hero_gray" value="on" />}
 
       <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line px-5 py-3">
@@ -417,66 +514,21 @@ export function CustomizeStudio({
               <p className="text-xs text-ink-soft">{projectSizeHints[draft.style.projectSize]}</p>
             </div>
           </Section>
-          <Section title="Sections" onReset={() => setStyle({ sections: siteStyleDefaults.sections })}>
+          <Section
+            title="Sections"
+            onReset={() => setStyle({ sections: siteStyleDefaults.sections, order: siteStyleDefaults.order })}
+          >
             <p className="text-xs text-ink-soft">
-              Untick a section to hide it from Home. Click a name to give it more or less space; this is added to
-              the Spacing choice above. A section with nothing to show stays hidden anyway. The hero and the
-              footer are fixed.
+              Drag :: or use the arrows to change the order. Untick Show to hide a section. Click a name to give it
+              more or less space (added to the Spacing choice above). A section with nothing to show stays hidden
+              anyway. The hero is always first and the footer always last.
             </p>
-            <div className="flex flex-col gap-2">
-              {sectionIds.map((id) => {
-                const s = sec[id];
-                const head = (
-                  <>
-                    <span className={cn("text-sm", s.hidden && "text-ink-soft line-through")}>
-                      {sectionLabels[id]}
-                    </span>
-                    <label className="flex cursor-pointer items-center gap-2 font-mono text-xs uppercase tracking-wider text-ink-soft">
-                      <input
-                        type="checkbox"
-                        checked={!s.hidden}
-                        onChange={(e) => setSection(id, { hidden: !e.target.checked })}
-                        className="accent-accent"
-                      />
-                      Show
-                    </label>
-                  </>
-                );
-                if (!sectionHasSpace[id]) {
-                  return (
-                    <div key={id} className="ink-border flex items-center justify-between gap-3 rounded-md px-3 py-2">
-                      {head}
-                    </div>
-                  );
-                }
-                return (
-                  <details key={id} className="ink-border rounded-md">
-                    <summary className="flex cursor-pointer list-none items-center justify-between gap-3 px-3 py-2 [&::-webkit-details-marker]:hidden">
-                      {head}
-                    </summary>
-                    <div className="flex flex-col gap-4 px-3 pb-3 pt-1">
-                      <Slider
-                        id={`ui_sec_${id}_top`}
-                        label="Space above"
-                        unit=" rem"
-                        value={s.top}
-                        range={sectionSpace}
-                        hint="0 keeps the Spacing choice as it is."
-                        onChange={(top) => setSection(id, { top })}
-                      />
-                      <Slider
-                        id={`ui_sec_${id}_bottom`}
-                        label="Space below"
-                        unit=" rem"
-                        value={s.bottom}
-                        range={sectionSpace}
-                        onChange={(bottom) => setSection(id, { bottom })}
-                      />
-                    </div>
-                  </details>
-                );
-              })}
-            </div>
+            <SectionControls
+              order={draft.style.order}
+              sections={sec}
+              onOrder={(order) => setStyle({ order })}
+              onSection={setSection}
+            />
           </Section>
           <Section
             title="Colors"
@@ -705,95 +757,9 @@ export function CustomizeStudio({
                   )}
                   <HeroContents items={shownContents} />
                 </Hero>
-                {countdown && on("countdown") && (
-                  <SectionBox setting={sec.countdown}>
-                    <HomeCountdown
-                      title={countdown.title}
-                      description={countdown.body}
-                      target={countdown.data.target ?? ""}
-                      start={countdown.created_at}
-                    />
-                  </SectionBox>
-                )}
-                {cards.length > 0 && on("writing") && (
-                  <SectionBox setting={sec.writing}>
-                    <CardSlider
-                      items={cards}
-                      title={site.cardsTitle ?? site.writing.title ?? "Writing"}
-                      seconds={draft.style.heroSeconds}
-                      autoplay={autoplay}
-                      spacing={showArticles ? "site-pt pb-6 sm:pb-8" : undefined}
-                    />
-                  </SectionBox>
-                )}
-                {on("articles") && (
-                  <SectionBox setting={sec.articles}>
-                    <HomeArticles
-                      articles={articles}
-                      username={profile.username}
-                      title={site.articles.title ?? "Articles"}
-                      joined={cards.length > 0 && on("writing")}
-                    />
-                  </SectionBox>
-                )}
-                {on("projects") && (
-                  <SectionBox setting={sec.projects}>
-                    <HomeProjects items={projects} title={site.projects.title ?? "Projects"} />
-                  </SectionBox>
-                )}
-                {biblia && on("biblia") && (
-                  <SectionBox setting={sec.biblia}>
-                    <HomeBiblia data={biblia} title={site.bibliaTitle ?? "Biblia"} seeAll={`${base}/biblia`} />
-                  </SectionBox>
-                )}
-                {github && on("github") && (
-                  <SectionBox setting={sec.github}>
-                    <HomeGithub data={github} title={site.githubTitle ?? "GitHub"} />
-                  </SectionBox>
-                )}
-                {on("shop") && (
-                  <SectionBox setting={sec.shop}>
-                    <HomeShop products={shopItems} open={shopOpen} title={shopTitle} base={shopBase} />
-                  </SectionBox>
-                )}
-                {on("links") && (
-                  <SectionBox setting={sec.links}>
-                    <IndexSection
-                      blocks={previewRows}
-                      mediaUrl={media.indexMedia}
-                      credit={creditOf(site.credits, media.indexMedia)}
-                    />
-                  </SectionBox>
-                )}
-                {on("showcase") && (
-                  <SectionBox setting={sec.showcase}>
-                    <HomeShowcase items={showcase} title={site.showcaseTitle ?? "Showcase"} />
-                  </SectionBox>
-                )}
-                {designs && on("designs") && (
-                  <SectionBox setting={sec.designs}>
-                    <HomeDesigns
-                      data={designs}
-                      title={site.designsTitle ?? "Design"}
-                      href={site.designsUrl}
-                      seconds={draft.style.gallerySeconds}
-                      autoplay={autoplay}
-                    />
-                  </SectionBox>
-                )}
-                {on("visit") && (
-                  <SectionBox setting={sec.visit}>
-                    <VisitCards items={site.visits} title={site.visitTitle ?? "Visit website"} />
-                  </SectionBox>
-                )}
-                {on("gallery") && (
-                  <FadeGallery
-                    images={media.gallery}
-                    seconds={draft.style.gallerySeconds}
-                    autoplay={autoplay}
-                    credits={site.credits}
-                  />
-                )}
+                {draft.style.order.map((id) => (
+                  <Fragment key={id}>{parts[id]}</Fragment>
+                ))}
                 <SiteFooter
                   brand={profile.username}
                   note={site.footerNote}

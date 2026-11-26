@@ -42,7 +42,8 @@ export function readChoice<T extends string>(value: unknown, list: readonly T[],
 }
 
 // The sections of Home the owner can hide and give extra space (Customize, "Sections").
-// The hero and the footer are fixed and not in this list. The order here is the order on the page.
+// The hero and the footer are fixed and not in this list. The order here is the default order on the page;
+// the owner can change it in Customize (readOrder).
 export const sectionIds = [
   "countdown",
   "writing",
@@ -129,4 +130,16 @@ export function readSections(raw: unknown): SectionSettings {
     out[id] = { hidden: o.hidden === true, top: space(o.top), bottom: space(o.bottom) };
   }
   return out;
+}
+
+// The order of the sections on Home. Safe reader: unknown ids and repeats are dropped, and any section
+// that is missing is added at the end in its default place. Missing or dirty data gives the default order.
+export function readOrder(raw: unknown): SectionId[] {
+  const list = Array.isArray(raw) ? raw : [];
+  const seen = new Set<SectionId>();
+  for (const value of list) {
+    if ((sectionIds as readonly string[]).includes(value as string)) seen.add(value as SectionId);
+  }
+  for (const id of sectionIds) seen.add(id);
+  return [...seen];
 }
