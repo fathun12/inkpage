@@ -50,6 +50,12 @@ import {
   densityHints,
   densityLabels,
   densityModes,
+  designSizeHints,
+  designSizeLabels,
+  designSizes,
+  designViewHints,
+  designViewLabels,
+  designViews,
   projectSizeHints,
   projectSizeLabels,
   projectSizes,
@@ -514,11 +520,15 @@ export function CustomizeStudio({
     designs: designs && on("designs") && (
       <SectionBox setting={sec.designs}>
         <HomeDesigns
-          data={designs}
+          data={{ ...designs, projects: designs.projects.slice(0, draft.style.designCount) }}
           title={site.designsTitle ?? "Design"}
           href={site.designsUrl}
           seconds={draft.style.gallerySeconds}
           autoplay={autoplay}
+          view={draft.style.designView}
+          size={draft.style.designSize}
+          mediaHeight={draft.style.designMedia}
+          slide={{ seconds: draft.style.heroSeconds, autoplay }}
         />
       </SectionBox>
     ),
@@ -607,6 +617,63 @@ export function CustomizeStudio({
       <p className="text-xs text-ink-soft">{countdownViewHints[draft.style.countdownView]}</p>
     </div>
   );
+  const designControls = (
+    <>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-ink-soft">Layout on Home</span>
+        <div className="flex flex-wrap gap-2">
+          {designViews.map((m) => (
+            <label key={m} className={pill}>
+              <input
+                type="radio"
+                value={m}
+                checked={draft.style.designView === m}
+                onChange={() => setStyle({ designView: m })}
+                className="sr-only"
+              />
+              {designViewLabels[m]}
+            </label>
+          ))}
+        </div>
+        <p className="text-xs text-ink-soft">{designViewHints[draft.style.designView]}</p>
+      </div>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-ink-soft">Size on Home</span>
+        <div className="flex flex-wrap gap-2">
+          {designSizes.map((m) => (
+            <label key={m} className={pill}>
+              <input
+                type="radio"
+                value={m}
+                checked={draft.style.designSize === m}
+                onChange={() => setStyle({ designSize: m })}
+                className="sr-only"
+              />
+              {designSizeLabels[m]}
+            </label>
+          ))}
+        </div>
+        <p className="text-xs text-ink-soft">{designSizeHints[draft.style.designSize]}</p>
+      </div>
+      <Slider
+        id="ui_design_media"
+        label="Cover photo height"
+        value={draft.style.designMedia}
+        range={styleRanges.designMedia}
+        format={(v) => (v === 0 ? "Auto" : `${v} rem`)}
+        hint="Height of the big photo of each project. Auto keeps the 4:3 shape."
+        onChange={(designMedia) => setStyle({ designMedia })}
+      />
+      <Slider
+        id="ui_design_count"
+        label="Projects shown"
+        value={draft.style.designCount}
+        range={styleRanges.designCount}
+        hint="Picked at random from House Showcase on each visit."
+        onChange={(designCount) => setStyle({ designCount })}
+      />
+    </>
+  );
 
   return (
     <form action={action} className="fixed inset-0 z-40 flex flex-col overflow-hidden bg-bg">
@@ -632,6 +699,10 @@ export function CustomizeStudio({
       <input type="hidden" name="site_project_view" value={draft.style.projectView} />
       <input type="hidden" name="site_project_media" value={draft.style.projectMedia} />
       <input type="hidden" name="site_countdown_view" value={draft.style.countdownView} />
+      <input type="hidden" name="site_design_size" value={draft.style.designSize} />
+      <input type="hidden" name="site_design_view" value={draft.style.designView} />
+      <input type="hidden" name="site_design_media" value={draft.style.designMedia} />
+      <input type="hidden" name="site_design_count" value={draft.style.designCount} />
       {draft.style.heroGray && <input type="hidden" name="site_hero_gray" value="on" />}
 
       <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line px-5 py-3">
@@ -716,6 +787,10 @@ export function CustomizeStudio({
                 projectView: siteStyleDefaults.projectView,
                 projectMedia: siteStyleDefaults.projectMedia,
                 countdownView: siteStyleDefaults.countdownView,
+                designSize: siteStyleDefaults.designSize,
+                designView: siteStyleDefaults.designView,
+                designMedia: siteStyleDefaults.designMedia,
+                designCount: siteStyleDefaults.designCount,
               })
             }
           >
@@ -729,7 +804,7 @@ export function CustomizeStudio({
               order={draft.style.order}
               sections={sec}
               selected={picked}
-              extra={{ projects: projectControls, countdown: countdownControls }}
+              extra={{ projects: projectControls, countdown: countdownControls, designs: designControls }}
               onOrder={(order) => setStyle({ order })}
               onSection={setSection}
             />

@@ -6,6 +6,8 @@ import { hexColor, luminance } from "@/config/background";
 import {
   countdownViews,
   densityModes,
+  designSizes,
+  designViews,
   layoutDefaults,
   projectSizes,
   projectViews,
@@ -16,6 +18,8 @@ import {
   sectionIds,
   type CountdownView,
   type DensityMode,
+  type DesignSize,
+  type DesignView,
   type ProjectSize,
   type ProjectView,
   type SectionId,
@@ -46,6 +50,8 @@ export const styleRanges = {
   indexZoom: { min: 100, max: 250, step: 5 },
   seconds: { min: 3, max: 15, step: 1 },
   projectMedia: { min: 0, max: 40, step: 2 },
+  designMedia: { min: 0, max: 40, step: 2 },
+  designCount: { min: 3, max: 6, step: 1 },
 } as const satisfies Record<string, Range>;
 
 export type SiteStyle = {
@@ -62,6 +68,10 @@ export type SiteStyle = {
   projectView: ProjectView;
   projectMedia: number;
   countdownView: CountdownView;
+  designSize: DesignSize;
+  designView: DesignView;
+  designMedia: number;
+  designCount: number;
   sections: SectionSettings;
   order: SectionId[];
   colorBg: string;
@@ -88,6 +98,10 @@ export const siteStyleDefaults: SiteStyle = {
   projectView: layoutDefaults.projectView,
   projectMedia: layoutDefaults.projectMedia,
   countdownView: layoutDefaults.countdownView,
+  designSize: layoutDefaults.designSize,
+  designView: layoutDefaults.designView,
+  designMedia: layoutDefaults.designMedia,
+  designCount: layoutDefaults.designCount,
   sections: sectionDefaults,
   order: [...sectionIds],
   colorBg: "#ffffff",
@@ -124,6 +138,10 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     projectView: readChoice(r.projectView, projectViews, d.projectView),
     projectMedia: num(r.projectMedia, styleRanges.projectMedia, d.projectMedia),
     countdownView: readChoice(r.countdownView, countdownViews, d.countdownView),
+    designSize: readChoice(r.designSize, designSizes, d.designSize),
+    designView: readChoice(r.designView, designViews, d.designView),
+    designMedia: num(r.designMedia, styleRanges.designMedia, d.designMedia),
+    designCount: num(r.designCount, styleRanges.designCount, d.designCount),
     sections: readSections(r.sections),
     order: readOrder(r.order),
     colorBg: color(r.colorBg, d.colorBg),

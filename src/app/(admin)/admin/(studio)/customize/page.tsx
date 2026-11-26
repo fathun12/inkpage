@@ -47,7 +47,7 @@ export default async function CustomizePage({ searchParams }: Props) {
   // The same data as Home, so the preview shows the same sections.
   const [biblia, designs, github, shop, articles] = await Promise.all([
     fetchBiblia(site.bibliaUrl, 6),
-    fetchDesigns(site.designsUrl, 3),
+    fetchDesigns(site.designsUrl, 6),
     fetchGithub(site.githubUser),
     getPublicShop(profile.id),
     getPublicArticles(profile.id),

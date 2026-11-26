@@ -47,6 +47,37 @@ export const projectViewHints: Record<ProjectView, string> = {
   slider: "One project at a time. It slides by itself and has arrows.",
 };
 
+// How the Design projects section looks on Home. Grid is the original look.
+export const designViews = ["grid", "list", "slider"] as const;
+export type DesignView = (typeof designViews)[number];
+
+export const designViewLabels: Record<DesignView, string> = {
+  grid: "Grid",
+  list: "List",
+  slider: "Slider",
+};
+
+export const designViewHints: Record<DesignView, string> = {
+  grid: "Cards side by side: cover, photos and title (the original).",
+  list: "One project per row: photos on the left, text on the right.",
+  slider: "One project at a time. It slides by itself and has arrows.",
+};
+
+export const designSizes = ["small", "medium", "large"] as const;
+export type DesignSize = (typeof designSizes)[number];
+
+export const designSizeLabels: Record<DesignSize, string> = {
+  small: "Small",
+  medium: "Medium",
+  large: "Large",
+};
+
+export const designSizeHints: Record<DesignSize, string> = {
+  small: "Five cards per row. In List and Slider: the narrowest photo column and the smallest title.",
+  medium: "Four cards per row. In List and Slider: a narrower photo column and a smaller title.",
+  large: "The original size: three cards per row on a wide screen.",
+};
+
 // How the Countdown section looks.
 export const countdownViews = ["section", "strip"] as const;
 export type CountdownView = (typeof countdownViews)[number];
@@ -68,12 +99,20 @@ export const layoutDefaults: {
   projectView: ProjectView;
   projectMedia: number;
   countdownView: CountdownView;
+  designSize: DesignSize;
+  designView: DesignView;
+  designMedia: number;
+  designCount: number;
 } = {
   density: "comfortable",
   projectSize: "large",
   projectView: "list",
   projectMedia: 0,
   countdownView: "section",
+  designSize: "large",
+  designView: "grid",
+  designMedia: 0,
+  designCount: 3,
 };
 
 // Safe reader: an unknown or missing value falls back to the default.

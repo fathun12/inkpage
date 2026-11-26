@@ -80,7 +80,7 @@ export default async function HomePage({ params }: Props) {
   const autoplay = style.motion !== "off";
   const [biblia, designs, github, shop, articles] = await Promise.all([
     fetchBiblia(site.bibliaUrl, 6),
-    fetchDesigns(site.designsUrl, 3),
+    fetchDesigns(site.designsUrl, style.designCount),
     fetchGithub(site.githubUser),
     getPublicShop(profile.id),
     getPublicArticles(profile.id),
@@ -214,6 +214,10 @@ export default async function HomePage({ params }: Props) {
           href={site.designsUrl}
           seconds={style.gallerySeconds}
           autoplay={autoplay}
+          view={style.designView}
+          size={style.designSize}
+          mediaHeight={style.designMedia}
+          slide={{ seconds: style.heroSeconds, autoplay }}
         />
       </SectionBox>
     ),

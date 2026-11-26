@@ -4,6 +4,8 @@ import { fontIds } from "@/config/font-choices";
 import {
   countdownViews,
   densityModes,
+  designSizes,
+  designViews,
   projectSizes,
   projectViews,
   sectionSpace,
@@ -89,6 +91,10 @@ export const appearanceSchema = z.object({
   site_project_view: z.enum(projectViews, { error: "Pick a projects layout." }),
   site_project_media: whole("Projects photo height", styleRanges.projectMedia),
   site_countdown_view: z.enum(countdownViews, { error: "Pick a countdown style." }),
+  site_design_size: z.enum(designSizes, { error: "Pick a design projects size." }),
+  site_design_view: z.enum(designViews, { error: "Pick a design projects layout." }),
+  site_design_media: whole("Design cover height", styleRanges.designMedia),
+  site_design_count: whole("Design projects shown", styleRanges.designCount),
   site_sections: sectionsJson,
   site_order: orderJson,
 });
