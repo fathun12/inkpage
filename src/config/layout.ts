@@ -239,6 +239,53 @@ export const stackAspect: Record<Exclude<StackRatio, "default">, string> = {
   ultra: "32 / 9",
 };
 
+// The Writing section of Home (cards of writing from other websites). Slider is the original look.
+// Mode, the title place, the fonts and the title sizes reuse the Design names above.
+export const writingViews = ["slider", "list", "grid"] as const;
+export type WritingView = (typeof writingViews)[number];
+
+export const writingViewLabels: Record<WritingView, string> = {
+  slider: "Slider",
+  list: "List",
+  grid: "Grid",
+};
+
+export const writingViewHints: Record<WritingView, string> = {
+  slider: "One row of cards that slides by itself and has arrows (the original).",
+  list: "One writing per row: big title, short text, and the source at the right. No photos.",
+  grid: "Cards side by side: photo on top, title below. One column on a phone.",
+};
+
+export const writingSizes = ["small", "medium", "large"] as const;
+export type WritingSize = (typeof writingSizes)[number];
+
+export const writingSizeLabels: Record<WritingSize, string> = {
+  small: "Small",
+  medium: "Medium",
+  large: "Large",
+};
+
+export const writingSizeHints: Record<WritingSize, string> = {
+  small: "Four cards per row on a wide screen.",
+  medium: "Three cards per row on a wide screen.",
+  large: "Two cards per row.",
+};
+
+export const writingWideViews = ["stack", "stackslide", "filmstrip"] as const;
+export type WritingWideView = (typeof writingWideViews)[number];
+
+export const writingWideViewLabels: Record<WritingWideView, string> = {
+  stack: "Stack",
+  stackslide: "Stack slide",
+  filmstrip: "Filmstrip",
+};
+
+export const writingWideViewHints: Record<WritingWideView, string> = {
+  stack: "One writing per row: one photo across the whole screen, then the title and text. A writing without a photo shows its title big on a tinted box.",
+  stackslide: "Like Stack, but one writing at a time across the whole screen. It slides by itself and has arrows.",
+  filmstrip: "One row of cards that runs to the edges of the screen. It slides by itself and has arrows.",
+};
+
 // How the Countdown section looks.
 export const countdownViews = ["section", "strip"] as const;
 export type CountdownView = (typeof countdownViews)[number];
@@ -285,6 +332,18 @@ export const layoutDefaults: {
   showcaseStackCrop: number;
   designStackRatio: StackRatio;
   designStackCrop: number;
+  writingMode: DesignMode;
+  writingView: WritingView;
+  writingWideView: WritingWideView;
+  writingSize: WritingSize;
+  writingMedia: number;
+  writingTitleAlign: DesignTitleAlign;
+  writingTitleFont: DesignFont;
+  writingTitleSize: DesignTitleSize;
+  writingIntroFont: DesignFont;
+  writingIntroSize: DesignIntroSize;
+  writingStackRatio: StackRatio;
+  writingStackCrop: number;
 } = {
   density: "comfortable",
   projectSize: "large",
@@ -316,6 +375,18 @@ export const layoutDefaults: {
   showcaseStackCrop: 50,
   designStackRatio: "default",
   designStackCrop: 50,
+  writingMode: "centered",
+  writingView: "slider",
+  writingWideView: "stack",
+  writingSize: "large",
+  writingMedia: 0,
+  writingTitleAlign: "center",
+  writingTitleFont: "default",
+  writingTitleSize: "auto",
+  writingIntroFont: "default",
+  writingIntroSize: "auto",
+  writingStackRatio: "default",
+  writingStackCrop: 50,
 };
 
 // Safe reader: an unknown or missing value falls back to the default.

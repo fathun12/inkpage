@@ -60,6 +60,15 @@ import {
   projectViewHints,
   projectViewLabels,
   projectViews,
+  writingSizeHints,
+  writingSizeLabels,
+  writingSizes,
+  writingViewHints,
+  writingViewLabels,
+  writingViews,
+  writingWideViewHints,
+  writingWideViewLabels,
+  writingWideViews,
   showcaseSizeHints,
   showcaseSizeLabels,
   showcaseSizes,
@@ -739,6 +748,172 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
     </>
   );
 
+  const writingWide = draft.style.writingMode === "full";
+  const writingStack =
+    writingWide && (draft.style.writingWideView === "stack" || draft.style.writingWideView === "stackslide");
+  const writingControls = (
+    <>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-ink-soft">Mode on Home</span>
+        <div className="flex flex-wrap gap-2">
+          {designModes.map((m) => (
+            <label key={m} className={pill}>
+              <input
+                type="radio"
+                value={m}
+                checked={draft.style.writingMode === m}
+                onChange={() => setStyle({ writingMode: m })}
+                className="sr-only"
+              />
+              {designModeLabels[m]}
+            </label>
+          ))}
+        </div>
+        <p className="text-xs text-ink-soft">{designModeHints[draft.style.writingMode]}</p>
+      </div>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-ink-soft">Layout on Home</span>
+        <div className="flex flex-wrap gap-2">
+          {writingWide
+            ? writingWideViews.map((m) => (
+                <label key={m} className={pill}>
+                  <input
+                    type="radio"
+                    value={m}
+                    checked={draft.style.writingWideView === m}
+                    onChange={() => setStyle({ writingWideView: m })}
+                    className="sr-only"
+                  />
+                  {writingWideViewLabels[m]}
+                </label>
+              ))
+            : writingViews.map((m) => (
+                <label key={m} className={pill}>
+                  <input
+                    type="radio"
+                    value={m}
+                    checked={draft.style.writingView === m}
+                    onChange={() => setStyle({ writingView: m })}
+                    className="sr-only"
+                  />
+                  {writingViewLabels[m]}
+                </label>
+              ))}
+        </div>
+        <p className="text-xs text-ink-soft">
+          {writingWide
+            ? writingWideViewHints[draft.style.writingWideView]
+            : writingViewHints[draft.style.writingView]}
+        </p>
+      </div>
+      {!writingWide && draft.style.writingView === "grid" && (
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Size on Home</span>
+          <div className="flex flex-wrap gap-2">
+            {writingSizes.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.writingSize === m}
+                  onChange={() => setStyle({ writingSize: m })}
+                  className="sr-only"
+                />
+                {writingSizeLabels[m]}
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-ink-soft">{writingSizeHints[draft.style.writingSize]}</p>
+        </div>
+      )}
+      {writingStack && (
+        <div className="flex flex-col gap-4 border-t border-line pt-4">
+          <Slider
+            id="ui_writing_media"
+            label="Photo height"
+            value={draft.style.writingMedia}
+            range={styleRanges.writingMedia}
+            format={(v) => (v === 0 ? "Auto" : `${v} rem`)}
+            hint="Height of the photo. Auto uses 16:9, or the Ratio below."
+            onChange={(writingMedia) => setStyle({ writingMedia })}
+          />
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium text-ink-soft">Ratio</span>
+            <div className="flex flex-wrap gap-2">
+              {stackRatios.map((m) => (
+                <label key={m} className={pill}>
+                  <input
+                    type="radio"
+                    value={m}
+                    checked={draft.style.writingStackRatio === m}
+                    onChange={() => setStyle({ writingStackRatio: m })}
+                    className="sr-only"
+                  />
+                  {stackRatioLabels[m]}
+                </label>
+              ))}
+            </div>
+            <p className="text-xs text-ink-soft">{stackRatioHints[draft.style.writingStackRatio]}</p>
+          </div>
+          {(draft.style.writingStackRatio === "wide" || draft.style.writingStackRatio === "ultra") && (
+            <Slider
+              id="ui_writing_stack_crop"
+              label="Crop position"
+              value={draft.style.writingStackCrop}
+              range={styleRanges.stackCrop}
+              format={(v) => (v === 0 ? "Top" : v === 100 ? "Bottom" : v === 50 ? "Middle" : `${v}%`)}
+              hint="Which part of the photo shows: Top, Middle or Bottom."
+              onChange={(writingStackCrop) => setStyle({ writingStackCrop })}
+            />
+          )}
+        </div>
+      )}
+      <div className="flex flex-col gap-4 border-t border-line pt-4">
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Title place</span>
+          <div className="flex flex-wrap gap-2">
+            {designTitleAligns.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.writingTitleAlign === m}
+                  onChange={() => setStyle({ writingTitleAlign: m })}
+                  className="sr-only"
+                />
+                {designTitleAlignLabels[m]}
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-ink-soft">{designTitleAlignHints[draft.style.writingTitleAlign]}</p>
+        </div>
+        <TextFontSelect
+          id="ui_writing_title_font"
+          label="Title font"
+          value={draft.style.writingTitleFont}
+          hint="Default is the small label. Pick a font or a size to turn the title into a big heading."
+          onChange={(writingTitleFont) => setStyle({ writingTitleFont })}
+        />
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Title size</span>
+          <div className="flex flex-wrap gap-2">
+            {designTitleSizes.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.writingTitleSize === m}
+                  onChange={() => setStyle({ writingTitleSize: m })}
+                  className="sr-only"
+                />
+                {designTitleSizeLabels[m]}
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  );
   const showcaseWide = draft.style.showcaseMode === "full";
   const showcaseControls = (
     <>
@@ -993,6 +1168,18 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
       <input type="hidden" name="site_showcase_intro_size" value={draft.style.showcaseIntroSize} />
       <input type="hidden" name="site_showcase_stack_ratio" value={draft.style.showcaseStackRatio} />
       <input type="hidden" name="site_showcase_stack_crop" value={draft.style.showcaseStackCrop} />
+      <input type="hidden" name="site_writing_mode" value={draft.style.writingMode} />
+      <input type="hidden" name="site_writing_view" value={draft.style.writingView} />
+      <input type="hidden" name="site_writing_wide_view" value={draft.style.writingWideView} />
+      <input type="hidden" name="site_writing_size" value={draft.style.writingSize} />
+      <input type="hidden" name="site_writing_media" value={draft.style.writingMedia} />
+      <input type="hidden" name="site_writing_title_align" value={draft.style.writingTitleAlign} />
+      <input type="hidden" name="site_writing_title_font" value={draft.style.writingTitleFont} />
+      <input type="hidden" name="site_writing_title_size" value={draft.style.writingTitleSize} />
+      <input type="hidden" name="site_writing_intro_font" value={draft.style.writingIntroFont} />
+      <input type="hidden" name="site_writing_intro_size" value={draft.style.writingIntroSize} />
+      <input type="hidden" name="site_writing_stack_ratio" value={draft.style.writingStackRatio} />
+      <input type="hidden" name="site_writing_stack_crop" value={draft.style.writingStackCrop} />
       <input type="hidden" name="site_design_stack_ratio" value={draft.style.designStackRatio} />
       <input type="hidden" name="site_design_stack_crop" value={draft.style.designStackCrop} />
       <input type="hidden" name="site_about_layout" value={draft.style.aboutLayout} />
@@ -1131,6 +1318,18 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
                 showcaseIntroSize: siteStyleDefaults.showcaseIntroSize,
                 showcaseStackRatio: siteStyleDefaults.showcaseStackRatio,
                 showcaseStackCrop: siteStyleDefaults.showcaseStackCrop,
+                writingMode: siteStyleDefaults.writingMode,
+                writingView: siteStyleDefaults.writingView,
+                writingWideView: siteStyleDefaults.writingWideView,
+                writingSize: siteStyleDefaults.writingSize,
+                writingMedia: siteStyleDefaults.writingMedia,
+                writingTitleAlign: siteStyleDefaults.writingTitleAlign,
+                writingTitleFont: siteStyleDefaults.writingTitleFont,
+                writingTitleSize: siteStyleDefaults.writingTitleSize,
+                writingIntroFont: siteStyleDefaults.writingIntroFont,
+                writingIntroSize: siteStyleDefaults.writingIntroSize,
+                writingStackRatio: siteStyleDefaults.writingStackRatio,
+                writingStackCrop: siteStyleDefaults.writingStackCrop,
                 designStackRatio: siteStyleDefaults.designStackRatio,
                 designStackCrop: siteStyleDefaults.designStackCrop,
               })
@@ -1149,6 +1348,7 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
               extra={{
                 projects: projectControls,
                 countdown: countdownControls,
+                writing: writingControls,
                 showcase: showcaseControls,
                 designs: designControls,
               }}

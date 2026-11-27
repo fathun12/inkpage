@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Fragment, type ReactNode } from "react";
-import { CardSlider } from "@/components/site/CardSlider";
+import { HomeWriting } from "@/components/site/HomeWriting";
 import { FadeGallery } from "@/components/site/FadeGallery";
 import { Hero } from "@/components/site/Hero";
 import { HeroContents, type ContentsItem } from "@/components/site/HeroContents";
@@ -149,7 +149,19 @@ export default async function HomePage({ params }: Props) {
     writing: writing.length > 0 && on("writing") && (
       <SectionBox setting={sec.writing}>
         <span id="writing" className="block" />
-        <CardSlider
+        <HomeWriting
+          mode={style.writingMode}
+          view={style.writingView}
+          wideView={style.writingWideView}
+          size={style.writingSize}
+          mediaHeight={style.writingMedia}
+          stackRatio={style.writingStackRatio}
+          stackCrop={style.writingStackCrop}
+          titleAlign={style.writingTitleAlign}
+          titleFont={style.writingTitleFont}
+          titleSize={style.writingTitleSize}
+          introFont={style.writingIntroFont}
+          introSize={style.writingIntroSize}
           items={writing}
           title={site.cardsTitle ?? site.writing.title ?? "Writing"}
           seconds={style.heroSeconds}

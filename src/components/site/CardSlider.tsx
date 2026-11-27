@@ -1,13 +1,22 @@
 "use client";
 
-import { useCallback, useEffect, useRef, type PointerEvent as ReactPointerEvent } from "react";
+import { useCallback, useEffect, useRef, type PointerEvent as ReactPointerEvent, type ReactNode } from "react";
 import type { Block } from "@/types/block";
 import { Reveal } from "./Reveal";
 import { WritingCard } from "./WritingCard";
 
 // "autoplay" is not used any more: a row with more than one card always slides by itself (only a visitor's own
 // "reduce motion" setting stops it). It stays in the props so the callers do not need to change.
-type Props = { items: Block[]; title: string | null; seconds: number; autoplay?: boolean; spacing?: string; id?: string };
+// "heading": a ready-made title block (font, size, place, text under it). Without it the small label is used.
+type Props = {
+  items: Block[];
+  title: string | null;
+  seconds: number;
+  autoplay?: boolean;
+  spacing?: string;
+  id?: string;
+  heading?: ReactNode;
+};
 
 const GLIDE_MS = 700;
 const DRAG_START_PX = 6;
@@ -40,7 +49,7 @@ function nearest(points: number[], v: number) {
 // dragging (mouse, finger or pen: press, move, release, then it glides on and stops exactly on a card) and by the
 // arrows. The wheel and the touchpad do NOT move it, so the page always scrolls freely over it (the row is
 // overflow hidden, not a scroll box). Same model as MediaSlider.
-export function CardSlider({ items, title, seconds, spacing = "site-py", id = "selected" }: Props) {
+export function CardSlider({ items, title, seconds, spacing = "site-py", id = "selected", heading }: Props) {
   const track = useRef<HTMLUListElement>(null);
   const paused = useRef(false);
   const raf = useRef(0);
@@ -220,9 +229,14 @@ export function CardSlider({ items, title, seconds, spacing = "site-py", id = "s
       onFocus={pause}
       onBlur={resume}
     >
-      <div className="mx-auto flex max-w-6xl items-end justify-between px-5 pb-8 sm:px-8">
+      {heading}
+      <div className={`mx-auto flex max-w-6xl items-end justify-between px-5 sm:px-8 ${heading ? "pb-4" : "pb-8"}`}>
         <Reveal>
-          {title ? <h2 className="font-mono text-xs uppercase tracking-widest opacity-70">{title}</h2> : <span />}
+          {title && !heading ? (
+            <h2 className="font-mono text-xs uppercase tracking-widest opacity-70">{title}</h2>
+          ) : (
+            <span />
+          )}
         </Reveal>
         {count > 1 && (
           <div className="flex gap-2">

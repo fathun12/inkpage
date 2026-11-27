@@ -19,6 +19,9 @@ import {
   showcaseViews,
   showcaseWideViews,
   stackRatios,
+  writingSizes,
+  writingViews,
+  writingWideViews,
   layoutDefaults,
   projectSizes,
   projectViews,
@@ -41,6 +44,9 @@ import {
   type ShowcaseView,
   type ShowcaseWideView,
   type StackRatio,
+  type WritingSize,
+  type WritingView,
+  type WritingWideView,
   type ProjectSize,
   type ProjectView,
   type SectionId,
@@ -93,6 +99,7 @@ export const styleRanges = {
   designMedia: { min: 0, max: 60, step: 2 },
   designCount: { min: 3, max: 6, step: 1 },
   showcaseMedia: { min: 0, max: 60, step: 2 },
+  writingMedia: { min: 0, max: 60, step: 2 },
   stackCrop: { min: 0, max: 100, step: 5 },
   steamOpacity: { min: 10, max: 100, step: 5 },
   steamPosition: { min: 0, max: 100, step: 5 },
@@ -138,6 +145,18 @@ export type SiteStyle = {
   showcaseStackCrop: number;
   designStackRatio: StackRatio;
   designStackCrop: number;
+  writingMode: DesignMode;
+  writingView: WritingView;
+  writingWideView: WritingWideView;
+  writingSize: WritingSize;
+  writingMedia: number;
+  writingTitleAlign: DesignTitleAlign;
+  writingTitleFont: DesignFont;
+  writingTitleSize: DesignTitleSize;
+  writingIntroFont: DesignFont;
+  writingIntroSize: DesignIntroSize;
+  writingStackRatio: StackRatio;
+  writingStackCrop: number;
   sections: SectionSettings;
   order: SectionId[];
   aboutLayout: AboutLayout;
@@ -199,6 +218,18 @@ export const siteStyleDefaults: SiteStyle = {
   showcaseStackCrop: layoutDefaults.showcaseStackCrop,
   designStackRatio: layoutDefaults.designStackRatio,
   designStackCrop: layoutDefaults.designStackCrop,
+  writingMode: layoutDefaults.writingMode,
+  writingView: layoutDefaults.writingView,
+  writingWideView: layoutDefaults.writingWideView,
+  writingSize: layoutDefaults.writingSize,
+  writingMedia: layoutDefaults.writingMedia,
+  writingTitleAlign: layoutDefaults.writingTitleAlign,
+  writingTitleFont: layoutDefaults.writingTitleFont,
+  writingTitleSize: layoutDefaults.writingTitleSize,
+  writingIntroFont: layoutDefaults.writingIntroFont,
+  writingIntroSize: layoutDefaults.writingIntroSize,
+  writingStackRatio: layoutDefaults.writingStackRatio,
+  writingStackCrop: layoutDefaults.writingStackCrop,
   sections: sectionDefaults,
   order: [...sectionIds],
   aboutLayout: aboutDefaults.aboutLayout,
@@ -268,6 +299,18 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     showcaseStackCrop: num(r.showcaseStackCrop, styleRanges.stackCrop, d.showcaseStackCrop),
     designStackRatio: readChoice(r.designStackRatio, stackRatios, d.designStackRatio),
     designStackCrop: num(r.designStackCrop, styleRanges.stackCrop, d.designStackCrop),
+    writingMode: readChoice(r.writingMode, designModes, d.writingMode),
+    writingView: readChoice(r.writingView, writingViews, d.writingView),
+    writingWideView: readChoice(r.writingWideView, writingWideViews, d.writingWideView),
+    writingSize: readChoice(r.writingSize, writingSizes, d.writingSize),
+    writingMedia: num(r.writingMedia, styleRanges.writingMedia, d.writingMedia),
+    writingTitleAlign: readChoice(r.writingTitleAlign, designTitleAligns, d.writingTitleAlign),
+    writingTitleFont: readChoice(r.writingTitleFont, designTextFonts, d.writingTitleFont),
+    writingTitleSize: readChoice(r.writingTitleSize, designTitleSizes, d.writingTitleSize),
+    writingIntroFont: readChoice(r.writingIntroFont, designTextFonts, d.writingIntroFont),
+    writingIntroSize: readChoice(r.writingIntroSize, designIntroSizes, d.writingIntroSize),
+    writingStackRatio: readChoice(r.writingStackRatio, stackRatios, d.writingStackRatio),
+    writingStackCrop: num(r.writingStackCrop, styleRanges.stackCrop, d.writingStackCrop),
     designMedia: num(r.designMedia, styleRanges.designMedia, d.designMedia),
     designCount: num(r.designCount, styleRanges.designCount, d.designCount),
     sections: readSections(r.sections),

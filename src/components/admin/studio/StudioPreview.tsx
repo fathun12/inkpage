@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type ComponentProps, type ReactNode } from "react";
 import { HomeShop } from "@/components/shop/HomeShop";
 import { AboutContent } from "@/components/site/AboutContent";
-import { CardSlider } from "@/components/site/CardSlider";
+import { HomeWriting } from "@/components/site/HomeWriting";
 import { FadeGallery } from "@/components/site/FadeGallery";
 import { Hero } from "@/components/site/Hero";
 import { HeroContents, type ContentsItem } from "@/components/site/HeroContents";
@@ -293,7 +293,19 @@ export function StudioPreview({
     writing: cards.length > 0 && on("writing") && (
       <SectionBox setting={sec.writing}>
         <span id="writing" className="block" />
-        <CardSlider
+        <HomeWriting
+          mode={draft.style.writingMode}
+          view={draft.style.writingView}
+          wideView={draft.style.writingWideView}
+          size={draft.style.writingSize}
+          mediaHeight={draft.style.writingMedia}
+          stackRatio={draft.style.writingStackRatio}
+          stackCrop={draft.style.writingStackCrop}
+          titleAlign={draft.style.writingTitleAlign}
+          titleFont={draft.style.writingTitleFont}
+          titleSize={draft.style.writingTitleSize}
+          introFont={draft.style.writingIntroFont}
+          introSize={draft.style.writingIntroSize}
           items={cards}
           title={site.cardsTitle ?? site.writing.title ?? "Writing"}
           seconds={draft.style.heroSeconds}
