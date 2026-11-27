@@ -213,6 +213,8 @@ export default async function HomePage({ params }: Props) {
           mediaHeight={style.showcaseMedia}
           slide={{ seconds: style.heroSeconds, autoplay }}
           intro={site.showcaseIntro}
+          stackRatio={style.showcaseStackRatio}
+          stackCrop={style.showcaseStackCrop}
           titleAlign={style.showcaseTitleAlign}
           titleFont={style.showcaseTitleFont}
           titleSize={style.showcaseTitleSize}
@@ -233,6 +235,8 @@ export default async function HomePage({ params }: Props) {
           view={style.designView}
           wideView={style.designWideView}
           intro={site.designsIntro}
+          stackRatio={style.designStackRatio}
+          stackCrop={style.designStackCrop}
           titleAlign={style.designTitleAlign}
           titleFont={style.designTitleFont}
           titleSize={style.designTitleSize}

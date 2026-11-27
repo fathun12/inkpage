@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
 import { Img } from "@/components/ui/Img";
-import type { DesignWideView } from "@/config/layout";
+import { stackAspect, type DesignWideView, type StackRatio } from "@/config/layout";
 import type { DesignProject } from "@/types/designs";
 import { MediaSlider } from "./MediaSlider";
 import { Reveal } from "./Reveal";
@@ -12,6 +12,15 @@ const shade: CSSProperties = { background: "linear-gradient(to top, rgb(0 0 0 / 
 // Height of a photo frame: a fixed height in rem, or (0 = Auto) the shape that suits the layout.
 function frame(height: number, aspect: string): CSSProperties {
   return height > 0 ? { height: `${height}rem` } : { aspectRatio: aspect };
+}
+
+// The frame of the Stack photo. Default = as before. Another ratio sets the shape; crop (0 top to 100 bottom)
+// is which part of the photo shows. --crop is read by the cover (object-position).
+function stackFrame(height: number, ratio: StackRatio, crop: number): CSSProperties {
+  if (ratio === "default") return frame(height, "16 / 9");
+  const style: Record<string, string> = { aspectRatio: stackAspect[ratio] };
+  if (ratio !== "normal") style["--crop"] = `50% ${crop}%`;
+  return style as CSSProperties;
 }
 
 // The big photo of a project. It fills its frame; a project without a cover shows its title instead.
@@ -27,7 +36,7 @@ function Cover({ project }: { project: DesignProject }) {
     <Img
       src={project.cover}
       alt={`Cover of ${project.title}`}
-      className="absolute inset-0 size-full object-cover transition-[scale] duration-700 ease-out group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+      className="absolute inset-0 size-full object-cover [object-position:var(--crop,50%_50%)] transition-[scale] duration-700 ease-out group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
     />
   );
 }
@@ -71,7 +80,9 @@ function Stack({
   projects,
   height,
   slide,
-}: Shape & { slide?: { seconds: number; autoplay: boolean } }) {
+  ratio,
+  crop,
+}: Shape & { slide?: { seconds: number; autoplay: boolean }; ratio: StackRatio; crop: number }) {
   // With slide (Stack slide): the same project, one per screen, sliding by itself.
   const items = projects.map((p) => (
         <li key={p.slug} className={slide ? "w-full shrink-0 snap-start" : undefined}>
@@ -79,7 +90,7 @@ function Stack({
             <a href={p.href} {...link} className="group block">
               <span
                 className="site-media-pop relative block overflow-hidden bg-surface"
-                style={frame(height, "16 / 9")}
+                style={stackFrame(height, ratio, crop)}
               >
                 <Cover project={p} />
               </span>
@@ -236,17 +247,23 @@ export function DesignWide({
   projects,
   height,
   slide,
+  ratio = "default",
+  crop = 50,
 }: {
   view: DesignWideView;
   projects: DesignProject[];
   height: number;
   slide: { seconds: number; autoplay: boolean };
+  ratio?: StackRatio;
+  crop?: number;
 }) {
   if (projects.length === 0) return null;
   if (view === "split") return <Split projects={projects} height={height} />;
   if (view === "sheet") return <Sheet projects={projects} height={height} />;
   if (view === "mosaic") return <Mosaic projects={projects} height={height} />;
   if (view === "filmstrip") return <Filmstrip projects={projects} height={height} slide={slide} />;
-  if (view === "stackslide") return <Stack projects={projects} height={height} slide={slide} />;
-  return <Stack projects={projects} height={height} />;
+  if (view === "stackslide") {
+    return <Stack projects={projects} height={height} slide={slide} ratio={ratio} crop={crop} />;
+  }
+  return <Stack projects={projects} height={height} ratio={ratio} crop={crop} />;
 }

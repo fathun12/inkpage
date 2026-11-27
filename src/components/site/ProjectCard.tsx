@@ -40,7 +40,7 @@ export function ItemMedia({
   inFrame?: boolean;
 }) {
   const fill =
-    "absolute inset-0 size-full object-cover transition-[scale] duration-500 ease-out group-hover/media:scale-105 motion-reduce:transition-none motion-reduce:group-hover/media:scale-100";
+    "absolute inset-0 size-full object-cover [object-position:var(--crop,50%_50%)] transition-[scale] duration-500 ease-out group-hover/media:scale-105 motion-reduce:transition-none motion-reduce:group-hover/media:scale-100";
   const base: CSSProperties = inFrame
     ? {}
     : height

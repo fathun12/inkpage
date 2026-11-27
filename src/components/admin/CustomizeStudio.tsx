@@ -67,6 +67,9 @@ import {
   showcaseWideViewHints,
   showcaseWideViewLabels,
   showcaseWideViews,
+  stackRatioHints,
+  stackRatioLabels,
+  stackRatios,
   type DesignFont,
   type SectionId,
   type SectionSetting,
@@ -596,6 +599,40 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
         hint="Picked at random from House Showcase on each visit."
         onChange={(designCount) => setStyle({ designCount })}
       />
+      {designWide && (draft.style.designWideView === "stack" || draft.style.designWideView === "stackslide") && (
+        <div className="flex flex-col gap-4 border-t border-line pt-4">
+          <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">Stack photo</span>
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium text-ink-soft">Ratio</span>
+            <div className="flex flex-wrap gap-2">
+              {stackRatios.map((m) => (
+                <label key={m} className={pill}>
+                  <input
+                    type="radio"
+                    value={m}
+                    checked={draft.style.designStackRatio === m}
+                    onChange={() => setStyle({ designStackRatio: m })}
+                    className="sr-only"
+                  />
+                  {stackRatioLabels[m]}
+                </label>
+              ))}
+            </div>
+            <p className="text-xs text-ink-soft">{stackRatioHints[draft.style.designStackRatio]}</p>
+          </div>
+          {(draft.style.designStackRatio === "wide" || draft.style.designStackRatio === "ultra") && (
+            <Slider
+              id="ui_design_stack_crop"
+              label="Crop position"
+              value={draft.style.designStackCrop}
+              range={styleRanges.stackCrop}
+              format={(v) => (v === 0 ? "Top" : v === 100 ? "Bottom" : v === 50 ? "Middle" : `${v}%`)}
+              hint="Which part of the photo shows: Top, Middle or Bottom."
+              onChange={(designStackCrop) => setStyle({ designStackCrop })}
+            />
+          )}
+        </div>
+      )}
       <div className="flex flex-col gap-4 border-t border-line pt-4">
         <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">Title</span>
         <div className="flex flex-col gap-2">
@@ -768,6 +805,40 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
         }
         onChange={(showcaseMedia) => setStyle({ showcaseMedia })}
       />
+      {showcaseWide && (draft.style.showcaseWideView === "stack" || draft.style.showcaseWideView === "stackslide") && (
+        <div className="flex flex-col gap-4 border-t border-line pt-4">
+          <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">Stack photo</span>
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium text-ink-soft">Ratio</span>
+            <div className="flex flex-wrap gap-2">
+              {stackRatios.map((m) => (
+                <label key={m} className={pill}>
+                  <input
+                    type="radio"
+                    value={m}
+                    checked={draft.style.showcaseStackRatio === m}
+                    onChange={() => setStyle({ showcaseStackRatio: m })}
+                    className="sr-only"
+                  />
+                  {stackRatioLabels[m]}
+                </label>
+              ))}
+            </div>
+            <p className="text-xs text-ink-soft">{stackRatioHints[draft.style.showcaseStackRatio]}</p>
+          </div>
+          {(draft.style.showcaseStackRatio === "wide" || draft.style.showcaseStackRatio === "ultra") && (
+            <Slider
+              id="ui_showcase_stack_crop"
+              label="Crop position"
+              value={draft.style.showcaseStackCrop}
+              range={styleRanges.stackCrop}
+              format={(v) => (v === 0 ? "Top" : v === 100 ? "Bottom" : v === 50 ? "Middle" : `${v}%`)}
+              hint="Which part of the photo shows: Top, Middle or Bottom."
+              onChange={(showcaseStackCrop) => setStyle({ showcaseStackCrop })}
+            />
+          )}
+        </div>
+      )}
       <div className="flex flex-col gap-4 border-t border-line pt-4">
         <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">Title</span>
         <div className="flex flex-col gap-2">
@@ -897,6 +968,10 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
       <input type="hidden" name="site_showcase_title_size" value={draft.style.showcaseTitleSize} />
       <input type="hidden" name="site_showcase_intro_font" value={draft.style.showcaseIntroFont} />
       <input type="hidden" name="site_showcase_intro_size" value={draft.style.showcaseIntroSize} />
+      <input type="hidden" name="site_showcase_stack_ratio" value={draft.style.showcaseStackRatio} />
+      <input type="hidden" name="site_showcase_stack_crop" value={draft.style.showcaseStackCrop} />
+      <input type="hidden" name="site_design_stack_ratio" value={draft.style.designStackRatio} />
+      <input type="hidden" name="site_design_stack_crop" value={draft.style.designStackCrop} />
       {draft.style.heroGray && <input type="hidden" name="site_hero_gray" value="on" />}
 
       <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line px-5 py-3">
@@ -1002,6 +1077,10 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
                 showcaseTitleSize: siteStyleDefaults.showcaseTitleSize,
                 showcaseIntroFont: siteStyleDefaults.showcaseIntroFont,
                 showcaseIntroSize: siteStyleDefaults.showcaseIntroSize,
+                showcaseStackRatio: siteStyleDefaults.showcaseStackRatio,
+                showcaseStackCrop: siteStyleDefaults.showcaseStackCrop,
+                designStackRatio: siteStyleDefaults.designStackRatio,
+                designStackCrop: siteStyleDefaults.designStackCrop,
               })
             }
           >

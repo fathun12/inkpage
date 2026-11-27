@@ -7,6 +7,7 @@ import type {
   DesignTitleSize,
   DesignView,
   DesignWideView,
+  StackRatio,
 } from "@/config/layout";
 import type { DesignsData } from "@/types/designs";
 import { DesignCard } from "./DesignCard";
@@ -37,6 +38,9 @@ type Props = {
   mediaHeight?: number;
   // The slider layouts slide by themselves with these.
   slide?: { seconds: number; autoplay: boolean };
+  // The photo of the Stack layouts: its ratio and the crop position (0 top to 100 bottom).
+  stackRatio?: StackRatio;
+  stackCrop?: number;
   // The text under the title (written in Pages) and the look of the title and of that text (Customize).
   intro?: string | null;
   titleAlign?: DesignTitleAlign;
@@ -60,6 +64,8 @@ export function HomeDesigns({
   size = "large",
   mediaHeight = 0,
   slide,
+  stackRatio = "default",
+  stackCrop = 50,
   intro = null,
   titleAlign = "center",
   titleFont = "default",
@@ -86,7 +92,14 @@ export function HomeDesigns({
 
       {wide && (
         <div className="site-pb">
-          <DesignWide view={wideView} projects={data.projects} height={mediaHeight} slide={run} />
+          <DesignWide
+            view={wideView}
+            projects={data.projects}
+            height={mediaHeight}
+            slide={run}
+            ratio={stackRatio}
+            crop={stackCrop}
+          />
         </div>
       )}
 

@@ -18,6 +18,7 @@ import {
   showcaseSizes,
   showcaseViews,
   showcaseWideViews,
+  stackRatios,
   layoutDefaults,
   projectSizes,
   projectViews,
@@ -39,6 +40,7 @@ import {
   type ShowcaseSize,
   type ShowcaseView,
   type ShowcaseWideView,
+  type StackRatio,
   type ProjectSize,
   type ProjectView,
   type SectionId,
@@ -72,6 +74,7 @@ export const styleRanges = {
   designMedia: { min: 0, max: 60, step: 2 },
   designCount: { min: 3, max: 6, step: 1 },
   showcaseMedia: { min: 0, max: 60, step: 2 },
+  stackCrop: { min: 0, max: 100, step: 5 },
 } as const satisfies Record<string, Range>;
 
 export type SiteStyle = {
@@ -110,6 +113,10 @@ export type SiteStyle = {
   showcaseTitleSize: DesignTitleSize;
   showcaseIntroFont: DesignFont;
   showcaseIntroSize: DesignIntroSize;
+  showcaseStackRatio: StackRatio;
+  showcaseStackCrop: number;
+  designStackRatio: StackRatio;
+  designStackCrop: number;
   sections: SectionSettings;
   order: SectionId[];
   colorBg: string;
@@ -158,6 +165,10 @@ export const siteStyleDefaults: SiteStyle = {
   showcaseTitleSize: layoutDefaults.showcaseTitleSize,
   showcaseIntroFont: layoutDefaults.showcaseIntroFont,
   showcaseIntroSize: layoutDefaults.showcaseIntroSize,
+  showcaseStackRatio: layoutDefaults.showcaseStackRatio,
+  showcaseStackCrop: layoutDefaults.showcaseStackCrop,
+  designStackRatio: layoutDefaults.designStackRatio,
+  designStackCrop: layoutDefaults.designStackCrop,
   sections: sectionDefaults,
   order: [...sectionIds],
   colorBg: "#ffffff",
@@ -214,6 +225,10 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     showcaseTitleSize: readChoice(r.showcaseTitleSize, designTitleSizes, d.showcaseTitleSize),
     showcaseIntroFont: readChoice(r.showcaseIntroFont, designTextFonts, d.showcaseIntroFont),
     showcaseIntroSize: readChoice(r.showcaseIntroSize, designIntroSizes, d.showcaseIntroSize),
+    showcaseStackRatio: readChoice(r.showcaseStackRatio, stackRatios, d.showcaseStackRatio),
+    showcaseStackCrop: num(r.showcaseStackCrop, styleRanges.stackCrop, d.showcaseStackCrop),
+    designStackRatio: readChoice(r.designStackRatio, stackRatios, d.designStackRatio),
+    designStackCrop: num(r.designStackCrop, styleRanges.stackCrop, d.designStackCrop),
     designMedia: num(r.designMedia, styleRanges.designMedia, d.designMedia),
     designCount: num(r.designCount, styleRanges.designCount, d.designCount),
     sections: readSections(r.sections),

@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import type { ShowcaseWideView } from "@/config/layout";
+import { stackAspect, type ShowcaseWideView, type StackRatio } from "@/config/layout";
 import { routes } from "@/config/site";
 import { pickShowcase, pickStack, readProjectItem, type ProjectFile, type ProjectItem } from "@/lib/item-data";
 import type { Block } from "@/types/block";
@@ -30,6 +30,15 @@ function prepare(blocks: Block[]): Entry[] {
 // Height of a photo frame: a fixed height in rem, or (0 = Auto) the shape that suits the layout.
 function frame(height: number, aspect: string): CSSProperties {
   return height > 0 ? { height: `${height}rem` } : { aspectRatio: aspect };
+}
+
+// The frame of the Stack photo. Default = as before. Another ratio sets the shape; crop (0 top to 100 bottom)
+// is which part of the photo shows. --crop is read by the media (object-position).
+function stackFrame(height: number, ratio: StackRatio, crop: number): CSSProperties {
+  if (ratio === "default") return frame(height, "16 / 9");
+  const style: Record<string, string> = { aspectRatio: stackAspect[ratio] };
+  if (ratio !== "normal") style["--crop"] = `50% ${crop}%`;
+  return style as CSSProperties;
 }
 
 // A project without a photo shows its title in the box.
@@ -120,12 +129,14 @@ function Stack({
   entries,
   height,
   slide,
-}: Shape & { slide?: { seconds: number; autoplay: boolean } }) {
+  ratio,
+  crop,
+}: Shape & { slide?: { seconds: number; autoplay: boolean }; ratio: StackRatio; crop: number }) {
   // With slide (Stack slide): the same project, one per screen, sliding by itself.
   const items = entries.map((e, i) => (
         <li key={e.block.id} className={slide ? "w-full shrink-0 snap-start" : undefined}>
           <Reveal variant="still">
-            <Frame entry={{ ...e, main: e.stack }} eager={i === 0} style={frame(height, "16 / 9")} />
+            <Frame entry={{ ...e, main: e.stack }} eager={i === 0} style={stackFrame(height, ratio, crop)} />
           </Reveal>
           <Reveal delay={100}>
             <div className="mt-6 grid gap-5 px-5 sm:px-8 md:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] md:gap-12">
@@ -304,11 +315,15 @@ export function ShowcaseWide({
   blocks,
   height,
   slide,
+  ratio = "default",
+  crop = 50,
 }: {
   view: ShowcaseWideView;
   blocks: Block[];
   height: number;
   slide: { seconds: number; autoplay: boolean };
+  ratio?: StackRatio;
+  crop?: number;
 }) {
   const entries = prepare(blocks);
   if (entries.length === 0) return null;
@@ -316,6 +331,8 @@ export function ShowcaseWide({
   if (view === "filmstrip") return <Filmstrip entries={entries} height={height} slide={slide} />;
   if (view === "sheet") return <Sheet entries={entries} height={height} />;
   if (view === "mosaic") return <Mosaic entries={entries} height={height} />;
-  if (view === "stackslide") return <Stack entries={entries} height={height} slide={slide} />;
-  return <Stack entries={entries} height={height} />;
+  if (view === "stackslide") {
+    return <Stack entries={entries} height={height} slide={slide} ratio={ratio} crop={crop} />;
+  }
+  return <Stack entries={entries} height={height} ratio={ratio} crop={crop} />;
 }

@@ -214,6 +214,31 @@ export const showcaseWideViewHints: Record<ShowcaseWideView, string> = {
   mosaic: "Photos of different sizes in one tight grid. Only the title shows.",
 };
 
+// The photo of the Stack and Stack slide layouts (Showcase and Design projects): its shape, and (when the shape is
+// wide) which part of it shows. Default = as before: 16:9, or the Photo height.
+export const stackRatios = ["default", "normal", "wide", "ultra"] as const;
+export type StackRatio = (typeof stackRatios)[number];
+
+export const stackRatioLabels: Record<StackRatio, string> = {
+  default: "Default",
+  normal: "Normal",
+  wide: "Wide",
+  ultra: "Ultra-wide",
+};
+
+export const stackRatioHints: Record<StackRatio, string> = {
+  default: "As before: 16:9, or the Photo height above.",
+  normal: "16:9. The Photo height above is not used.",
+  wide: "21:9, a wide and low photo. The photo is cropped; move the crop to choose which part shows.",
+  ultra: "32:9, very wide and low. The photo is cropped; move the crop to choose which part shows.",
+};
+
+export const stackAspect: Record<Exclude<StackRatio, "default">, string> = {
+  normal: "16 / 9",
+  wide: "21 / 9",
+  ultra: "32 / 9",
+};
+
 // How the Countdown section looks.
 export const countdownViews = ["section", "strip"] as const;
 export type CountdownView = (typeof countdownViews)[number];
@@ -256,6 +281,10 @@ export const layoutDefaults: {
   showcaseTitleSize: DesignTitleSize;
   showcaseIntroFont: DesignFont;
   showcaseIntroSize: DesignIntroSize;
+  showcaseStackRatio: StackRatio;
+  showcaseStackCrop: number;
+  designStackRatio: StackRatio;
+  designStackCrop: number;
 } = {
   density: "comfortable",
   projectSize: "large",
@@ -283,6 +312,10 @@ export const layoutDefaults: {
   showcaseTitleSize: "auto",
   showcaseIntroFont: "default",
   showcaseIntroSize: "auto",
+  showcaseStackRatio: "default",
+  showcaseStackCrop: 50,
+  designStackRatio: "default",
+  designStackCrop: 50,
 };
 
 // Safe reader: an unknown or missing value falls back to the default.
