@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { AboutSection } from "@/components/site/AboutSection";
-import { AboutSteam } from "@/components/site/AboutSteam";
+import { AboutContent } from "@/components/site/AboutContent";
 import { JsonLd } from "@/components/site/JsonLd";
-import { PageIntro } from "@/components/site/PageIntro";
 import { cleanUrl } from "@/config/seo";
 import { hasAbout, readSite } from "@/config/site-content";
+import { readSiteStyle } from "@/config/site-style";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
 import { fetchSteam } from "@/features/site/steam";
@@ -42,14 +41,15 @@ export default async function AboutPage({ params }: Props) {
       {person && url && (
         <JsonLd data={{ "@context": "https://schema.org", "@type": "ProfilePage", url, mainEntity: person }} />
       )}
-      <PageIntro title={site.about.title ?? "About"} intro={null} />
-      <AboutSection
+      <AboutContent
+        title={site.about.title ?? "About"}
         name={profile.display_name}
         bio={profile.bio}
         body={site.about.body}
         photo={site.about.photo}
+        steam={steam}
+        style={readSiteStyle(profile.site_style)}
       />
-      {steam && <AboutSteam data={steam} />}
     </>
   );
 }

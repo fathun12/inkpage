@@ -16,6 +16,7 @@ import { getPublicShop } from "@/features/shop/public";
 import { fetchBiblia } from "@/features/site/biblia";
 import { fetchDesigns } from "@/features/site/designs";
 import { fetchGithub } from "@/features/site/github";
+import { fetchSteam } from "@/features/site/steam";
 import {
   buildNav,
   homeCountdown,
@@ -40,10 +41,11 @@ export default async function PreviewPage() {
   const site = readSite(profile.site);
   const base = routes.profile(profile.username);
 
-  const [biblia, designs, github, shop, articles] = await Promise.all([
+  const [biblia, designs, github, steam, shop, articles] = await Promise.all([
     fetchBiblia(site.bibliaUrl, 6),
     fetchDesigns(site.designsUrl, 6),
     fetchGithub(site.githubUser),
+    fetchSteam(site.steamId),
     getPublicShop(profile.id),
     getPublicArticles(profile.id),
   ]);
@@ -90,6 +92,7 @@ export default async function PreviewPage() {
       biblia={biblia}
       designs={designs}
       github={github}
+      steam={steam}
       shopItems={shopItems}
       shopOpen={shop.settings.is_open}
       shopTitle={shopTitle}

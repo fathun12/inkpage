@@ -1,7 +1,15 @@
 "use server";
 
 import { readHeroMotion } from "@/config/intro";
-import { readOrder, readSections } from "@/config/layout";
+import {
+  aboutDefaults,
+  aboutLayouts,
+  aboutPhotoShapes,
+  readAboutOrder,
+  readAboutSections,
+  steamLayouts,
+} from "@/config/about-style";
+import { readChoice, readOrder, readSections } from "@/config/layout";
 import { routes } from "@/config/site";
 import { requireUser } from "@/features/auth/queries";
 import { redirectWithError, redirectWithSaved } from "@/lib/flash";
@@ -11,6 +19,16 @@ import { firstError } from "@/lib/validation";
 import { appearanceSchema } from "./schema";
 
 const back = routes.customize;
+
+// The About settings arrive as text (JSON). Dirty text gives null, and the readers turn null into the defaults.
+function parseJson(text: unknown): unknown {
+  if (typeof text !== "string" || text === "") return null;
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
 
 export async function updateAppearanceAction(formData: FormData): Promise<void> {
   const user = await requireUser();
@@ -116,6 +134,11 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
         designCount: v.site_design_count,
         sections: readSections(v.site_sections),
         order: readOrder(v.site_order),
+        aboutLayout: readChoice(field(formData, "site_about_layout"), aboutLayouts, aboutDefaults.aboutLayout),
+        aboutPhoto: readChoice(field(formData, "site_about_photo"), aboutPhotoShapes, aboutDefaults.aboutPhoto),
+        steamLayout: readChoice(field(formData, "site_steam_layout"), steamLayouts, aboutDefaults.steamLayout),
+        aboutSections: readAboutSections(parseJson(field(formData, "site_about_sections"))),
+        aboutOrder: readAboutOrder(parseJson(field(formData, "site_about_order"))),
         colorBg: v.site_color_bg,
         colorInk: v.site_color_ink,
         colorAccent: v.site_color_accent,

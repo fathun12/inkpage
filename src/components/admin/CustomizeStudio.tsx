@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { AboutControls } from "@/components/admin/studio/AboutControls";
 import { SectionControls } from "@/components/admin/studio/SectionControls";
+import type { AboutSectionId } from "@/config/about-style";
 import { Field } from "@/components/ui/Field";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import {
@@ -373,18 +375,20 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
   // The preview is the page /admin/preview in a frame. The draft is sent to it with postMessage.
   const frameRef = useRef<HTMLIFrameElement>(null);
   const draftRef = useRef(draft);
+  const pageRef = useRef<StudioPage>(page);
 
   const send = useCallback(() => {
     frameRef.current?.contentWindow?.postMessage(
-      { type: previewMessages.draft, draft: draftRef.current },
+      { type: previewMessages.draft, draft: draftRef.current, page: pageRef.current },
       window.location.origin,
     );
   }, []);
 
   useEffect(() => {
     draftRef.current = draft;
+    pageRef.current = page;
     send();
-  }, [draft, send]);
+  }, [draft, page, send]);
 
   // Selects a section: opens the Sections panel and the row of that section, and scrolls to it.
   const pick = useCallback((id: SectionId) => {
@@ -433,6 +437,16 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
       style: {
         ...d.style,
         sections: { ...d.style.sections, [id]: { ...d.style.sections[id], ...patch } },
+      },
+    }));
+  }
+
+  function setAboutSection(id: AboutSectionId, patch: Partial<SectionSetting>) {
+    setDraft((d) => ({
+      ...d,
+      style: {
+        ...d.style,
+        aboutSections: { ...d.style.aboutSections, [id]: { ...d.style.aboutSections[id], ...patch } },
       },
     }));
   }
@@ -981,6 +995,11 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
       <input type="hidden" name="site_showcase_stack_crop" value={draft.style.showcaseStackCrop} />
       <input type="hidden" name="site_design_stack_ratio" value={draft.style.designStackRatio} />
       <input type="hidden" name="site_design_stack_crop" value={draft.style.designStackCrop} />
+      <input type="hidden" name="site_about_layout" value={draft.style.aboutLayout} />
+      <input type="hidden" name="site_about_photo" value={draft.style.aboutPhoto} />
+      <input type="hidden" name="site_steam_layout" value={draft.style.steamLayout} />
+      <input type="hidden" name="site_about_sections" value={JSON.stringify(draft.style.aboutSections)} />
+      <input type="hidden" name="site_about_order" value={JSON.stringify(draft.style.aboutOrder)} />
       {draft.style.heroGray && <input type="hidden" name="site_hero_gray" value="on" />}
 
       <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line px-5 py-3">
@@ -1347,7 +1366,27 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
 
           </div>
           <div className={cn(page !== "about" && "hidden")}>
-            <p className="px-5 py-4 text-sm text-ink-soft">No settings for the About page yet.</p>
+            <AboutControls
+              layout={draft.style.aboutLayout}
+              photo={draft.style.aboutPhoto}
+              steamLayout={draft.style.steamLayout}
+              sections={draft.style.aboutSections}
+              order={draft.style.aboutOrder}
+              onLayout={(aboutLayout) => setStyle({ aboutLayout })}
+              onPhoto={(aboutPhoto) => setStyle({ aboutPhoto })}
+              onSteamLayout={(steamLayout) => setStyle({ steamLayout })}
+              onSection={setAboutSection}
+              onOrder={(aboutOrder) => setStyle({ aboutOrder })}
+              onReset={() =>
+                setStyle({
+                  aboutLayout: siteStyleDefaults.aboutLayout,
+                  aboutPhoto: siteStyleDefaults.aboutPhoto,
+                  steamLayout: siteStyleDefaults.steamLayout,
+                  aboutSections: siteStyleDefaults.aboutSections,
+                  aboutOrder: siteStyleDefaults.aboutOrder,
+                })
+              }
+            />
           </div>
           <p className="px-5 py-4 text-xs text-ink-soft">
             Media, text and pages are set in <Link href={routes.pages} className="underline underline-offset-4">Pages</Link>.

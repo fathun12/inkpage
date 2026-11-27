@@ -46,6 +46,21 @@ import {
   type SectionId,
   type SectionSettings,
 } from "@/config/layout";
+import {
+  aboutDefaults,
+  aboutLayouts,
+  aboutPhotoShapes,
+  aboutSectionDefaults,
+  aboutSectionIds,
+  readAboutOrder,
+  readAboutSections,
+  steamLayouts,
+  type AboutLayout,
+  type AboutPhotoShape,
+  type AboutSectionId,
+  type AboutSections,
+  type SteamLayout,
+} from "@/config/about-style";
 
 export const motionModes = ["full", "subtle", "off"] as const;
 export type MotionMode = (typeof motionModes)[number];
@@ -119,6 +134,11 @@ export type SiteStyle = {
   designStackCrop: number;
   sections: SectionSettings;
   order: SectionId[];
+  aboutLayout: AboutLayout;
+  aboutPhoto: AboutPhotoShape;
+  steamLayout: SteamLayout;
+  aboutSections: AboutSections;
+  aboutOrder: AboutSectionId[];
   colorBg: string;
   colorInk: string;
   colorAccent: string;
@@ -171,6 +191,11 @@ export const siteStyleDefaults: SiteStyle = {
   designStackCrop: layoutDefaults.designStackCrop,
   sections: sectionDefaults,
   order: [...sectionIds],
+  aboutLayout: aboutDefaults.aboutLayout,
+  aboutPhoto: aboutDefaults.aboutPhoto,
+  steamLayout: aboutDefaults.steamLayout,
+  aboutSections: aboutSectionDefaults,
+  aboutOrder: [...aboutSectionIds],
   colorBg: "#ffffff",
   colorInk: "#000000",
   colorAccent: "#b5532f",
@@ -233,6 +258,11 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     designCount: num(r.designCount, styleRanges.designCount, d.designCount),
     sections: readSections(r.sections),
     order: readOrder(r.order),
+    aboutLayout: readChoice(r.aboutLayout, aboutLayouts, d.aboutLayout),
+    aboutPhoto: readChoice(r.aboutPhoto, aboutPhotoShapes, d.aboutPhoto),
+    steamLayout: readChoice(r.steamLayout, steamLayouts, d.steamLayout),
+    aboutSections: readAboutSections(r.aboutSections),
+    aboutOrder: readAboutOrder(r.aboutOrder),
     colorBg: color(r.colorBg, d.colorBg),
     colorInk: color(r.colorInk, d.colorInk),
     colorAccent: color(r.colorAccent, d.colorAccent),

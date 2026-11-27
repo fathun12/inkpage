@@ -1,4 +1,6 @@
 import { Img } from "@/components/ui/Img";
+import type { SteamLayout } from "@/config/about-style";
+import { cn } from "@/lib/utils";
 import type { SteamData, SteamGame } from "@/types/steam";
 import { Reveal } from "./Reveal";
 
@@ -49,7 +51,7 @@ function GameList({
 
 // The Steam section of the About page: the profile on the left, recent and most played games on the right.
 // It only appears when Steam answered.
-export function AboutSteam({ data }: { data: SteamData }) {
+export function AboutSteam({ data, layout = "split" }: { data: SteamData; layout?: SteamLayout }) {
   const status =
     data.state === "playing" ? `Playing ${data.playing}` : data.state === "online" ? "Online" : "Offline";
   return (
@@ -58,7 +60,7 @@ export function AboutSteam({ data }: { data: SteamData }) {
         <Reveal>
           <h2 className="font-mono text-xs font-normal uppercase tracking-widest text-ink-soft">Steam</h2>
         </Reveal>
-        <div className="mt-8 grid gap-10 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+        <div className={cn("mt-8 grid gap-10", layout === "split" && "md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]")}>
           <Reveal variant="still">
             <Img src={data.avatar} alt={`Steam avatar of ${data.name}`} className="size-24 object-cover" />
             <p className="mt-4 font-display text-2xl leading-tight">{data.name}</p>

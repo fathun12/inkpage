@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ComponentProps, type ReactNode } from "react";
 import { HomeShop } from "@/components/shop/HomeShop";
+import { AboutContent } from "@/components/site/AboutContent";
 import { CardSlider } from "@/components/site/CardSlider";
 import { FadeGallery } from "@/components/site/FadeGallery";
 import { Hero } from "@/components/site/Hero";
@@ -32,6 +33,7 @@ import type { SiteStyle } from "@/config/site-style";
 import { routes } from "@/config/site";
 import { creditOf, type HomeMedia } from "@/lib/site-view";
 import type { Block, SocialItem } from "@/types/block";
+import type { SteamData } from "@/types/steam";
 
 type Props = {
   profile: { username: string; displayName: string; bio: string | null };
@@ -50,6 +52,7 @@ type Props = {
   biblia: ComponentProps<typeof HomeBiblia>["data"] | null;
   designs: ComponentProps<typeof HomeDesigns>["data"] | null;
   github: ComponentProps<typeof HomeGithub>["data"] | null;
+  steam: SteamData | null;
   shopItems: ComponentProps<typeof HomeShop>["products"];
   shopOpen: boolean;
   shopTitle: string;
@@ -143,6 +146,7 @@ export function StudioPreview({
   biblia,
   designs,
   github,
+  steam,
   shopItems,
   shopOpen,
   shopTitle,
@@ -154,6 +158,11 @@ export function StudioPreview({
   const [mode, setMode] = useState<Mode>("system");
   // Counts up to play the entrance of the top of Home again.
   const [replay, setReplay] = useState(0);
+  // The page the studio is editing: Home or the About page.
+  const [page, setPage] = useState<"home" | "about">("home");
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [page]);
 
   const hoverBox = useRef<HTMLDivElement>(null);
   const hoverTag = useRef<HTMLSpanElement>(null);
@@ -191,8 +200,9 @@ export function StudioPreview({
       if (event.origin !== window.location.origin || event.source !== window.parent) return;
       const data: unknown = event.data;
       if (typeof data !== "object" || data === null) return;
-      const msg = data as { type?: unknown; draft?: unknown };
+      const msg = data as { type?: unknown; draft?: unknown; page?: unknown };
       if (msg.type === previewMessages.draft && typeof msg.draft === "object" && msg.draft !== null) {
+        if (msg.page === "home" || msg.page === "about") setPage(msg.page);
         const raw = msg.draft as { fontHeading?: unknown; fontBody?: unknown; style?: unknown };
         if (typeof raw.style !== "object" || raw.style === null) return;
         setDraft((d) => ({
@@ -420,8 +430,20 @@ export function StudioPreview({
           showClock={site.showClock}
           countdown={newsCountdown}
         />
-        <SiteHeader brand={profile.username} home={base} items={nav} overlay />
+        <SiteHeader brand={profile.username} home={base} items={nav} overlay={page === "home"} />
         <main>
+          {page === "about" ? (
+            <AboutContent
+              title={site.about.title ?? "About"}
+              name={profile.displayName}
+              bio={profile.bio}
+              body={site.about.body}
+              photo={site.about.photo}
+              steam={steam}
+              style={draft.style}
+            />
+          ) : (
+          <>
           <Hero
             slides={media.hero}
             name={profile.displayName}
@@ -448,6 +470,8 @@ export function StudioPreview({
                 {parts[id]}
               </div>
             ) : null,
+          )}
+          </>
           )}
         </main>
         <SiteFooter
