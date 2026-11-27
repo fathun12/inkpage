@@ -142,13 +142,8 @@ export function MediaSlider({ count, seconds, autoplay, inset = false, bleed = f
     const fit = () => {
       frame = 0;
       const tiles = Array.from(el.children) as HTMLElement[];
-      const from = el.scrollLeft;
-      const to = from + el.clientWidth;
       let tallest = 0;
-      for (const tile of tiles) {
-        const overlap = Math.min(tile.offsetLeft + tile.offsetWidth, to) - Math.max(tile.offsetLeft, from);
-        if (overlap >= tile.offsetWidth * 0.5) tallest = Math.max(tallest, tile.offsetHeight);
-      }
+      for (const tile of tiles) tallest = Math.max(tallest, tile.offsetHeight);
       if (tallest < 1) return;
       const next = `${tallest}px`;
       if (el.style.height !== next) el.style.height = next;
@@ -291,7 +286,7 @@ export function MediaSlider({ count, seconds, autoplay, inset = false, bleed = f
             dragged.current = false;
           }
         }}
-        className={`site-cards-track relative flex cursor-grab touch-pan-y select-none items-start gap-3 overflow-hidden transition-[height] duration-500 ease-out active:cursor-grabbing motion-reduce:transition-none [--slide-h:13rem] sm:[--slide-h:16rem]${
+        className={`site-cards-track relative flex cursor-grab touch-pan-y select-none items-start gap-3 overflow-hidden active:cursor-grabbing [--slide-h:13rem] sm:[--slide-h:16rem]${
           inset ? " px-5 sm:px-8" : ""
         }`}
       >
