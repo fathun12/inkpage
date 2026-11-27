@@ -12,7 +12,7 @@ export function HomeGithub({ data, title }: { data: GithubData; title: string })
   const active = data.status === "active";
   const max = Math.max(1, ...data.days);
   return (
-    <section id="github" aria-label={title} className="site-mt bg-band site-pt text-band-ink">
+    <section id="github" aria-label={title} className="bg-band site-pt text-band-ink">
       <div className="mx-auto max-w-5xl px-5 pb-8 sm:px-8">
         <Reveal>
           <h2 className="font-mono text-xs uppercase tracking-widest opacity-70">{title}</h2>
