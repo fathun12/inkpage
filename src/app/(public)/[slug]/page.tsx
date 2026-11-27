@@ -162,6 +162,7 @@ export default async function HomePage({ params }: Props) {
           titleSize={style.writingTitleSize}
           introFont={style.writingIntroFont}
           introSize={style.writingIntroSize}
+          intro={site.cardsIntro}
           items={writing}
           title={site.cardsTitle ?? site.writing.title ?? "Writing"}
           seconds={style.heroSeconds}

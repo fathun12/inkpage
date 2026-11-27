@@ -912,6 +912,34 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
           </div>
         </div>
       </div>
+      <div className="flex flex-col gap-4 border-t border-line pt-4">
+        <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">Text under the title</span>
+        <TextFontSelect
+          id="ui_writing_intro_font"
+          label="Font"
+          value={draft.style.writingIntroFont}
+          hint="Default is the font of the site. The text itself is written in Pages, tab Home, Section titles."
+          onChange={(writingIntroFont) => setStyle({ writingIntroFont })}
+        />
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Size</span>
+          <div className="flex flex-wrap gap-2">
+            {designIntroSizes.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.writingIntroSize === m}
+                  onChange={() => setStyle({ writingIntroSize: m })}
+                  className="sr-only"
+                />
+                {designIntroSizeLabels[m]}
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-ink-soft">Auto follows the size of the title.</p>
+        </div>
+      </div>
     </>
   );
   const showcaseWide = draft.style.showcaseMode === "full";

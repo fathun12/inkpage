@@ -306,6 +306,7 @@ export function StudioPreview({
           titleSize={draft.style.writingTitleSize}
           introFont={draft.style.writingIntroFont}
           introSize={draft.style.writingIntroSize}
+          intro={site.cardsIntro}
           items={cards}
           title={site.cardsTitle ?? site.writing.title ?? "Writing"}
           seconds={draft.style.heroSeconds}
