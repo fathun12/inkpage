@@ -285,7 +285,14 @@ export function StudioPreview({
             description={countdown.body}
             target={countdown.data.target ?? ""}
             start={countdown.created_at}
-            variant={draft.style.countdownView}
+            mode={draft.style.countdownMode}
+            view={draft.style.countdownView}
+            wideView={draft.style.countdownWideView}
+            titleAlign={draft.style.countdownTitleAlign}
+            titleFont={draft.style.countdownTitleFont}
+            titleSize={draft.style.countdownTitleSize}
+            introFont={draft.style.countdownIntroFont}
+            introSize={draft.style.countdownIntroSize}
           />
         </Reveal>
       </SectionBox>

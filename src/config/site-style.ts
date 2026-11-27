@@ -24,6 +24,7 @@ import {
   writingWideViews,
   articleViews,
   articleWideViews,
+  countdownWideViews,
   projectWideViews,
   bibliaViews,
   bibliaWideViews,
@@ -45,6 +46,7 @@ import {
   sectionDefaults,
   sectionIds,
   type CountdownView,
+  type CountdownWideView,
   type DensityMode,
   type DesignFont,
   type DesignIntroSize,
@@ -150,6 +152,13 @@ export type SiteStyle = {
   projectView: ProjectView;
   projectMedia: number;
   countdownView: CountdownView;
+  countdownMode: DesignMode;
+  countdownWideView: CountdownWideView;
+  countdownTitleAlign: DesignTitleAlign;
+  countdownTitleFont: DesignFont;
+  countdownTitleSize: DesignTitleSize;
+  countdownIntroFont: DesignFont;
+  countdownIntroSize: DesignIntroSize;
   designSize: DesignSize;
   designView: DesignView;
   designMode: DesignMode;
@@ -290,6 +299,13 @@ export const siteStyleDefaults: SiteStyle = {
   projectView: layoutDefaults.projectView,
   projectMedia: layoutDefaults.projectMedia,
   countdownView: layoutDefaults.countdownView,
+  countdownMode: layoutDefaults.countdownMode,
+  countdownWideView: layoutDefaults.countdownWideView,
+  countdownTitleAlign: layoutDefaults.countdownTitleAlign,
+  countdownTitleFont: layoutDefaults.countdownTitleFont,
+  countdownTitleSize: layoutDefaults.countdownTitleSize,
+  countdownIntroFont: layoutDefaults.countdownIntroFont,
+  countdownIntroSize: layoutDefaults.countdownIntroSize,
   designSize: layoutDefaults.designSize,
   designView: layoutDefaults.designView,
   designMode: layoutDefaults.designMode,
@@ -440,6 +456,13 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     projectView: readChoice(r.projectView, projectViews, d.projectView),
     projectMedia: num(r.projectMedia, styleRanges.projectMedia, d.projectMedia),
     countdownView: readChoice(r.countdownView, countdownViews, d.countdownView),
+    countdownMode: readChoice(r.countdownMode, designModes, d.countdownMode),
+    countdownWideView: readChoice(r.countdownWideView, countdownWideViews, d.countdownWideView),
+    countdownTitleAlign: readChoice(r.countdownTitleAlign, designTitleAligns, d.countdownTitleAlign),
+    countdownTitleFont: readChoice(r.countdownTitleFont, designTextFonts, d.countdownTitleFont),
+    countdownTitleSize: readChoice(r.countdownTitleSize, designTitleSizes, d.countdownTitleSize),
+    countdownIntroFont: readChoice(r.countdownIntroFont, designTextFonts, d.countdownIntroFont),
+    countdownIntroSize: readChoice(r.countdownIntroSize, designIntroSizes, d.countdownIntroSize),
     designSize: readChoice(r.designSize, designSizes, d.designSize),
     designView: readChoice(r.designView, designViews, d.designView),
     designMode: readChoice(r.designMode, designModes, d.designMode),

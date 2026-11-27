@@ -141,7 +141,14 @@ export default async function HomePage({ params }: Props) {
             description={countdown.body}
             target={countdown.data.target ?? ""}
             start={countdown.created_at}
-            variant={style.countdownView}
+            mode={style.countdownMode}
+            view={style.countdownView}
+            wideView={style.countdownWideView}
+            titleAlign={style.countdownTitleAlign}
+            titleFont={style.countdownTitleFont}
+            titleSize={style.countdownTitleSize}
+            introFont={style.countdownIntroFont}
+            introSize={style.countdownIntroSize}
           />
         </Reveal>
       </SectionBox>

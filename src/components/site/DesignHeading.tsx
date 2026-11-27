@@ -4,7 +4,7 @@ import type { DesignFont, DesignIntroSize, DesignTitleAlign, DesignTitleSize } f
 import { Reveal } from "./Reveal";
 
 // Size of the title when it is a heading. The clamp shrinks it on a phone so a big title never runs off the screen.
-const titleSizes: Record<Exclude<DesignTitleSize, "auto">, string> = {
+export const titleSizes: Record<Exclude<DesignTitleSize, "auto">, string> = {
   small: "clamp(1.25rem, 3.5vw, 1.75rem)",
   medium: "clamp(1.75rem, 5vw, 2.75rem)",
   large: "clamp(2.25rem, 8vw, 4.5rem)",
@@ -13,7 +13,7 @@ const titleSizes: Record<Exclude<DesignTitleSize, "auto">, string> = {
 };
 
 // The text under the title at Auto size follows the size of the title, so the two always go together.
-const introAuto: Record<DesignTitleSize, string> = {
+export const introAuto: Record<DesignTitleSize, string> = {
   auto: "1rem",
   small: "0.9375rem",
   medium: "1rem",
@@ -22,14 +22,14 @@ const introAuto: Record<DesignTitleSize, string> = {
   giant: "1.5rem",
 };
 
-const introSizes: Record<Exclude<DesignIntroSize, "auto">, string> = {
+export const introSizes: Record<Exclude<DesignIntroSize, "auto">, string> = {
   small: "0.875rem",
   medium: "1.125rem",
   large: "clamp(1.25rem, 2.4vw, 1.75rem)",
 };
 
 // A chosen font. "default" gives nothing, so the text keeps the font it already has.
-function family(font: DesignFont): string | undefined {
+export function family(font: DesignFont): string | undefined {
   return font === "default" ? undefined : `var(${fontChoices[font].cssVar}), system-ui, sans-serif`;
 }
 

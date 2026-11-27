@@ -536,17 +536,34 @@ export const shopWideViewHints: Record<ShopWideView, string> = {
 };
 
 // How the Countdown section looks.
-export const countdownViews = ["section", "strip"] as const;
+export const countdownViews = ["section", "strip", "clock"] as const;
 export type CountdownView = (typeof countdownViews)[number];
 
 export const countdownViewLabels: Record<CountdownView, string> = {
   section: "Section",
   strip: "Strip",
+  clock: "Clock",
 };
 
 export const countdownViewHints: Record<CountdownView, string> = {
   section: "The full block: message, title, text and big numbers.",
   strip: "One thin line: the title and the time left.",
+  clock: "Four big numbers, one under the other: days, hours, minutes and seconds.",
+};
+
+// Full width: the countdown has no photos and does not slide, so there is no Size, Ratio, Crop or Photo height.
+// Mode (Centered or Full width), the title place, the fonts and the title sizes reuse the names above.
+export const countdownWideViews = ["giant", "edge"] as const;
+export type CountdownWideView = (typeof countdownWideViews)[number];
+
+export const countdownWideViewLabels: Record<CountdownWideView, string> = {
+  giant: "Giant",
+  edge: "Edge strip",
+};
+
+export const countdownWideViewHints: Record<CountdownWideView, string> = {
+  giant: "The four numbers huge across the whole screen, from the left edge to the right edge.",
+  edge: "One thin line from the left edge to the right edge: the title and the time left.",
 };
 
 // projectMedia = height of each Projects photo on Home in rem. 0 = Auto (the shape of each photo, as before).
@@ -556,6 +573,13 @@ export const layoutDefaults: {
   projectView: ProjectView;
   projectMedia: number;
   countdownView: CountdownView;
+  countdownMode: DesignMode;
+  countdownWideView: CountdownWideView;
+  countdownTitleAlign: DesignTitleAlign;
+  countdownTitleFont: DesignFont;
+  countdownTitleSize: DesignTitleSize;
+  countdownIntroFont: DesignFont;
+  countdownIntroSize: DesignIntroSize;
   designSize: DesignSize;
   designView: DesignView;
   designMode: DesignMode;
@@ -666,6 +690,13 @@ export const layoutDefaults: {
   projectView: "list",
   projectMedia: 0,
   countdownView: "section",
+  countdownMode: "centered",
+  countdownWideView: "giant",
+  countdownTitleAlign: "center",
+  countdownTitleFont: "default",
+  countdownTitleSize: "auto",
+  countdownIntroFont: "default",
+  countdownIntroSize: "auto",
   designSize: "large",
   designView: "grid",
   designMode: "centered",

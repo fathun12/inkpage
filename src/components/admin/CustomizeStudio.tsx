@@ -3,6 +3,7 @@
 import { GithubControls } from "@/components/admin/studio/GithubControls";
 import { LinksControls } from "@/components/admin/studio/LinksControls";
 import { VisitControls } from "@/components/admin/studio/VisitControls";
+import { CountdownControls } from "@/components/admin/studio/CountdownControls";
 import { ShopControls } from "@/components/admin/studio/ShopControls";
 
 import Link from "next/link";
@@ -535,9 +536,9 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
       />
     </>
   );
-  const countdownControls = (
+  const countdownStyleRadios = (
     <div className="flex flex-col gap-2">
-      <span className="text-sm font-medium text-ink-soft">Style</span>
+      <span className="text-sm font-medium text-ink-soft">Layout on Home</span>
       <div className="flex flex-wrap gap-2">
         {countdownViews.map((m) => (
           <label key={m} className={pill}>
@@ -554,6 +555,11 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
       </div>
       <p className="text-xs text-ink-soft">{countdownViewHints[draft.style.countdownView]}</p>
     </div>
+  );
+  const countdownControls = (
+    <CountdownControls style={draft.style} onChange={setStyle}>
+      {countdownStyleRadios}
+    </CountdownControls>
   );
   const designWide = draft.style.designMode === "full";
   const designControls = (
@@ -1700,6 +1706,13 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
       <input type="hidden" name="site_project_view" value={draft.style.projectView} />
       <input type="hidden" name="site_project_media" value={draft.style.projectMedia} />
       <input type="hidden" name="site_countdown_view" value={draft.style.countdownView} />
+      <input type="hidden" name="site_countdown_mode" value={draft.style.countdownMode} />
+      <input type="hidden" name="site_countdown_wide_view" value={draft.style.countdownWideView} />
+      <input type="hidden" name="site_countdown_title_align" value={draft.style.countdownTitleAlign} />
+      <input type="hidden" name="site_countdown_title_font" value={draft.style.countdownTitleFont} />
+      <input type="hidden" name="site_countdown_title_size" value={draft.style.countdownTitleSize} />
+      <input type="hidden" name="site_countdown_intro_font" value={draft.style.countdownIntroFont} />
+      <input type="hidden" name="site_countdown_intro_size" value={draft.style.countdownIntroSize} />
       <input type="hidden" name="site_design_size" value={draft.style.designSize} />
       <input type="hidden" name="site_design_view" value={draft.style.designView} />
       <input type="hidden" name="site_design_media" value={draft.style.designMedia} />
@@ -1917,6 +1930,13 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
                 projectView: siteStyleDefaults.projectView,
                 projectMedia: siteStyleDefaults.projectMedia,
                 countdownView: siteStyleDefaults.countdownView,
+                countdownMode: siteStyleDefaults.countdownMode,
+                countdownWideView: siteStyleDefaults.countdownWideView,
+                countdownTitleAlign: siteStyleDefaults.countdownTitleAlign,
+                countdownTitleFont: siteStyleDefaults.countdownTitleFont,
+                countdownTitleSize: siteStyleDefaults.countdownTitleSize,
+                countdownIntroFont: siteStyleDefaults.countdownIntroFont,
+                countdownIntroSize: siteStyleDefaults.countdownIntroSize,
                 designSize: siteStyleDefaults.designSize,
                 designView: siteStyleDefaults.designView,
                 designMedia: siteStyleDefaults.designMedia,
