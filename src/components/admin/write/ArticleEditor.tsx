@@ -29,6 +29,7 @@ import type {
   SignArticleImageAction,
 } from "@/types/article";
 import type { FormAction } from "@/types/form";
+import type { SeriesOption } from "@/types/series";
 import { ArticleImage } from "./ArticleImage";
 import { ArticleCodeBlock } from "./ArticleCodeBlock";
 import { ArticleDirection, ArticleFootnote } from "./ArticleExtras";
@@ -47,6 +48,9 @@ type Props = {
     state: ArticleState;
     slug: string | null;
     cover: string | null;
+    tags: string[];
+    seriesId: string | null;
+    seriesPosition: number | null;
   };
   username: string;
   backHref: string;
@@ -54,6 +58,7 @@ type Props = {
   previewHref: string;
   save: SaveArticleAction;
   signImage: SignArticleImageAction;
+  seriesOptions: SeriesOption[];
   publish: FormAction;
   unpublish: FormAction;
   remove: FormAction;
@@ -106,7 +111,7 @@ function AutoTextarea({ value, onChange, onEnter }: AutoProps) {
   );
 }
 
-export function ArticleEditor({ initial, username, backHref, viewHref, previewHref, save, signImage, publish, unpublish, remove, notice }: Props) {
+export function ArticleEditor({ initial, username, backHref, viewHref, previewHref, save, signImage, seriesOptions, publish, unpublish, remove, notice }: Props) {
   const published = initial.status === "published";
   const [title, setTitle] = useState(initial.title);
   const [subtitle, setSubtitle] = useState(initial.subtitle);
@@ -504,6 +509,10 @@ export function ArticleEditor({ initial, username, backHref, viewHref, previewHr
           status={initial.status}
           slug={initial.slug}
           cover={initial.cover}
+          tags={initial.tags}
+          seriesId={initial.seriesId}
+          seriesPosition={initial.seriesPosition}
+          seriesOptions={seriesOptions}
           signImage={signImage}
           username={username}
           viewHref={viewHref}

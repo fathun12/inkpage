@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ButtonLink } from "@/components/ui/Button";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import { routes } from "@/config/site";
@@ -12,11 +13,16 @@ const stateLabels: Record<ArticleState, string> = { draft: "Draft", scheduled: "
 export function ArticlesAdmin({ articles, username, create }: Props) {
   return (
     <div className="flex flex-col gap-5">
-      <form action={create}>
-        <SubmitButton variant="accent" pendingLabel="Creating...">
-          Write a new article
-        </SubmitButton>
-      </form>
+      <div className="flex flex-wrap items-center gap-4">
+        <form action={create}>
+          <SubmitButton variant="accent" pendingLabel="Creating...">
+            Write a new article
+          </SubmitButton>
+        </form>
+        <Link href={routes.series} className="text-sm underline underline-offset-4">
+          Manage series
+        </Link>
+      </div>
 
       {articles.length === 0 ? (
         <p className="font-mono text-sm text-ink-soft">No articles yet.</p>

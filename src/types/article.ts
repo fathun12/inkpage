@@ -21,6 +21,9 @@ export type Article = {
   excerpt: string | null;
   reading_minutes: number;
   cover_url: string | null;
+  tags: string[];
+  series_id: string | null;
+  series_position: number | null;
   status: ArticleStatus;
   published_at: string | null;
   created_at: string;
@@ -29,7 +32,19 @@ export type Article = {
 
 export type ArticleSummary = Pick<
   Article,
-  "id" | "slug" | "title" | "subtitle" | "excerpt" | "reading_minutes" | "cover_url" | "status" | "published_at" | "updated_at"
+  | "id"
+  | "slug"
+  | "title"
+  | "subtitle"
+  | "excerpt"
+  | "reading_minutes"
+  | "cover_url"
+  | "tags"
+  | "series_id"
+  | "series_position"
+  | "status"
+  | "published_at"
+  | "updated_at"
 >;
 export type OwnArticleSummary = ArticleSummary & { state: ArticleState };
 export type OwnArticle = Article & { state: ArticleState };

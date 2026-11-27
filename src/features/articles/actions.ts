@@ -18,6 +18,7 @@ import {
 } from "@/lib/article-doc";
 import { redirectWithError, redirectWithSaved } from "@/lib/flash";
 import { createClient } from "@/lib/supabase/server";
+import { cleanTags } from "@/lib/tags";
 import { firstError } from "@/lib/validation";
 import type {
   ArticleDraftInput,
@@ -134,6 +135,17 @@ export async function publishArticleAction(id: string, formData: FormData): Prom
     return redirectWithError(back, "The cover picture is not valid. Pick it again.");
   }
 
+  const tagged = cleanTags(String(formData.get("tags") ?? ""));
+  if ("error" in tagged) return redirectWithError(back, tagged.error);
+
+  const seriesField = String(formData.get("series_id") ?? "").trim();
+  const partField = String(formData.get("series_position") ?? "").trim();
+  if (seriesField !== "" && !isUuid(seriesField)) return redirectWithError(back, "The series is not valid. Pick it again.");
+  const part = partField === "" ? null : Number(partField);
+  if (part !== null && (!Number.isInteger(part) || part < 1 || part > articleLimits.seriesPart)) {
+    return redirectWithError(back, `The part number must be a whole number from 1 to ${articleLimits.seriesPart}.`);
+  }
+
   const supabase = await createClient();
   const { data: current, error: readError } = await supabase
     .from("articles")
@@ -143,6 +155,36 @@ export async function publishArticleAction(id: string, formData: FormData): Prom
     .maybeSingle();
   if (readError) return redirectWithError(back, dbMessage(readError));
   if (!current) return redirectWithError(routes.write, "This article no longer exists.");
+
+  // The series must be the owner's. No part number = the end of the series.
+  let seriesId: string | null = null;
+  let seriesPosition: number | null = null;
+  if (seriesField !== "") {
+    const { data: owned, error: seriesError } = await supabase
+      .from("series")
+      .select("id")
+      .eq("id", seriesField)
+      .eq("user_id", user.id)
+      .maybeSingle();
+    if (seriesError) return redirectWithError(back, dbMessage(seriesError));
+    if (!owned) return redirectWithError(back, "That series no longer exists. Pick another one.");
+    seriesId = seriesField;
+    if (part !== null) {
+      seriesPosition = part;
+    } else {
+      const { data: last } = await supabase
+        .from("articles")
+        .select("series_position")
+        .eq("user_id", user.id)
+        .eq("series_id", seriesId)
+        .neq("id", id)
+        .not("series_position", "is", null)
+        .order("series_position", { ascending: false })
+        .limit(1);
+      const top = (last?.[0] as { series_position: number } | undefined)?.series_position ?? 0;
+      seriesPosition = Math.min(top + 1, articleLimits.seriesPart);
+    }
+  }
 
   const now = new Date();
   const mode = String(formData.get("mode") ?? "now");
@@ -166,6 +208,9 @@ export async function publishArticleAction(id: string, formData: FormData): Prom
       reading_minutes: prepared.minutes,
       slug: parsed.data.slug,
       cover_url: coverField || null,
+      tags: tagged.tags,
+      series_id: seriesId,
+      series_position: seriesPosition,
       status: "published",
       published_at: publishedAt.toISOString(),
       updated_at: now.toISOString(),

@@ -11,6 +11,7 @@ import {
 import { getOwnArticle } from "@/features/articles/queries";
 import { requireUser } from "@/features/auth/queries";
 import { getProfileById } from "@/features/profile/queries";
+import { getOwnSeries } from "@/features/series/queries";
 import { savedText } from "@/lib/flash";
 
 type Props = {
@@ -28,6 +29,7 @@ export default async function WriteEditPage({ params, searchParams }: Props) {
   if (!profile) redirect(routes.setup);
   const article = await getOwnArticle(user.id, id);
   if (!article) notFound();
+  const series = await getOwnSeries(user.id);
 
   const error = first(sp.error);
   const saved = first(sp.saved);
@@ -47,6 +49,9 @@ export default async function WriteEditPage({ params, searchParams }: Props) {
         state: article.state,
         slug: article.slug,
         cover: article.cover_url,
+        tags: article.tags,
+        seriesId: article.series_id,
+        seriesPosition: article.series_position,
       }}
       username={profile.username}
       backHref={routes.write}
@@ -54,6 +59,7 @@ export default async function WriteEditPage({ params, searchParams }: Props) {
       previewHref={routes.articlePreview(profile.username, article.id)}
       save={saveArticleAction.bind(null, article.id)}
       signImage={signArticleImageAction.bind(null, article.id)}
+      seriesOptions={series.map((s) => ({ id: s.id, title: s.title }))}
       publish={publishArticleAction.bind(null, article.id)}
       unpublish={unpublishArticleAction.bind(null, article.id)}
       remove={deleteArticleAction.bind(null, article.id)}

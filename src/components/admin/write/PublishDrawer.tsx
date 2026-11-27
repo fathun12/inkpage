@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/Button";
 import { Field, Input } from "@/components/ui/Field";
 import { Img } from "@/components/ui/Img";
 import { SubmitButton } from "@/components/ui/SubmitButton";
-import { articleImages } from "@/config/article";
+import { articleImages, articleLimits } from "@/config/article";
 import { mediaConfig } from "@/config/media";
 import { siteConfig } from "@/config/site";
 import { slugify } from "@/lib/article-doc";
@@ -13,6 +13,7 @@ import { prepareCover } from "@/lib/article-image";
 import { uploadToSignedPath } from "@/lib/direct-upload";
 import type { ArticleStatus, SignArticleImageAction } from "@/types/article";
 import type { FormAction } from "@/types/form";
+import type { SeriesOption } from "@/types/series";
 
 // What the editor had when the drawer opened. It travels inside the form, so Publish saves the latest text too.
 export type DrawerSnapshot = { title: string; subtitle: string; content: string };
@@ -22,6 +23,10 @@ type Props = {
   status: ArticleStatus;
   slug: string | null;
   cover: string | null;
+  tags: string[];
+  seriesId: string | null;
+  seriesPosition: number | null;
+  seriesOptions: SeriesOption[];
   signImage: SignArticleImageAction;
   username: string;
   viewHref: string | null;
@@ -36,6 +41,10 @@ export function PublishDrawer({
   status,
   slug,
   cover: startCover,
+  tags,
+  seriesId,
+  seriesPosition,
+  seriesOptions,
   signImage,
   username,
   viewHref,
@@ -139,6 +148,48 @@ export function PublishDrawer({
               </p>
             )}
           </div>
+
+          <Field
+            label="Tags"
+            htmlFor="article-tags"
+            hint={`Separate with commas, up to ${articleLimits.tags}. Saved in lowercase.`}
+          >
+            <Input id="article-tags" name="tags" defaultValue={tags.join(", ")} placeholder="philosophy, essay" />
+          </Field>
+
+          <Field
+            label="Series"
+            htmlFor="article-series"
+            hint={
+              seriesOptions.length === 0
+                ? "No series yet. Make one under Write, Manage series."
+                : "Optional. Articles of one series are shown together, in part order."
+            }
+          >
+            <select
+              id="article-series"
+              name="series_id"
+              defaultValue={seriesId ?? ""}
+              className="ink-border w-full rounded-sm bg-bg px-3 py-2 text-sm"
+            >
+              <option value="">Not in a series</option>
+              {seriesOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {option.title}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Part number" htmlFor="article-part" hint="Only with a series. Empty = at the end of the series.">
+            <Input
+              id="article-part"
+              name="series_position"
+              type="number"
+              min={1}
+              max={articleLimits.seriesPart}
+              defaultValue={seriesPosition ?? ""}
+            />
+          </Field>
 
           <fieldset className="flex flex-col gap-2">
             <legend className="mb-1 text-sm font-medium text-ink-soft">When</legend>

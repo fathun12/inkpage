@@ -2,7 +2,8 @@ import { articleState, isUuid, readDoc } from "@/lib/article-doc";
 import { createClient } from "@/lib/supabase/server";
 import type { Article, ArticleSummary, OwnArticle, OwnArticleSummary } from "@/types/article";
 
-const summaryColumns = "id, slug, title, subtitle, excerpt, reading_minutes, cover_url, status, published_at, updated_at";
+const summaryColumns =
+  "id, slug, title, subtitle, excerpt, reading_minutes, cover_url, tags, series_id, series_position, status, published_at, updated_at";
 
 type DbError = { code?: string; message: string };
 

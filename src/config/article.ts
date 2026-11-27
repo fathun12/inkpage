@@ -14,6 +14,15 @@ export const articleLimits = {
   nodes: 20_000,
   depth: 12,
   textNode: 50_000,
+  tags: 8, // the database also stops at 8 (migration 20261127010000)
+  tag: 30,
+  seriesPart: 999,
+} as const;
+
+// Series (Phase 28c).
+export const seriesLimits = {
+  title: 100,
+  description: 400,
 } as const;
 
 export const articleConfig = {

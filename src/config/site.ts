@@ -37,6 +37,7 @@ export const routes = {
   shop: "/admin/shop",
   write: "/admin/write",
   writeEdit: (id: string) => `/admin/write/${id}`,
+  series: "/admin/series",
   article: (username: string, slug: string) => `/${username}/writing/${slug}`,
   articlePreview: (username: string, id: string) => `/${username}/preview/${id}`,
   track: "/api/track",
