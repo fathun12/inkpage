@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Credit } from "@/components/ui/Credit";
 import type { SocialItem } from "@/types/block";
 import { NewsTicker, type NewsProps } from "./NewsBar";
+import { Reveal } from "./Reveal";
 import { ThemeSwitch, type Mode } from "./ThemeSwitch";
 import { WhatsAppLink } from "./WhatsAppLink";
 
@@ -36,61 +37,69 @@ export function SiteFooter({ brand, name, bio, note, socials, contactEmail = nul
           {(
             <div className="grid gap-12 sm:grid-cols-[repeat(auto-fit,minmax(12rem,1fr))]">
               {hasNote && (
-                <div className="flex flex-col gap-3">
-                  <p className={heading}>Note</p>
-                  {name && <p className="font-display text-base font-normal leading-tight">{name}</p>}
-                  {bio && <p className="max-w-xs whitespace-pre-line text-xs opacity-70">{bio}</p>}
-                  {note && <p className="max-w-xs whitespace-pre-line text-sm opacity-70">{note}</p>}
-                </div>
+                <Reveal>
+                  <div className="flex flex-col gap-3">
+                    <p className={heading}>Note</p>
+                    {name && <p className="font-display text-base font-normal leading-tight">{name}</p>}
+                    {bio && <p className="max-w-xs whitespace-pre-line text-xs opacity-70">{bio}</p>}
+                    {note && <p className="max-w-xs whitespace-pre-line text-sm opacity-70">{note}</p>}
+                  </div>
+                </Reveal>
               )}
 
               {hasNav && (
-                <nav aria-label="Footer" className="flex flex-col gap-4">
-                  <p className={heading}>Explore</p>
+                <Reveal delay={100}>
+                  <nav aria-label="Footer" className="flex flex-col gap-4">
+                    <p className={heading}>Explore</p>
+                    <ul className="flex flex-col gap-2.5">
+                      {nav.map((item) => (
+                        <li key={item.href}>
+                          <Link href={item.href} className={link}>
+                            {item.label}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  </nav>
+                </Reveal>
+              )}
+
+              <Reveal delay={200}>
+                <div className="flex flex-col gap-4">
+                  <p className={heading}>Connect</p>
                   <ul className="flex flex-col gap-2.5">
-                    {nav.map((item) => (
-                      <li key={item.href}>
-                        <Link href={item.href} className={link}>
-                          {item.label}
-                        </Link>
+                    {contactEmail && (
+                      <li>
+                        <a href={`mailto:${contactEmail}`} className={`${link} break-all`}>
+                          {contactEmail}
+                        </a>
+                      </li>
+                    )}
+                    <li>
+                      <WhatsAppLink number={whatsapp} className={link} />
+                    </li>
+                    {socials.map((item) => (
+                      <li key={item.url}>
+                        <a href={item.url} target="_blank" rel="noopener noreferrer" className={link}>
+                          {item.label} <span aria-hidden>↗</span>
+                        </a>
                       </li>
                     ))}
                   </ul>
-                </nav>
-              )}
-
-              <div className="flex flex-col gap-4">
-                <p className={heading}>Connect</p>
-                <ul className="flex flex-col gap-2.5">
-                  {contactEmail && (
-                    <li>
-                      <a href={`mailto:${contactEmail}`} className={`${link} break-all`}>
-                        {contactEmail}
-                      </a>
-                    </li>
-                  )}
-                  <li>
-                    <WhatsAppLink number={whatsapp} className={link} />
-                  </li>
-                  {socials.map((item) => (
-                    <li key={item.url}>
-                      <a href={item.url} target="_blank" rel="noopener noreferrer" className={link}>
-                        {item.label} <span aria-hidden>↗</span>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                </div>
+              </Reveal>
             </div>
           )}
 
           {/* The name, very large and cut off by the band below. Decorative. */}
-          <div
-            aria-hidden
-            className="mt-16 h-[0.74em] select-none overflow-hidden whitespace-nowrap text-[clamp(4rem,19vw,15rem)] sm:mt-24"
-          >
-            <span className="block font-voice leading-none">{brand}</span>
-          </div>
+          <Reveal variant="still">
+            <div
+              aria-hidden
+              className="mt-16 h-[0.74em] select-none overflow-hidden whitespace-nowrap text-[clamp(4rem,19vw,15rem)] sm:mt-24"
+            >
+              <span className="site-footer-name block font-voice leading-none">{brand}</span>
+            </div>
+          </Reveal>
         </div>
       </div>
 

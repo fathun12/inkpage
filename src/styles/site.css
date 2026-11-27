@@ -232,6 +232,18 @@
   [data-motion="subtle"] [data-reveal]:not([data-in]) .site-media-pop {
     opacity: 0;
   }
+  [data-motion="full"] [data-reveal]:not([data-in]) .site-footer-name {
+    transform: translateY(100%);
+  }
+  [data-motion="subtle"] [data-reveal]:not([data-in]) .site-footer-name {
+    opacity: 0;
+  }
+}
+/* The big name in the footer rises from behind the band below it (Motion Full), or only fades in (Subtle). */
+.site-footer-name {
+  transition:
+    transform 1100ms cubic-bezier(0.22, 1, 0.36, 1) 150ms,
+    opacity 700ms var(--ease-out) 150ms;
 }
 
 /* The hero media drifts slower than the page (Chrome and Edge; others keep it still). */
@@ -342,6 +354,10 @@
     opacity: 1 !important;
   }
   [data-motion] [data-reveal]:not([data-in]) .site-media-pop {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+  [data-motion] [data-reveal]:not([data-in]) .site-footer-name {
     opacity: 1 !important;
     transform: none !important;
   }
