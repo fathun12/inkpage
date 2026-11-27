@@ -132,6 +132,13 @@ export function HomeForm({ action, sign, site }: WithMedia) {
         >
           <Textarea id="biblia_home_intro" name="biblia_home_intro" defaultValue={site.bibliaHomeIntro ?? ""} rows={3} maxLength={siteLimits.intro} />
         </Field>
+        <Field
+          label="GitHub text under the title"
+          htmlFor="github_home_intro"
+          hint="Optional. Under the GitHub label on Home (the label is set in the GitHub box). Its font, size and place are set in Customize, Sections, GitHub. Up to 400 characters."
+        >
+          <Textarea id="github_home_intro" name="github_home_intro" defaultValue={site.githubHomeIntro ?? ""} rows={3} maxLength={siteLimits.intro} />
+        </Field>
         <Field label="Showcase" htmlFor="showcase_title" hint="Above the Showcase section.">
           <Input id="showcase_title" name="showcase_title" defaultValue={site.showcaseTitle ?? ""} maxLength={siteLimits.title} />
         </Field>

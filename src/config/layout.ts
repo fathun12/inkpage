@@ -378,6 +378,39 @@ export const bibliaWideViewHints: Record<BibliaWideView, string> = {
     "One book big at a time across the whole screen, its cover whole and never cropped. It slides by itself and has arrows.",
 };
 
+// The GitHub section of Home (the profile, 30 days of commits and the newest repositories). Profile is the original look.
+// Mode (Centered or Full width), the title place, the fonts and the title sizes reuse the names above.
+// No Size, Ratio, Crop or Photo height: the section is made of numbers, bars and repository names, not photos.
+export const githubViews = ["profile", "index", "stats"] as const;
+export type GithubView = (typeof githubViews)[number];
+
+export const githubViewLabels: Record<GithubView, string> = {
+  profile: "Profile",
+  index: "Index",
+  stats: "Stats",
+};
+
+export const githubViewHints: Record<GithubView, string> = {
+  profile: "Profile on the left, activity and the newest repositories on the right (the original).",
+  index: "Only type: one repository per row with its name big, and a thin line of activity. A quiet index.",
+  stats: "Three huge numbers (commits, repositories, followers), tall activity bars and the newest repositories.",
+};
+
+export const githubWideViews = ["pulse", "slide", "edge"] as const;
+export type GithubWideView = (typeof githubWideViews)[number];
+
+export const githubWideViewLabels: Record<GithubWideView, string> = {
+  pulse: "Pulse",
+  slide: "Repo slide",
+  edge: "Edge index",
+};
+
+export const githubWideViewHints: Record<GithubWideView, string> = {
+  pulse: "30 tall activity bars from the left edge of the screen to the right edge, then the profile and the repositories.",
+  slide: "One repository at a time across the whole screen, its name huge. It slides by itself and has arrows.",
+  edge: "Like Index, but the rows and the lines run edge to edge.",
+};
+
 // How the Countdown section looks.
 export const countdownViews = ["section", "strip"] as const;
 export type CountdownView = (typeof countdownViews)[number];
@@ -466,6 +499,14 @@ export const layoutDefaults: {
   bibliaTitleSize: DesignTitleSize;
   bibliaIntroFont: DesignFont;
   bibliaIntroSize: DesignIntroSize;
+  githubMode: DesignMode;
+  githubView: GithubView;
+  githubWideView: GithubWideView;
+  githubTitleAlign: DesignTitleAlign;
+  githubTitleFont: DesignFont;
+  githubTitleSize: DesignTitleSize;
+  githubIntroFont: DesignFont;
+  githubIntroSize: DesignIntroSize;
 } = {
   density: "comfortable",
   projectSize: "large",
@@ -539,6 +580,14 @@ export const layoutDefaults: {
   bibliaTitleSize: "auto",
   bibliaIntroFont: "default",
   bibliaIntroSize: "auto",
+  githubMode: "centered",
+  githubView: "profile",
+  githubWideView: "pulse",
+  githubTitleAlign: "center",
+  githubTitleFont: "default",
+  githubTitleSize: "auto",
+  githubIntroFont: "default",
+  githubIntroSize: "auto",
 };
 
 // Safe reader: an unknown or missing value falls back to the default.

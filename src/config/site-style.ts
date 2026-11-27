@@ -27,6 +27,8 @@ import {
   projectWideViews,
   bibliaViews,
   bibliaWideViews,
+  githubViews,
+  githubWideViews,
   layoutDefaults,
   projectSizes,
   projectViews,
@@ -57,6 +59,8 @@ import {
   type ProjectWideView,
   type BibliaView,
   type BibliaWideView,
+  type GithubView,
+  type GithubWideView,
   type ProjectSize,
   type ProjectView,
   type SectionId,
@@ -198,6 +202,14 @@ export type SiteStyle = {
   bibliaTitleSize: DesignTitleSize;
   bibliaIntroFont: DesignFont;
   bibliaIntroSize: DesignIntroSize;
+  githubMode: DesignMode;
+  githubView: GithubView;
+  githubWideView: GithubWideView;
+  githubTitleAlign: DesignTitleAlign;
+  githubTitleFont: DesignFont;
+  githubTitleSize: DesignTitleSize;
+  githubIntroFont: DesignFont;
+  githubIntroSize: DesignIntroSize;
   sections: SectionSettings;
   order: SectionId[];
   aboutLayout: AboutLayout;
@@ -301,6 +313,14 @@ export const siteStyleDefaults: SiteStyle = {
   bibliaTitleSize: layoutDefaults.bibliaTitleSize,
   bibliaIntroFont: layoutDefaults.bibliaIntroFont,
   bibliaIntroSize: layoutDefaults.bibliaIntroSize,
+  githubMode: layoutDefaults.githubMode,
+  githubView: layoutDefaults.githubView,
+  githubWideView: layoutDefaults.githubWideView,
+  githubTitleAlign: layoutDefaults.githubTitleAlign,
+  githubTitleFont: layoutDefaults.githubTitleFont,
+  githubTitleSize: layoutDefaults.githubTitleSize,
+  githubIntroFont: layoutDefaults.githubIntroFont,
+  githubIntroSize: layoutDefaults.githubIntroSize,
   sections: sectionDefaults,
   order: [...sectionIds],
   aboutLayout: aboutDefaults.aboutLayout,
@@ -412,6 +432,14 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     bibliaTitleSize: readChoice(r.bibliaTitleSize, designTitleSizes, d.bibliaTitleSize),
     bibliaIntroFont: readChoice(r.bibliaIntroFont, designTextFonts, d.bibliaIntroFont),
     bibliaIntroSize: readChoice(r.bibliaIntroSize, designIntroSizes, d.bibliaIntroSize),
+    githubMode: readChoice(r.githubMode, designModes, d.githubMode),
+    githubView: readChoice(r.githubView, githubViews, d.githubView),
+    githubWideView: readChoice(r.githubWideView, githubWideViews, d.githubWideView),
+    githubTitleAlign: readChoice(r.githubTitleAlign, designTitleAligns, d.githubTitleAlign),
+    githubTitleFont: readChoice(r.githubTitleFont, designTextFonts, d.githubTitleFont),
+    githubTitleSize: readChoice(r.githubTitleSize, designTitleSizes, d.githubTitleSize),
+    githubIntroFont: readChoice(r.githubIntroFont, designTextFonts, d.githubIntroFont),
+    githubIntroSize: readChoice(r.githubIntroSize, designIntroSizes, d.githubIntroSize),
     designMedia: num(r.designMedia, styleRanges.designMedia, d.designMedia),
     designCount: num(r.designCount, styleRanges.designCount, d.designCount),
     sections: readSections(r.sections),

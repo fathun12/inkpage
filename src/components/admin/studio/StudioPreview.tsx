@@ -383,7 +383,20 @@ export function StudioPreview({
     ),
     github: github && on("github") && (
       <SectionBox setting={sec.github}>
-        <HomeGithub data={github} title={site.githubTitle ?? "GitHub"} />
+        <HomeGithub
+          data={github}
+          title={site.githubTitle ?? "GitHub"}
+          seconds={draft.style.heroSeconds}
+          mode={draft.style.githubMode}
+          view={draft.style.githubView}
+          wideView={draft.style.githubWideView}
+          intro={site.githubHomeIntro}
+          titleAlign={draft.style.githubTitleAlign}
+          titleFont={draft.style.githubTitleFont}
+          titleSize={draft.style.githubTitleSize}
+          introFont={draft.style.githubIntroFont}
+          introSize={draft.style.githubIntroSize}
+        />
       </SectionBox>
     ),
     shop: on("shop") && (

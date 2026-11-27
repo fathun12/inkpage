@@ -65,7 +65,7 @@ export async function fetchGithub(user: string | null): Promise<GithubData | nul
   const repoList = Array.isArray(rawRepos) ? rawRepos.map(obj) : [];
   const recent = repoList
     .filter((r) => r.fork !== true && str(r.name) && str(r.html_url))
-    .slice(0, 4)
+    .slice(0, 6)
     .map(
       (r): GithubRepo => ({
         name: String(r.name).slice(0, 100),

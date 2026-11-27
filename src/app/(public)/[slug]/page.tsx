@@ -239,7 +239,20 @@ export default async function HomePage({ params }: Props) {
     ),
     github: github && on("github") && (
       <SectionBox setting={sec.github}>
-        <HomeGithub data={github} title={site.githubTitle ?? "GitHub"} />
+        <HomeGithub
+          data={github}
+          title={site.githubTitle ?? "GitHub"}
+          seconds={style.heroSeconds}
+          mode={style.githubMode}
+          view={style.githubView}
+          wideView={style.githubWideView}
+          intro={site.githubHomeIntro}
+          titleAlign={style.githubTitleAlign}
+          titleFont={style.githubTitleFont}
+          titleSize={style.githubTitleSize}
+          introFont={style.githubIntroFont}
+          introSize={style.githubIntroSize}
+        />
       </SectionBox>
     ),
     shop: on("shop") && (

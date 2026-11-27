@@ -1,5 +1,7 @@
 "use client";
 
+import { GithubControls } from "@/components/admin/studio/GithubControls";
+
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { AboutControls } from "@/components/admin/studio/AboutControls";
@@ -1760,6 +1762,14 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
       <input type="hidden" name="site_biblia_title_size" value={draft.style.bibliaTitleSize} />
       <input type="hidden" name="site_biblia_intro_font" value={draft.style.bibliaIntroFont} />
       <input type="hidden" name="site_biblia_intro_size" value={draft.style.bibliaIntroSize} />
+      <input type="hidden" name="site_github_mode" value={draft.style.githubMode} />
+      <input type="hidden" name="site_github_view" value={draft.style.githubView} />
+      <input type="hidden" name="site_github_wide_view" value={draft.style.githubWideView} />
+      <input type="hidden" name="site_github_title_align" value={draft.style.githubTitleAlign} />
+      <input type="hidden" name="site_github_title_font" value={draft.style.githubTitleFont} />
+      <input type="hidden" name="site_github_title_size" value={draft.style.githubTitleSize} />
+      <input type="hidden" name="site_github_intro_font" value={draft.style.githubIntroFont} />
+      <input type="hidden" name="site_github_intro_size" value={draft.style.githubIntroSize} />
       <input type="hidden" name="site_design_stack_ratio" value={draft.style.designStackRatio} />
       <input type="hidden" name="site_design_stack_crop" value={draft.style.designStackCrop} />
       <input type="hidden" name="site_about_layout" value={draft.style.aboutLayout} />
@@ -1940,6 +1950,14 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
                 bibliaTitleSize: siteStyleDefaults.bibliaTitleSize,
                 bibliaIntroFont: siteStyleDefaults.bibliaIntroFont,
                 bibliaIntroSize: siteStyleDefaults.bibliaIntroSize,
+                githubMode: siteStyleDefaults.githubMode,
+                githubView: siteStyleDefaults.githubView,
+                githubWideView: siteStyleDefaults.githubWideView,
+                githubTitleAlign: siteStyleDefaults.githubTitleAlign,
+                githubTitleFont: siteStyleDefaults.githubTitleFont,
+                githubTitleSize: siteStyleDefaults.githubTitleSize,
+                githubIntroFont: siteStyleDefaults.githubIntroFont,
+                githubIntroSize: siteStyleDefaults.githubIntroSize,
                 designStackRatio: siteStyleDefaults.designStackRatio,
                 designStackCrop: siteStyleDefaults.designStackCrop,
               })
@@ -1958,6 +1976,7 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
               extra={{
                 projects: projectsAll,
                 biblia: bibliaControls,
+                github: <GithubControls style={draft.style} onChange={setStyle} />,
                 countdown: countdownControls,
                 writing: writingControls,
                 articles: articlesControls,

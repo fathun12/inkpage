@@ -42,12 +42,14 @@ type Props = {
   size: DesignTitleSize;
   introFont: DesignFont;
   introSize: DesignIntroSize;
+  // "band": the section sits on the Secondary color, so the text uses the color of the band.
+  tone?: "page" | "band";
 };
 
 // The title of the Design projects section, the text under it and the "Visit website" link.
 // Default (Centered, Default font, Auto size) = the small label inside the page margins, as before.
 // Left edge, Right edge and Full stick to the edges of the screen, like the hero and the footer.
-export function DesignHeading({ title, href, intro, align, font, size, introFont, introSize }: Props) {
+export function DesignHeading({ title, href, intro, align, font, size, introFont, introSize, tone = "page" }: Props) {
   const styled = font !== "default" || size !== "auto";
   const titleStyle: CSSProperties | undefined = styled
     ? { fontFamily: family(font), fontSize: titleSizes[size === "auto" ? "medium" : size] }
@@ -71,7 +73,7 @@ export function DesignHeading({ title, href, intro, align, font, size, introFont
   const introEl = intro ? (
     <Reveal>
       <p
-        className={`max-w-xl whitespace-pre-line leading-snug text-ink-soft ${
+        className={`max-w-xl whitespace-pre-line leading-snug ${tone === "band" ? "opacity-70" : "text-ink-soft"} ${
           align === "right" ? "ml-auto text-right" : align === "full" ? "md:text-right" : ""
         }`}
         style={textStyle}
