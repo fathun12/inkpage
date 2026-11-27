@@ -7,6 +7,7 @@ import { SeriesStack } from "@/components/site/SeriesStack";
 import { cleanUrl } from "@/config/seo";
 import { routes } from "@/config/site";
 import { hasAbout, readSite } from "@/config/site-content";
+import { getLikeInfo, getPopularArticleId } from "@/features/articles/like-queries";
 import { getPublicArticle, getPublicArticles } from "@/features/articles/queries";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
@@ -52,13 +53,15 @@ export default async function ArticlePage({ params }: Props) {
   const url = cleanUrl(profile.username, `/writing/${articleSlug}`);
 
   // Every live article: the series card and "More from" are made from this list.
-  const [seriesRows, all] = await Promise.all([
+  const [seriesRows, all, likeInfo, popularId] = await Promise.all([
     article.series_id ? getSeriesByIds([article.series_id]) : Promise.resolve([]),
     getPublicArticles(profile.id),
+    getLikeInfo(article.id),
+    getPopularArticleId(profile.id, article.id),
   ]);
   const seriesRow = seriesRows[0] ?? null;
   const seriesCards = seriesRow ? buildSeriesCards([seriesRow], all) : [];
-  const moreItems = pickMoreFrom(article, all);
+  const moreItems = pickMoreFrom(article, all, popularId);
   const seriesUrl = seriesRow ? cleanUrl(profile.username, `/series/${seriesRow.slug}`) : null;
 
   return (
@@ -98,6 +101,7 @@ export default async function ArticlePage({ params }: Props) {
           href: aboutPage ? `${routes.profile(profile.username)}/about` : null,
         }}
         shareUrl={url}
+        like={{ articleId: article.id, liked: likeInfo.liked, count: likeInfo.count }}
         after={
           <>
             <SeriesStack cards={seriesCards} username={profile.username} />

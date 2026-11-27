@@ -5,6 +5,7 @@ import { formatArticleDate } from "@/lib/article-doc";
 import type { DocNode } from "@/types/article";
 import { ArticleBody } from "./ArticleBody";
 import { ReaderShell } from "./ReaderShell";
+import { LikeButton } from "./LikeButton";
 import { ShareButtons } from "./ShareButtons";
 
 type Props = {
@@ -22,6 +23,8 @@ type Props = {
   tags?: { label: string; href: string }[];
   // The clean address of the article on the main domain. null = the share buttons use the address in the browser.
   shareUrl?: string | null;
+  // The like button (not given on the draft preview).
+  like?: { articleId: string; liked: boolean; count: number };
   // Shown under the reading column: the series card and More from.
   after?: ReactNode;
 };
@@ -39,6 +42,7 @@ export function ArticleView({
   author,
   tags,
   shareUrl,
+  like,
   after,
 }: Props) {
   const meta = [formatArticleDate(publishedAt), `${minutes} min read`].filter(Boolean).join(" · ");
@@ -90,7 +94,8 @@ export function ArticleView({
             ))}
           </div>
         )}
-        <div className="mt-10 border-t border-line pt-6">
+        <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-3 border-t border-line pt-6">
+          {like && <LikeButton articleId={like.articleId} initialLiked={like.liked} initialCount={like.count} />}
           <ShareButtons url={shareUrl ?? null} title={title} />
         </div>
       </ReaderShell>
