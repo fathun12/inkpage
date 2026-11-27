@@ -108,7 +108,7 @@ export const designWideViewLabels: Record<DesignWideView, string> = {
 };
 
 export const designWideViewHints: Record<DesignWideView, string> = {
-  stack: "One project per row: a photo across the whole screen, a tight row of photos, then the title.",
+  stack: "One project per row: one photo across the whole screen, then the title.",
   stackslide: "Like Stack, but one project at a time across the whole screen. It slides by itself and has arrows.",
   split: "Two columns edge to edge with tall photos.",
   sheet: "Square photos touching each other, like a contact sheet. The title shows on hover.",
@@ -206,7 +206,7 @@ export const showcaseWideViewLabels: Record<ShowcaseWideView, string> = {
 };
 
 export const showcaseWideViewHints: Record<ShowcaseWideView, string> = {
-  stack: "One project per row: the main photo across the whole screen, a tight row of photos, then title and buttons.",
+  stack: "One project per row: one photo or video across the whole screen, then title and buttons.",
   stackslide: "Like Stack, but one project at a time across the whole screen. It slides by itself and has arrows.",
   split: "Photo on one half of the screen, text on the other half. The sides swap on each project.",
   filmstrip: "One row of tall panels that slides sideways, with arrows.",

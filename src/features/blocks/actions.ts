@@ -116,6 +116,7 @@ function toRow(
     if (current?.downloads?.length) data.downloads = current.downloads;
     if (current?.links?.length) data.links = current.links;
     if (current?.showcase) data.showcase = true;
+    if (current?.stackMedia) data.stackMedia = current.stackMedia;
   }
 
   return {

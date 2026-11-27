@@ -83,25 +83,6 @@ function Stack({
               >
                 <Cover project={p} />
               </span>
-              {p.photos.length > 0 && (
-                <span className="mt-px grid grid-cols-2 gap-px sm:grid-cols-4">
-                  {p.photos.slice(0, 4).map((src, i) => (
-                    <span
-                      key={src}
-                      className={`site-media-pop relative aspect-[4/3] overflow-hidden bg-surface ${
-                        i >= 2 ? "hidden sm:block" : "block"
-                      }`}
-                      style={{ "--pop-delay": `${(i + 1) * 100}ms` } as CSSProperties}
-                    >
-                      <Img
-                        src={src}
-                        alt={`Documentation of ${p.title}`}
-                        className="absolute inset-0 size-full object-cover"
-                      />
-                    </span>
-                  ))}
-                </span>
-              )}
               <span className="mt-4 flex flex-col gap-1 px-5 sm:flex-row sm:items-baseline sm:justify-between sm:gap-8 sm:px-8">
                 <span className="block">
                   <span className="mr-3 font-mono text-[10px] uppercase tracking-widest text-ink-soft">

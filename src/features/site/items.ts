@@ -158,6 +158,10 @@ export async function saveProjectAction(formData: FormData): Promise<void> {
   if (links.length > 0) data.links = links;
   if (formData.get("home") === "on") data.home = true;
   if (formData.get("showcase") === "on") data.showcase = true;
+  // The media the Stack layouts show: the form sends the address of a kept file or the path of a new one.
+  const stackToken = field(formData, "stack_media");
+  const stackUrl = stackToken ? (oldUrls.has(stackToken) ? stackToken : byPath.get(stackToken)) : undefined;
+  if (stackUrl && ordered.includes(stackUrl)) data.stackMedia = stackUrl;
   // Older card media is kept as it is.
   if (current?.data?.media) data.media = current.data.media;
 

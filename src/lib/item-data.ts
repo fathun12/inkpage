@@ -90,6 +90,8 @@ export type ProjectItem = {
   links: ItemLink[];
   home: boolean;
   showcase: boolean;
+  // The media shown by the Stack layouts (chosen in Pages). null = automatic.
+  stackMedia: string | null;
 };
 
 export function readProjectItem(block: Block): ProjectItem {
@@ -109,6 +111,7 @@ export function readProjectItem(block: Block): ProjectItem {
     links: readLinks(d.links),
     home: d.home === true,
     showcase: d.showcase === true,
+    stackMedia: link(d.stackMedia),
   };
 }
 
@@ -155,6 +158,11 @@ export function pickShowcase<T extends { kind: MediaKind }>(files: T[]): { main:
   const main = files.find((f) => f.kind !== "image") ?? files[0] ?? null;
   const photos = files.filter((f) => f !== main && f.kind === "image").slice(0, itemLimits.showcasePhotos);
   return { main, photos };
+}
+
+// The Stack layouts show ONE media: the one chosen in Pages, or else the same as the Showcase main.
+export function pickStack<T extends { url: string; kind: MediaKind }>(files: T[], chosen: string | null): T | null {
+  return files.find((f) => f.url === chosen) ?? pickShowcase(files).main;
 }
 
 // The label under each file in the admin: where that file is used.

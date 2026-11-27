@@ -26,6 +26,9 @@ type Props = {
   inputId?: string;
   // Hides the credit boxes (shop products keep no credits).
   noCredit?: boolean;
+  // Only for a Projects item: the address of the media chosen for the Stack layouts (null = automatic).
+  // Left out = no Stack choice is shown.
+  stackUrl?: string | null;
 };
 type Added = { path: string; preview: string; kind: MediaKind };
 type Entry = { token: string; preview: string; kind: MediaKind; fresh: boolean; ratio: ItemRatio; credit: string };
@@ -47,7 +50,7 @@ function Thumb({ src, kind }: { src: string; kind: MediaKind }) {
 // Picks files for one slot of the website (hero, list background, gallery, About photo, a Projects item, a Writing image).
 // A file uploads straight to Storage as soon as it is picked. Only its storage path travels with the form,
 // and "Remove" boxes tell the server which saved files to drop.
-export function SiteMediaInput({ slot, current, max, sign, credits, files, inputId, noCredit }: Props) {
+export function SiteMediaInput({ slot, current, max, sign, credits, files, inputId, noCredit, stackUrl }: Props) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const { ask, dialog } = useCrop();
   const item = files !== undefined;
@@ -201,6 +204,24 @@ export function SiteMediaInput({ slot, current, max, sign, credits, files, input
     const roles = roleLabels(entries.map((e) => e.kind));
     return (
       <div ref={wrapRef} className="flex flex-col gap-3">
+        {stackUrl !== undefined && entries.length > 0 && (
+          <label className="flex flex-col gap-0.5 text-sm">
+            <span className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="stack_media"
+                value=""
+                defaultChecked={!entries.some((x) => x.token === stackUrl)}
+                className="accent-accent"
+              />
+              Stack media: Automatic
+            </span>
+            <span className="pl-6 text-xs text-ink-soft">
+              The Stack layouts show one media. Automatic = the first GIF or video, or else the first file. Or tick
+              &quot;Use in Stack&quot; under a file below.
+            </span>
+          </label>
+        )}
         {entries.length > 0 && (
           <ul className="flex flex-col gap-3">
             {entries.map((e, i) => {
@@ -214,6 +235,18 @@ export function SiteMediaInput({ slot, current, max, sign, credits, files, input
                     <p className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">
                       {i + 1} · {roles[i]}
                     </p>
+                    {stackUrl !== undefined && (
+                      <label className="flex items-center gap-2 text-sm">
+                        <input
+                          type="radio"
+                          name="stack_media"
+                          value={e.token}
+                          defaultChecked={e.token === stackUrl}
+                          className="accent-accent"
+                        />
+                        Use in Stack
+                      </label>
+                    )}
                     <div className="grid gap-2 sm:grid-cols-2">
                       <Select name={`fratio__${key}`} defaultValue={e.ratio} aria-label="Ratio">
                         {itemRatios.map((r) => (

@@ -1,14 +1,21 @@
 import type { CSSProperties } from "react";
 import type { ShowcaseWideView } from "@/config/layout";
 import { routes } from "@/config/site";
-import { pickShowcase, readProjectItem, type ProjectFile, type ProjectItem } from "@/lib/item-data";
+import { pickShowcase, pickStack, readProjectItem, type ProjectFile, type ProjectItem } from "@/lib/item-data";
 import type { Block } from "@/types/block";
 import { Downloads, TextLinks } from "./Downloads";
 import { MediaSlider } from "./MediaSlider";
 import { ItemMedia } from "./ProjectCard";
 import { Reveal } from "./Reveal";
 
-type Entry = { block: Block; item: ProjectItem; main: ProjectFile | null; photos: ProjectFile[] };
+type Entry = {
+  block: Block;
+  item: ProjectItem;
+  main: ProjectFile | null;
+  photos: ProjectFile[];
+  // The one media the Stack layouts show.
+  stack: ProjectFile | null;
+};
 
 const shade: CSSProperties = { background: "linear-gradient(to top, rgb(0 0 0 / 0.62), transparent)" };
 
@@ -16,7 +23,7 @@ function prepare(blocks: Block[]): Entry[] {
   return blocks.map((block) => {
     const item = readProjectItem(block);
     const { main, photos } = pickShowcase(item.files);
-    return { block, item, main, photos };
+    return { block, item, main, photos, stack: pickStack(item.files, item.stackMedia) };
   });
 }
 
@@ -108,7 +115,7 @@ function Details({ item, clamp = false }: { item: ProjectItem; clamp?: boolean }
 
 type Shape = { entries: Entry[]; height: number };
 
-// One project per row: the main media across the whole screen, a tight row of photos, then title and text.
+// One project per row: ONE media across the whole screen (chosen in Pages), then title and text.
 function Stack({
   entries,
   height,
@@ -118,9 +125,8 @@ function Stack({
   const items = entries.map((e, i) => (
         <li key={e.block.id} className={slide ? "w-full shrink-0 snap-start" : undefined}>
           <Reveal variant="still">
-            <Frame entry={e} eager={i === 0} style={frame(height, "16 / 9")} />
+            <Frame entry={{ ...e, main: e.stack }} eager={i === 0} style={frame(height, "16 / 9")} />
           </Reveal>
-          <Strip photos={e.photos} />
           <Reveal delay={100}>
             <div className="mt-6 grid gap-5 px-5 sm:px-8 md:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] md:gap-12">
               <Title entry={e} className="text-3xl sm:text-5xl" />

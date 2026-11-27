@@ -67,6 +67,7 @@ function ProjectForm({ item, visible, save, sign }: FormProps) {
             inputId={`p-files-${uid}`}
             current={files.map((f) => f.url)}
             files={files}
+            stackUrl={item?.stackMedia ?? null}
             max={itemLimits.files}
             sign={sign}
             credits={{}}
