@@ -276,7 +276,7 @@ export function AboutForm({ action, sign, site }: WithMedia) {
           htmlFor="steam_id"
           hint="Optional. 17 digits that start with 7656119, or paste your profile address (steamcommunity.com/profiles/...). A custom address (/id/name) does not work. Your Steam profile and Game details must be Public. Empty = no Steam section."
         >
-          <Input id="steam_id" name="steam_id" placeholder="76561198324590157" defaultValue={site.steamId ?? ""} maxLength={120} />
+          <Input id="steam_id" name="steam_id" placeholder="7656119XXXXXXXXXX" defaultValue={site.steamId ?? ""} maxLength={120} />
         </Field>
       </Section>
     </TabForm>
