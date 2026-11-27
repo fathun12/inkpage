@@ -82,6 +82,8 @@ export type SiteSettings = {
   indexMedia: string | null;
   gallery: string[];
   cardsTitle: string | null;
+  // The text under the Writing label on Home.
+  cardsIntro: string | null;
   highlightsTitle: string | null;
   showcaseTitle: string | null;
   // The text under the Showcase label.
@@ -255,6 +257,7 @@ export function readSite(raw: unknown): SiteSettings {
     indexMedia: link(r.indexMedia),
     gallery: links(r.gallery, siteLimits.gallery),
     cardsTitle: text(r.cardsTitle, siteLimits.title),
+    cardsIntro: text(r.cardsIntro, siteLimits.intro),
     highlightsTitle: text(r.highlightsTitle, siteLimits.title),
     showcaseTitle: text(r.showcaseTitle, siteLimits.title),
     showcaseIntro: text(r.showcaseIntro, siteLimits.intro),

@@ -101,8 +101,15 @@ export function HomeForm({ action, sign, site }: WithMedia) {
       </Section>
 
       <Section title="Section titles" hint="Small labels above the sections of Home. Empty = no label.">
-        <Field label="Writing" htmlFor="cards_title" hint="Above the sliding Writing cards. Empty = the title of the Writing page.">
+        <Field label="Writing" htmlFor="cards_title" hint="Above the Writing cards. Empty = the title of the Writing page.">
           <Input id="cards_title" name="cards_title" defaultValue={site.cardsTitle ?? ""} maxLength={siteLimits.title} />
+        </Field>
+        <Field
+          label="Writing text under the title"
+          htmlFor="cards_intro"
+          hint="Optional. Its font, size and place are set in Customize, Sections, Writing. Up to 400 characters."
+        >
+          <Textarea id="cards_intro" name="cards_intro" defaultValue={site.cardsIntro ?? ""} rows={3} maxLength={siteLimits.intro} />
         </Field>
         <Field label="Showcase" htmlFor="showcase_title" hint="Above the Showcase section.">
           <Input id="showcase_title" name="showcase_title" defaultValue={site.showcaseTitle ?? ""} maxLength={siteLimits.title} />
