@@ -105,6 +105,13 @@ type Draft = {
 // Width (px) of the preview in Phone mode. Change this one number to make it wider or narrower.
 const phoneWidth = 480;
 
+// The pages whose settings the sidebar can show. Each page has its own settings.
+const studioPages = [
+  { id: "home", label: "Home" },
+  { id: "about", label: "About" },
+] as const;
+type StudioPage = (typeof studioPages)[number]["id"];
+
 const pill =
   "ink-border cursor-pointer rounded-full px-3 py-1.5 text-sm has-checked:bg-ink has-checked:text-bg has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink";
 const colorInput = "ink-border h-10 w-20 cursor-pointer rounded-md bg-surface p-1";
@@ -360,6 +367,8 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
   const [picked, setPicked] = useState<SectionId | null>(null);
   // True once the preview page is loaded and has said it is ready.
   const [loaded, setLoaded] = useState(false);
+  // The page whose settings the sidebar shows.
+  const [page, setPage] = useState<StudioPage>("home");
 
   // The preview is the page /admin/preview in a frame. The draft is sent to it with postMessage.
   const frameRef = useRef<HTMLIFrameElement>(null);
@@ -1021,6 +1030,26 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         <aside className="relative order-2 min-h-0 flex-1 overflow-y-auto border-t border-line lg:order-1 lg:w-[360px] lg:flex-none lg:border-r lg:border-t-0">
+          <div className="border-b border-line px-5 py-4">
+            <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">Page</span>
+            <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Page">
+              {studioPages.map((p) => (
+                <button
+                  key={p.id}
+                  type="button"
+                  aria-pressed={page === p.id}
+                  onClick={() => setPage(p.id)}
+                  className={cn(
+                    "ink-border rounded-md px-3 py-1.5 text-sm",
+                    page === p.id ? "bg-ink text-bg" : "text-ink-soft hover:text-ink",
+                  )}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className={cn(page !== "home" && "hidden")}>
           <Section
             title="Layout"
             open
@@ -1316,6 +1345,10 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
             />
           </Section>
 
+          </div>
+          <div className={cn(page !== "about" && "hidden")}>
+            <p className="px-5 py-4 text-sm text-ink-soft">No settings for the About page yet.</p>
+          </div>
           <p className="px-5 py-4 text-xs text-ink-soft">
             Media, text and pages are set in <Link href={routes.pages} className="underline underline-offset-4">Pages</Link>.
           </p>
