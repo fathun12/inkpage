@@ -23,7 +23,7 @@ type Props = {
 };
 
 const heading = "text-sm font-semibold opacity-80";
-const link = "text-sm transition-opacity duration-(--dur-base) hover:opacity-60";
+const link = "site-ul text-sm";
 
 export function SiteFooter({ brand, name, bio, note, socials, contactEmail = null, whatsapp = null, nav = [], modeControl, news }: Props) {
   const hasNote = Boolean(name || bio || note);
@@ -112,7 +112,7 @@ export function SiteFooter({ brand, name, bio, note, socials, contactEmail = nul
               href={siteConfig.credit.author.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="relative z-10 cursor-pointer underline-offset-2 hover:underline"
+              className="site-ul relative z-10 cursor-pointer"
             >
               {name || brand}
             </a>
