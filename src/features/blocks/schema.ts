@@ -29,7 +29,7 @@ export const blockSchema = z
       .string({ error: "Title is required." })
       .trim()
       .min(1, "Title is required.")
-      .max(80, "Title can be at most 80 characters."),
+      .max(300, "Title can be at most 300 characters."),
     url: z.string().trim().max(500, "Link is too long.").optional(),
     body: z.string().trim().max(500, "Text can be at most 500 characters.").optional(),
     links: z.string().max(1500, "That is too much text for the links box.").optional(),
