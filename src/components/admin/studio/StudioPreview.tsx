@@ -352,6 +352,8 @@ export function StudioPreview({
           mediaHeight={draft.style.showcaseMedia}
           slide={{ seconds: draft.style.heroSeconds, autoplay }}
           intro={site.showcaseIntro}
+          stackRatio={draft.style.showcaseStackRatio}
+          stackCrop={draft.style.showcaseStackCrop}
           titleAlign={draft.style.showcaseTitleAlign}
           titleFont={draft.style.showcaseTitleFont}
           titleSize={draft.style.showcaseTitleSize}
@@ -372,6 +374,8 @@ export function StudioPreview({
           view={draft.style.designView}
           wideView={draft.style.designWideView}
           intro={site.designsIntro}
+          stackRatio={draft.style.designStackRatio}
+          stackCrop={draft.style.designStackCrop}
           titleAlign={draft.style.designTitleAlign}
           titleFont={draft.style.designTitleFont}
           titleSize={draft.style.designTitleSize}
