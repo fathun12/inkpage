@@ -79,6 +79,19 @@ const orderJson = z
   })
   .pipe(z.array(z.string()).max(30, "The section order is not valid."));
 
+// The studio sends the entrance settings of the hero as one JSON text. readHeroMotion cleans it before saving.
+const heroMotionJson = z
+  .string()
+  .max(4000, "The entrance settings are not valid.")
+  .transform((raw, ctx) => {
+    try {
+      return JSON.parse(raw) as unknown;
+    } catch {
+      ctx.addIssue({ code: "custom", message: "The entrance settings are not valid." });
+      return z.NEVER;
+    }
+  });
+
 export const appearanceSchema = z.object({
   font_heading: z.enum(fontIds, { error: "Pick a heading font." }),
   font_body: z.enum(fontIds, { error: "Pick a body font." }),
@@ -95,6 +108,7 @@ export const appearanceSchema = z.object({
   site_hero_zoom: whole("Scroll zoom", styleRanges.heroZoom),
   site_index_zoom: whole("Link list zoom", styleRanges.indexZoom),
   site_hero_gray: z.boolean(),
+  site_hero_motion: heroMotionJson,
   site_density: z.enum(densityModes, { error: "Pick a spacing." }),
   site_project_size: z.enum(projectSizes, { error: "Pick a project size." }),
   site_project_view: z.enum(projectViews, { error: "Pick a projects layout." }),

@@ -3,6 +3,7 @@
 
 import type { CSSProperties } from "react";
 import { hexColor, luminance } from "@/config/background";
+import { heroMotionDefaults, readHeroMotion, type HeroMotion } from "@/config/intro";
 import {
   countdownViews,
   densityModes,
@@ -82,6 +83,7 @@ export type SiteStyle = {
   indexZoom: number;
   indexVeil: number;
   heroGray: boolean;
+  heroMotion: HeroMotion;
   density: DensityMode;
   projectSize: ProjectSize;
   projectView: ProjectView;
@@ -129,6 +131,7 @@ export const siteStyleDefaults: SiteStyle = {
   indexZoom: 140,
   indexVeil: 62,
   heroGray: false,
+  heroMotion: heroMotionDefaults,
   density: layoutDefaults.density,
   projectSize: layoutDefaults.projectSize,
   projectView: layoutDefaults.projectView,
@@ -186,6 +189,7 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     indexZoom: num(r.indexZoom, styleRanges.indexZoom, d.indexZoom),
     indexVeil: num(r.indexVeil, styleRanges.indexVeil, d.indexVeil),
     heroGray: typeof r.heroGray === "boolean" ? r.heroGray : d.heroGray,
+    heroMotion: readHeroMotion(r.heroMotion),
     density: readChoice(r.density, densityModes, d.density),
     projectSize: readChoice(r.projectSize, projectSizes, d.projectSize),
     projectView: readChoice(r.projectView, projectViews, d.projectView),

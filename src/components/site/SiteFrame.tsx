@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import { defaultFonts, fontStyle, type FontPair } from "@/config/font-choices";
+import { heroMotionVars } from "@/config/intro";
 import { sitePalette, siteDarkPalette, siteStyleDefaults, type SiteStyle } from "@/config/site-style";
 
 type Props = {
@@ -27,6 +28,7 @@ export function SiteFrame({
     "--site-hero-zoom": String(style.heroZoom / 100),
     "--site-index-zoom": String(style.indexZoom / 100),
     "--site-veil": `${style.indexVeil}%`,
+    ...heroMotionVars(style.heroMotion),
     ...(viewportHeight ? { "--site-vh": viewportHeight } : {}),
   } as CSSProperties;
 

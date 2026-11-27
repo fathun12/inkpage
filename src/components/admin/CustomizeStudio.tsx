@@ -42,7 +42,19 @@ import {
   type FontId,
   type FontPair,
 } from "@/config/font-choices";
-import { resolveGreetings } from "@/config/intro";
+import {
+  heroAnimLabels,
+  heroAnims,
+  heroBlockAnims,
+  heroItemHints,
+  heroItemIds,
+  heroItemLabels,
+  heroMotionDefaults,
+  heroMotionRanges,
+  resolveGreetings,
+  type HeroItemId,
+  type HeroItemMotion,
+} from "@/config/intro";
 import {
   countdownViewHints,
   countdownViewLabels,
@@ -314,6 +326,97 @@ function TextFontSelect({
   );
 }
 
+// The entrance settings of one item of the top of Home (hero, name, tabs, intro lines, caption, contents).
+function HeroMotionItem({
+  id,
+  value,
+  onChange,
+}: {
+  id: HeroItemId;
+  value: HeroItemMotion;
+  onChange: (value: HeroItemMotion) => void;
+}) {
+  const d = heroMotionDefaults[id];
+  const block = id === "hero";
+  const anims = block ? heroBlockAnims : heroAnims;
+  const changed = JSON.stringify(value) !== JSON.stringify(d);
+  const patch = (p: Partial<HeroItemMotion>) => onChange({ ...value, ...p });
+  return (
+    <details className="ink-border rounded-md">
+      <summary className="flex cursor-pointer list-none items-center justify-between px-3 py-2 text-sm [&::-webkit-details-marker]:hidden">
+        <span>{heroItemLabels[id]}</span>
+        <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">
+          {changed ? "Changed" : "Original"}
+        </span>
+      </summary>
+      <div className="flex flex-col gap-4 px-3 pb-3">
+        <p className="text-xs text-ink-soft">{heroItemHints[id]}</p>
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Animation</span>
+          <div className="flex flex-wrap gap-2">
+            {anims.map((a) => (
+              <label key={a} className={pill}>
+                <input
+                  type="radio"
+                  value={a}
+                  checked={value.anim === a}
+                  onChange={() => patch({ anim: a })}
+                  className="sr-only"
+                />
+                {heroAnimLabels[a]}
+              </label>
+            ))}
+          </div>
+        </div>
+        <Slider
+          id={`ui_hm_${id}_ms`}
+          label="Time"
+          unit=" ms"
+          value={value.ms}
+          range={heroMotionRanges.ms}
+          hint="How long the motion takes."
+          onChange={(ms) => patch({ ms })}
+        />
+        {!block && (
+          <>
+            <Slider
+              id={`ui_hm_${id}_start`}
+              label="Starts when the hero is at"
+              unit="%"
+              value={value.start}
+              range={heroMotionRanges.start}
+              hint="0% = the hero has just begun to fall, 100% = it has landed."
+              onChange={(start) => patch({ start })}
+            />
+            <Slider
+              id={`ui_hm_${id}_wait`}
+              label="Then wait"
+              unit=" ms"
+              value={value.wait}
+              range={heroMotionRanges.wait}
+              onChange={(wait) => patch({ wait })}
+            />
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={value.bounce}
+                onChange={(e) => patch({ bounce: e.target.checked })}
+                className="accent-accent"
+              />
+              Bouncy (a little spring at the end)
+            </label>
+          </>
+        )}
+        {changed && (
+          <button type="button" onClick={() => onChange(d)} className={resetButton}>
+            Reset {heroItemLabels[id].toLowerCase()}
+          </button>
+        )}
+      </div>
+    </details>
+  );
+}
+
 function FontPicker({
   legend,
   value,
@@ -394,6 +497,8 @@ export function CustomizeStudio({
   const [device, setDevice] = useState<"phone" | "desktop">("phone");
   // System / Light / Dark inside the preview box only. Not saved.
   const [previewMode, setPreviewMode] = useState<Mode>("system");
+  // Counts up to play the entrance of the top of Home again (the preview page is made fresh).
+  const [replay, setReplay] = useState(0);
 
   // Inspect mode in the preview, like the inspector of a browser: hover shows a section, click selects it.
   // The two highlight boxes are moved by hand (no state), so moving the mouse does not render the studio again.
@@ -1066,6 +1171,7 @@ export function CustomizeStudio({
       <input type="hidden" name="site_hero_zoom" value={draft.style.heroZoom} />
       <input type="hidden" name="site_index_zoom" value={draft.style.indexZoom} />
       <input type="hidden" name="site_density" value={draft.style.density} />
+      <input type="hidden" name="site_hero_motion" value={JSON.stringify(draft.style.heroMotion)} />
       <input type="hidden" name="site_project_size" value={draft.style.projectSize} />
       <input type="hidden" name="site_sections" value={JSON.stringify(draft.style.sections)} />
       <input type="hidden" name="site_order" value={JSON.stringify(draft.style.order)} />
@@ -1327,6 +1433,7 @@ export function CustomizeStudio({
                 heroZoom: siteStyleDefaults.heroZoom,
                 indexZoom: siteStyleDefaults.indexZoom,
                 heroGray: siteStyleDefaults.heroGray,
+                heroMotion: siteStyleDefaults.heroMotion,
               })
             }
           >
@@ -1375,6 +1482,36 @@ export function CustomizeStudio({
               />
               Show the hero in black and white
             </label>
+            <div className="flex flex-col gap-3 border-t border-line pt-4">
+              <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">Entrance on Home</span>
+              <p className="text-xs text-ink-soft">
+                How the top of Home appears. Every item has its own motion, speed and moment to start. Original is
+                how it has always been. The hero, name and tabs follow these settings only when Motion is Full.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  scrollRef.current?.scrollTo({ top: 0 });
+                  setReplay((n) => n + 1);
+                }}
+                className="ink-border cursor-pointer self-start rounded-full px-3 py-1.5 text-sm"
+              >
+                ▶ Play the entrance in the preview
+              </button>
+              {heroItemIds.map((id) => (
+                <HeroMotionItem
+                  key={id}
+                  id={id}
+                  value={draft.style.heroMotion[id]}
+                  onChange={(next) =>
+                    setDraft((d) => ({
+                      ...d,
+                      style: { ...d.style, heroMotion: { ...d.style.heroMotion, [id]: next } },
+                    }))
+                  }
+                />
+              ))}
+            </div>
           </Section>
 
           <Section
@@ -1429,6 +1566,7 @@ export function CustomizeStudio({
               onScroll={paint}
             >
               <SiteFrame
+                key={replay}
                 fonts={{ heading: draft.fontHeading, body: draft.fontBody }}
                 style={draft.style}
                 viewportHeight={device === "phone" ? "620px" : "560px"}

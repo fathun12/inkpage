@@ -136,9 +136,13 @@
   pointer-events: none;
   background: rgb(0 0 0 / var(--site-hero-overlay, 0.25));
 }
+/* The motion of the hero items can be changed in Customize (Hero, Entrance). Each --m-* variable below is set
+   only when the owner changed it; the value after the comma is the original. --m-dist = how far it moves. */
 .site-hero-caption {
+  --m-dist: 10px;
   z-index: 10;
-  animation: site-caption 1.2s var(--ease-out) 0.4s both;
+  animation: var(--m-caption-name, site-caption) var(--m-caption-dur, 1200ms)
+    var(--m-caption-ease, var(--ease-out)) calc(var(--m-caption-wait, 0ms) + var(--m-caption-start, 400ms)) both;
 }
 .site-dot {
   display: block;
@@ -283,16 +287,19 @@
 
 /* Home intro: the lines rise in one after another, then it drifts away while you scroll down. */
 .site-intro-line {
-  animation: site-intro-rise 1.2s var(--ease-out) both;
+  --m-dist: 32px;
 }
 .site-intro-line[data-n="1"] {
-  animation-delay: 900ms;
+  animation: var(--m-greeting-name, site-intro-rise) var(--m-greeting-dur, 1200ms)
+    var(--m-greeting-ease, var(--ease-out)) calc(var(--m-greeting-wait, 0ms) + var(--m-greeting-start, 900ms)) both;
 }
 .site-intro-line[data-n="2"] {
-  animation-delay: 1080ms;
+  animation: var(--m-date-name, site-intro-rise) var(--m-date-dur, 1200ms) var(--m-date-ease, var(--ease-out))
+    calc(var(--m-date-wait, 0ms) + var(--m-date-start, 1080ms)) both;
 }
 .site-intro-line[data-n="3"] {
-  animation-delay: 1280ms;
+  animation: var(--m-sentence-name, site-intro-rise) var(--m-sentence-dur, 1200ms)
+    var(--m-sentence-ease, var(--ease-out)) calc(var(--m-sentence-wait, 0ms) + var(--m-sentence-start, 1280ms)) both;
 }
 @keyframes site-intro-rise {
   from {
@@ -511,15 +518,87 @@ a:focus-visible .site-sweep {
     opacity: 0;
   }
 }
+/* Motions the owner can pick instead of the original (Customize, Hero, Entrance). They move with `translate`,
+   so they add to the transforms the items already have. --m-dist is set per item. */
+@keyframes site-m-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes site-m-rise {
+  from {
+    opacity: 0;
+    translate: 0 var(--m-dist, 24px);
+  }
+}
+@keyframes site-m-drop {
+  from {
+    opacity: 0;
+    translate: 0 calc(-1 * var(--m-dist, 24px));
+  }
+}
+@keyframes site-m-left {
+  from {
+    opacity: 0;
+    translate: calc(-1 * var(--m-dist, 24px)) 0;
+  }
+}
+@keyframes site-m-right {
+  from {
+    opacity: 0;
+    translate: var(--m-dist, 24px) 0;
+  }
+}
+/* The negative inset keeps the tall letters of big text inside the cut. */
+@keyframes site-m-wipe {
+  from {
+    clip-path: inset(-1em 100% -1em -1em);
+  }
+  to {
+    clip-path: inset(-1em -1em -1em -1em);
+  }
+}
+/* The spring of "Bouncy": it goes about 12% past its place, then settles (same curve as the photos). */
+.site-root {
+  --site-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
+}
+@supports (transition-timing-function: linear(0, 1)) {
+  .site-root {
+    --site-spring: linear(0, 0.0283, 0.1021, 0.2065, 0.3283, 0.4567, 0.5831, 0.7012, 0.8067, 0.8969, 0.9707, 1.0281, 1.0699, 1.0978, 1.1136, 1.1195, 1.1174, 1.1095, 1.0976, 1.0834, 1.0681, 1.0528, 1.0385, 1.0255, 1.0143, 1.0051, 0.9979, 0.9925, 0.9888, 0.9867, 0.9858, 0.9858, 0.9867, 0.988, 0.9897, 0.9915, 0.9933, 0.9951, 0.9967, 0.998, 1);
+  }
+}
+.site-brand {
+  --m-dist: 14px;
+}
+.site-nav-item {
+  --m-dist: 24px;
+}
+.site-contents {
+  --m-dist: 24px;
+}
 .site-root:not([data-entered])[data-motion="full"] .site-hero,
 .site-root:has(.site-hero):not([data-entered])[data-motion="full"] .site-bar-in {
-  animation: site-fall-in 1100ms cubic-bezier(0.3, 0.7, 0.3, 1) backwards;
+  animation: var(--m-hero-name, site-fall-in) var(--m-hero-dur, 1100ms) cubic-bezier(0.3, 0.7, 0.3, 1) backwards;
 }
 .site-root:not([data-entered])[data-motion="full"] .site-brand {
-  animation: site-drop 900ms var(--ease-out) calc(450ms + var(--lag)) backwards;
+  animation: var(--m-brand-name, site-drop) var(--m-brand-dur, 900ms) var(--m-brand-ease, var(--ease-out))
+    calc(var(--m-brand-wait, 450ms) + var(--lag)) backwards;
+}
+/* On Home the start of the name and the tabs can be set against the fall of the hero (--m-*-start). */
+.site-root:has(.site-hero):not([data-entered])[data-motion="full"] .site-brand {
+  animation-delay: calc(var(--m-brand-wait, 450ms) + var(--m-brand-start, var(--lag)));
 }
 .site-root:not([data-entered])[data-motion="full"] .site-nav-item {
-  animation: site-slide-in 800ms var(--ease-out) calc(350ms + var(--lag) + var(--i, 0) * 80ms) backwards;
+  animation: var(--m-tabs-name, site-slide-in) var(--m-tabs-dur, 800ms) var(--m-tabs-ease, var(--ease-out))
+    calc(var(--m-tabs-wait, 350ms) + var(--lag) + var(--i, 0) * 80ms) backwards;
+}
+.site-root:has(.site-hero):not([data-entered])[data-motion="full"] .site-nav-item {
+  animation-delay: calc(var(--m-tabs-wait, 350ms) + var(--m-tabs-start, var(--lag)) + var(--i, 0) * 80ms);
+}
+/* The contents list has no entrance motion unless the owner picks one ("none" is the original). */
+.site-root:not([data-entered])[data-motion="full"] .site-contents {
+  animation: var(--m-contents-name, none) var(--m-contents-dur, 800ms) var(--m-contents-ease, var(--ease-out))
+    calc(var(--m-contents-wait, 0ms) + var(--m-contents-start, 0ms)) both;
 }
 .site-root:not([data-entered])[data-motion="subtle"] .site-hero,
 .site-root:not([data-entered])[data-motion="subtle"] .site-bar-in,
@@ -531,7 +610,8 @@ a:focus-visible .site-sweep {
   .site-hero,
   .site-bar-in,
   .site-brand,
-  .site-nav-item {
+  .site-nav-item,
+  .site-contents {
     animation: none !important;
   }
 }

@@ -39,7 +39,10 @@ export function SiteHeader({ brand, home, items, overlay }: Props) {
   useEffect(() => {
     const root = sentinel.current?.closest(".site-root");
     if (!root) return;
-    const id = window.setTimeout(() => root.setAttribute("data-entered", ""), 3000);
+    // 3 s as always, longer only when the owner made the entrance slower (--m-entrance, set by SiteFrame).
+    const custom = parseInt(getComputedStyle(root).getPropertyValue("--m-entrance"), 10);
+    const wait = Number.isFinite(custom) ? custom : 3000;
+    const id = window.setTimeout(() => root.setAttribute("data-entered", ""), wait);
     return () => window.clearTimeout(id);
   }, []);
 

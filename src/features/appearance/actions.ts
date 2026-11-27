@@ -1,5 +1,6 @@
 "use server";
 
+import { readHeroMotion } from "@/config/intro";
 import { readOrder, readSections } from "@/config/layout";
 import { routes } from "@/config/site";
 import { requireUser } from "@/features/auth/queries";
@@ -30,6 +31,7 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
     site_hero_zoom: field(formData, "site_hero_zoom"),
     site_index_zoom: field(formData, "site_index_zoom"),
     site_hero_gray: formData.get("site_hero_gray") === "on",
+    site_hero_motion: field(formData, "site_hero_motion"),
     site_density: field(formData, "site_density"),
     site_project_size: field(formData, "site_project_size"),
     site_project_view: field(formData, "site_project_view"),
@@ -77,6 +79,7 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
         heroZoom: v.site_hero_zoom,
         indexZoom: v.site_index_zoom,
         heroGray: v.site_hero_gray,
+        heroMotion: readHeroMotion(v.site_hero_motion),
         density: v.site_density,
         projectSize: v.site_project_size,
         projectView: v.site_project_view,
