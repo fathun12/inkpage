@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Img } from "@/components/ui/Img";
 import { routes } from "@/config/site";
 import { formatArticleDate } from "@/lib/article-doc";
+import { storageImage } from "@/lib/image-srcset";
 import type { ArticleSummary } from "@/types/article";
 import { Reveal } from "./Reveal";
 
@@ -37,7 +38,11 @@ export function ArticleList({ articles, username, previews = false, covers = fal
                 }
               >
                 {cover && (
-                  <Img src={cover} className="aspect-2/1 w-full shrink-0 bg-surface object-cover sm:order-last sm:w-64" />
+                  <Img
+                    src={cover}
+                    {...storageImage(cover, "(min-width: 640px) 16rem, calc(100vw - 2.5rem)")}
+                    className="aspect-2/1 w-full shrink-0 bg-surface object-cover sm:order-last sm:w-64"
+                  />
                 )}
                 <span className="block min-w-0 flex-1">
                   <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">{meta}</span>
