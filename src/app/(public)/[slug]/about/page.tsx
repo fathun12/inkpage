@@ -5,8 +5,10 @@ import { JsonLd } from "@/components/site/JsonLd";
 import { PageIntro } from "@/components/site/PageIntro";
 import { cleanUrl } from "@/config/seo";
 import { hasAbout, readSite } from "@/config/site-content";
+import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
 import { personLd } from "@/lib/person-ld";
+import { socialsOf } from "@/lib/site-view";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -29,7 +31,7 @@ export default async function AboutPage({ params }: Props) {
   const site = readSite(profile.site);
   if (!hasAbout(site)) notFound();
 
-  const person = personLd(profile, site);
+  const person = personLd(profile, site, socialsOf(await getPublicBlocks(profile.id)));
   const url = cleanUrl(profile.username, "/about");
 
   return (

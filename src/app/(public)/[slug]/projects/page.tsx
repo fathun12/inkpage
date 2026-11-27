@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { PageIntro } from "@/components/site/PageIntro";
 import { ProjectList } from "@/components/site/ProjectList";
+import { cleanUrl } from "@/config/seo";
 import { readSite } from "@/config/site-content";
 import { readSiteStyle } from "@/config/site-style";
 import { getPublicBlocks } from "@/features/blocks/queries";
@@ -14,7 +15,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const profile = await getProfileByUsername(slug.toLowerCase());
   if (!profile) return { title: "Not found" };
-  return { title: `${readSite(profile.site).projects.title ?? "Projects"} · ${profile.display_name}` };
+  const canonical = cleanUrl(profile.username, "/projects");
+  return {
+    title: `${readSite(profile.site).projects.title ?? "Projects"} · ${profile.display_name}`,
+    alternates: canonical ? { canonical } : undefined,
+  };
 }
 
 export default async function ProjectsPage({ params }: Props) {

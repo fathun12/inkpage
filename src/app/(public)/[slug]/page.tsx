@@ -21,6 +21,7 @@ import { SectionBox } from "@/components/site/SectionBox";
 import { VisitCards } from "@/components/site/VisitCards";
 import { readBackground } from "@/config/background";
 import type { SectionId } from "@/config/layout";
+import { cleanUrl } from "@/config/seo";
 import { readSite } from "@/config/site-content";
 import { readSiteStyle } from "@/config/site-style";
 import { routes, siteConfig } from "@/config/site";
@@ -50,8 +51,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const profile = await getProfileByUsername(slug.toLowerCase());
   if (!profile) return { title: "Not found" };
   const description = profile.bio ?? `${profile.display_name} on ${siteConfig.name}`;
+  const canonical = cleanUrl(profile.username, "/");
   return {
     metadataBase: new URL(await getSiteUrl()),
+    alternates: canonical ? { canonical } : undefined,
     title: profile.display_name,
     description,
     openGraph: { title: profile.display_name, description, type: "website" },

@@ -6,8 +6,10 @@ import { cleanUrl } from "@/config/seo";
 import { routes } from "@/config/site";
 import { hasAbout, readSite } from "@/config/site-content";
 import { getPublicArticle } from "@/features/articles/queries";
+import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
 import { personLd } from "@/lib/person-ld";
+import { socialsOf } from "@/lib/site-view";
 
 type Props = { params: Promise<{ slug: string; article: string }> };
 
@@ -41,7 +43,7 @@ export default async function ArticlePage({ params }: Props) {
 
   const site = readSite(profile.site);
   const aboutPage = hasAbout(site);
-  const person = personLd(profile, site);
+  const person = personLd(profile, site, socialsOf(await getPublicBlocks(profile.id)));
   const url = cleanUrl(profile.username, `/writing/${articleSlug}`);
 
   return (
