@@ -6,6 +6,7 @@ import { FadeGallery } from "@/components/site/FadeGallery";
 import { Hero } from "@/components/site/Hero";
 import { HeroContents, type ContentsItem } from "@/components/site/HeroContents";
 import { Intro } from "@/components/site/Intro";
+import { JsonLd } from "@/components/site/JsonLd";
 import { resolveGreetings } from "@/config/intro";
 import { HomeArticles } from "@/components/site/HomeArticles";
 import { getPublicArticles } from "@/features/articles/queries";
@@ -33,6 +34,7 @@ import { getProfileByUsername } from "@/features/profile/queries";
 import { fetchBiblia } from "@/features/site/biblia";
 import { fetchDesigns } from "@/features/site/designs";
 import { fetchGithub } from "@/features/site/github";
+import { personLd } from "@/lib/person-ld";
 import { getSiteUrl } from "@/lib/site-url";
 import {
   creditOf,
@@ -42,6 +44,7 @@ import {
   homeWriting,
   listBlocks,
   resolveHomeMedia,
+  socialsOf,
 } from "@/lib/site-view";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -264,8 +267,29 @@ export default async function HomePage({ params }: Props) {
     ),
   };
 
+  const person = personLd(profile, site, socialsOf(blocks));
+  const home = cleanUrl(profile.username, "/");
+
   return (
     <main>
+      {person && home && (
+        <JsonLd
+          data={{
+            "@context": "https://schema.org",
+            "@graph": [
+              {
+                "@type": "WebSite",
+                "@id": `${home}#website`,
+                url: home,
+                name: profile.display_name,
+                description: profile.bio ?? undefined,
+                publisher: { "@id": person["@id"] },
+              },
+              person,
+            ],
+          }}
+        />
+      )}
       <Hero
         slides={media.hero}
         name={profile.display_name}
