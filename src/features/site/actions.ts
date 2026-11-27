@@ -31,6 +31,7 @@ const slotMax = {
   index: 1,
   gallery: siteLimits.gallery,
   about: 1,
+  steam: 1,
 } as const;
 type Slot = keyof typeof slotMax;
 
@@ -40,7 +41,7 @@ const tabSlots: Record<PagesTab, Slot[]> = {
   projects: [],
   writing: [],
   articles: [],
-  about: ["about"],
+  about: ["about", "steam"],
   footer: [],
 };
 
@@ -48,6 +49,7 @@ function slotLabel(slot: Slot): string {
   if (slot === "hero") return "The hero";
   if (slot === "index") return "The list background";
   if (slot === "gallery") return "The gallery";
+  if (slot === "steam") return "The Steam media";
   return "The About photo";
 }
 
@@ -202,6 +204,7 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     index: one(old.indexMedia),
     gallery: old.gallery,
     about: one(old.about.photo),
+    steam: one(old.steamMedia),
   };
   const lists: Partial<Record<Slot, string[]>> = {};
   for (const slot of tabSlots[tab]) {
@@ -277,6 +280,7 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
   if (tab === "articles") next.articles = { title: v.articles_title ?? null, intro: v.articles_intro ?? null };
   if (tab === "about") {
     next.about = { title: v.about_title ?? null, body: v.about_body ?? null, photo: got("about")[0] ?? null };
+    next.steamMedia = got("steam")[0] ?? null;
     // One name per line. Empty lines and repeats are dropped.
     const names = (v.alt_names ?? "")
       .split(/\r?\n/)

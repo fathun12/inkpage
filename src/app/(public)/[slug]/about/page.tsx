@@ -9,7 +9,7 @@ import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
 import { fetchSteam } from "@/features/site/steam";
 import { personLd } from "@/lib/person-ld";
-import { socialsOf } from "@/lib/site-view";
+import { creditOf, socialsOf } from "@/lib/site-view";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -48,6 +48,8 @@ export default async function AboutPage({ params }: Props) {
         body={site.about.body}
         photo={site.about.photo}
         steam={steam}
+        steamMedia={site.steamMedia}
+        steamCredit={creditOf(site.credits, site.steamMedia)}
         style={readSiteStyle(profile.site_style)}
       />
     </>

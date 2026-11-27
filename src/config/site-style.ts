@@ -54,12 +54,16 @@ import {
   aboutSectionIds,
   readAboutOrder,
   readAboutSections,
+  steamBackgrounds,
   steamLayouts,
+  steamModes,
   type AboutLayout,
   type AboutPhotoShape,
   type AboutSectionId,
   type AboutSections,
+  type SteamBackground,
   type SteamLayout,
+  type SteamMode,
 } from "@/config/about-style";
 
 export const motionModes = ["full", "subtle", "off"] as const;
@@ -90,6 +94,8 @@ export const styleRanges = {
   designCount: { min: 3, max: 6, step: 1 },
   showcaseMedia: { min: 0, max: 60, step: 2 },
   stackCrop: { min: 0, max: 100, step: 5 },
+  steamOpacity: { min: 10, max: 100, step: 5 },
+  steamPosition: { min: 0, max: 100, step: 5 },
 } as const satisfies Record<string, Range>;
 
 export type SiteStyle = {
@@ -137,6 +143,10 @@ export type SiteStyle = {
   aboutLayout: AboutLayout;
   aboutPhoto: AboutPhotoShape;
   steamLayout: SteamLayout;
+  steamMode: SteamMode;
+  steamBackground: SteamBackground;
+  steamOpacity: number;
+  steamPosition: number;
   aboutSections: AboutSections;
   aboutOrder: AboutSectionId[];
   colorBg: string;
@@ -194,6 +204,10 @@ export const siteStyleDefaults: SiteStyle = {
   aboutLayout: aboutDefaults.aboutLayout,
   aboutPhoto: aboutDefaults.aboutPhoto,
   steamLayout: aboutDefaults.steamLayout,
+  steamMode: aboutDefaults.steamMode,
+  steamBackground: aboutDefaults.steamBackground,
+  steamOpacity: aboutDefaults.steamOpacity,
+  steamPosition: aboutDefaults.steamPosition,
   aboutSections: aboutSectionDefaults,
   aboutOrder: [...aboutSectionIds],
   colorBg: "#ffffff",
@@ -261,6 +275,10 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     aboutLayout: readChoice(r.aboutLayout, aboutLayouts, d.aboutLayout),
     aboutPhoto: readChoice(r.aboutPhoto, aboutPhotoShapes, d.aboutPhoto),
     steamLayout: readChoice(r.steamLayout, steamLayouts, d.steamLayout),
+    steamMode: readChoice(r.steamMode, steamModes, d.steamMode),
+    steamBackground: readChoice(r.steamBackground, steamBackgrounds, d.steamBackground),
+    steamOpacity: num(r.steamOpacity, styleRanges.steamOpacity, d.steamOpacity),
+    steamPosition: num(r.steamPosition, styleRanges.steamPosition, d.steamPosition),
     aboutSections: readAboutSections(r.aboutSections),
     aboutOrder: readAboutOrder(r.aboutOrder),
     colorBg: color(r.colorBg, d.colorBg),

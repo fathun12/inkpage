@@ -7,9 +7,12 @@ import {
   aboutPhotoShapes,
   readAboutOrder,
   readAboutSections,
+  steamBackgrounds,
   steamLayouts,
+  steamModes,
 } from "@/config/about-style";
 import { readChoice, readOrder, readSections } from "@/config/layout";
+import { styleRanges } from "@/config/site-style";
 import { routes } from "@/config/site";
 import { requireUser } from "@/features/auth/queries";
 import { redirectWithError, redirectWithSaved } from "@/lib/flash";
@@ -28,6 +31,13 @@ function parseJson(text: unknown): unknown {
   } catch {
     return null;
   }
+}
+
+// A number from the form, kept inside its range and step. Dirty text gives the default.
+function rangeValue(text: unknown, range: { min: number; max: number; step: number }, fallback: number): number {
+  const n = typeof text === "string" && text !== "" ? Number(text) : NaN;
+  if (!Number.isFinite(n)) return fallback;
+  return Math.round(Math.min(range.max, Math.max(range.min, n)) / range.step) * range.step;
 }
 
 export async function updateAppearanceAction(formData: FormData): Promise<void> {
@@ -137,6 +147,18 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
         aboutLayout: readChoice(field(formData, "site_about_layout"), aboutLayouts, aboutDefaults.aboutLayout),
         aboutPhoto: readChoice(field(formData, "site_about_photo"), aboutPhotoShapes, aboutDefaults.aboutPhoto),
         steamLayout: readChoice(field(formData, "site_steam_layout"), steamLayouts, aboutDefaults.steamLayout),
+        steamMode: readChoice(field(formData, "site_steam_mode"), steamModes, aboutDefaults.steamMode),
+        steamBackground: readChoice(
+          field(formData, "site_steam_background"),
+          steamBackgrounds,
+          aboutDefaults.steamBackground,
+        ),
+        steamOpacity: rangeValue(field(formData, "site_steam_opacity"), styleRanges.steamOpacity, aboutDefaults.steamOpacity),
+        steamPosition: rangeValue(
+          field(formData, "site_steam_position"),
+          styleRanges.steamPosition,
+          aboutDefaults.steamPosition,
+        ),
         aboutSections: readAboutSections(parseJson(field(formData, "site_about_sections"))),
         aboutOrder: readAboutOrder(parseJson(field(formData, "site_about_order"))),
         colorBg: v.site_color_bg,

@@ -440,6 +440,8 @@ export function StudioPreview({
               body={site.about.body}
               photo={site.about.photo}
               steam={steam}
+              steamMedia={site.steamMedia}
+              steamCredit={creditOf(site.credits, site.steamMedia)}
               style={draft.style}
             />
           ) : (

@@ -998,6 +998,10 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
       <input type="hidden" name="site_about_layout" value={draft.style.aboutLayout} />
       <input type="hidden" name="site_about_photo" value={draft.style.aboutPhoto} />
       <input type="hidden" name="site_steam_layout" value={draft.style.steamLayout} />
+      <input type="hidden" name="site_steam_mode" value={draft.style.steamMode} />
+      <input type="hidden" name="site_steam_background" value={draft.style.steamBackground} />
+      <input type="hidden" name="site_steam_opacity" value={draft.style.steamOpacity} />
+      <input type="hidden" name="site_steam_position" value={draft.style.steamPosition} />
       <input type="hidden" name="site_about_sections" value={JSON.stringify(draft.style.aboutSections)} />
       <input type="hidden" name="site_about_order" value={JSON.stringify(draft.style.aboutOrder)} />
       {draft.style.heroGray && <input type="hidden" name="site_hero_gray" value="on" />}
@@ -1367,21 +1371,18 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
           </div>
           <div className={cn(page !== "about" && "hidden")}>
             <AboutControls
-              layout={draft.style.aboutLayout}
-              photo={draft.style.aboutPhoto}
-              steamLayout={draft.style.steamLayout}
-              sections={draft.style.aboutSections}
-              order={draft.style.aboutOrder}
-              onLayout={(aboutLayout) => setStyle({ aboutLayout })}
-              onPhoto={(aboutPhoto) => setStyle({ aboutPhoto })}
-              onSteamLayout={(steamLayout) => setStyle({ steamLayout })}
+              style={draft.style}
+              onStyle={setStyle}
               onSection={setAboutSection}
-              onOrder={(aboutOrder) => setStyle({ aboutOrder })}
               onReset={() =>
                 setStyle({
                   aboutLayout: siteStyleDefaults.aboutLayout,
                   aboutPhoto: siteStyleDefaults.aboutPhoto,
                   steamLayout: siteStyleDefaults.steamLayout,
+                  steamMode: siteStyleDefaults.steamMode,
+                  steamBackground: siteStyleDefaults.steamBackground,
+                  steamOpacity: siteStyleDefaults.steamOpacity,
+                  steamPosition: siteStyleDefaults.steamPosition,
                   aboutSections: siteStyleDefaults.aboutSections,
                   aboutOrder: siteStyleDefaults.aboutOrder,
                 })

@@ -278,6 +278,14 @@ export function AboutForm({ action, sign, site }: WithMedia) {
         >
           <Input id="steam_id" name="steam_id" placeholder="7656119XXXXXXXXXX" defaultValue={site.steamId ?? ""} maxLength={120} />
         </Field>
+        <Field
+          label="Background media"
+          htmlFor="site-steam"
+          hint={`Optional. An image, GIF or video behind the Steam section. It shows when the Background of Steam is set to Media (Customize, About page, Steam). One item. ${mediaHint}`}
+        >
+          {/* "steam" is a new slot name, so it is cast: the form field names are add_steam and remove_steam. */}
+          <SiteMediaInput slot={"steam" as never} current={site.steamMedia ? [site.steamMedia] : []} max={1} sign={sign} credits={site.credits} />
+        </Field>
       </Section>
     </TabForm>
   );

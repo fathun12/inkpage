@@ -54,22 +54,62 @@ export type SteamLayout = (typeof steamLayouts)[number];
 
 export const steamLayoutLabels: Record<SteamLayout, string> = {
   split: "Side by side",
-  stack: "Stacked",
+  stack: "Stack",
 };
 
 export const steamLayoutHints: Record<SteamLayout, string> = {
-  split: "Profile on the left, games on the right (the original).",
-  stack: "Profile on top, games below.",
+  split: "Profile on the left, the game lists on the right (the original).",
+  stack: "Profile on top, then the two game lists side by side below it.",
+};
+
+// Centered keeps the text inside the page margins. Full width takes the text edge to edge.
+export const steamModes = ["centered", "full"] as const;
+export type SteamMode = (typeof steamModes)[number];
+
+export const steamModeLabels: Record<SteamMode, string> = {
+  centered: "Centered",
+  full: "Full width",
+};
+
+export const steamModeHints: Record<SteamMode, string> = {
+  centered: "Text inside the page margins (the original). The background still runs edge to edge.",
+  full: "Text and lists go edge to edge, with only a small space at the sides.",
+};
+
+// The background of the Steam section. Media is the file uploaded in Pages, About tab, Steam.
+export const steamBackgrounds = ["page", "tertiary", "band", "media"] as const;
+export type SteamBackground = (typeof steamBackgrounds)[number];
+
+export const steamBackgroundLabels: Record<SteamBackground, string> = {
+  page: "Page",
+  tertiary: "Tertiary",
+  band: "Secondary",
+  media: "Media",
+};
+
+export const steamBackgroundHints: Record<SteamBackground, string> = {
+  page: "The page color (as now).",
+  tertiary: "The Tertiary color, edge to edge.",
+  band: "The Secondary color, edge to edge.",
+  media: "Your image, GIF or video, over the Secondary color. The text turns light.",
 };
 
 export const aboutDefaults: {
   aboutLayout: AboutLayout;
   aboutPhoto: AboutPhotoShape;
   steamLayout: SteamLayout;
+  steamMode: SteamMode;
+  steamBackground: SteamBackground;
+  steamOpacity: number;
+  steamPosition: number;
 } = {
   aboutLayout: "split",
   aboutPhoto: "portrait",
   steamLayout: "split",
+  steamMode: "centered",
+  steamBackground: "page",
+  steamOpacity: 60,
+  steamPosition: 50,
 };
 
 function space(value: unknown): number {

@@ -99,6 +99,8 @@ export type SiteSettings = {
   githubTitle: string | null;
   // Steam profile (SteamID64, 17 digits). Empty = no Steam section on the About page.
   steamId: string | null;
+  // The media behind the Steam section of the About page (empty = none).
+  steamMedia: string | null;
   // YouTube or Spotify link of the music player (empty = no player).
   musicUrl: string | null;
   // The "Visit website" cards of Home and the label above them.
@@ -265,6 +267,7 @@ export function readSite(raw: unknown): SiteSettings {
     githubUser: githubName(r.githubUser),
     githubTitle: text(r.githubTitle, siteLimits.title),
     steamId: steamIdNumber(r.steamId),
+    steamMedia: link(r.steamMedia),
     musicUrl: link(r.musicUrl),
     visitTitle: text(r.visitTitle, siteLimits.title),
     visits: readVisits(r.visits),
@@ -294,6 +297,7 @@ export function siteMediaUrls(site: SiteSettings): string[] {
     ...site.gallery,
     ...(site.indexMedia ? [site.indexMedia] : []),
     ...(site.about.photo ? [site.about.photo] : []),
+    ...(site.steamMedia ? [site.steamMedia] : []),
     ...site.highlights.flatMap((h) => h.media),
   ];
 }
