@@ -2,4 +2,5 @@
 export const pageSizes = {
   articles: 10,
   writing: 12,
+  projects: 6,
 } as const;
