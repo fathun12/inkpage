@@ -25,7 +25,7 @@ import type { SectionId } from "@/config/layout";
 import { cleanUrl } from "@/config/seo";
 import { readSite } from "@/config/site-content";
 import { readSiteStyle } from "@/config/site-style";
-import { routes, siteConfig } from "@/config/site";
+import { routes } from "@/config/site";
 import { shopConfig } from "@/config/shop";
 import { HomeShop } from "@/components/shop/HomeShop";
 import { getPublicShop } from "@/features/shop/public";
@@ -53,7 +53,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const profile = await getProfileByUsername(slug.toLowerCase());
   if (!profile) return { title: "Not found" };
-  const description = profile.bio ?? `${profile.display_name} on ${siteConfig.name}`;
+  const description = profile.bio ?? `Personal website of ${profile.display_name}.`;
   const canonical = cleanUrl(profile.username, "/");
   return {
     metadataBase: new URL(await getSiteUrl()),

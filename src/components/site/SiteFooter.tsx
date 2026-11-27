@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { siteConfig } from "@/config/site";
 import type { SocialItem } from "@/types/block";
 import { NewsTicker, type NewsProps } from "./NewsBar";
 import { Reveal } from "./Reveal";
@@ -106,7 +107,15 @@ export function SiteFooter({ brand, name, bio, note, socials, contactEmail = nul
       <div className="bg-band px-5 text-band-ink sm:px-8">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-2 py-2.5">
           <p className="text-xs opacity-70">
-            © {new Date().getFullYear()} {brand}
+            © {new Date().getFullYear()}{" "}
+            <a
+              href={siteConfig.credit.author.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="relative z-10 cursor-pointer underline-offset-2 hover:underline"
+            >
+              {name || brand}
+            </a>
           </p>
           {news && (
             <div className="order-last flex min-w-0 basis-full justify-center sm:order-none sm:flex-1">
