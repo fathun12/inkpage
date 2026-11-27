@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
+import sharp from "sharp";
 import { mediaConfig } from "@/config/media";
 import { readBackground } from "@/config/background";
 import { readSite } from "@/config/site-content";
@@ -15,6 +16,7 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 const sans = "Instrument Sans";
+// The same font as the brand in the header (font-voice = Instrument Serif, upright).
 const voice = "Instrument Serif";
 
 // Same dark look as the Home hero. Used when there is no hero picture that can be drawn.
@@ -24,8 +26,9 @@ const soft = "rgba(255, 255, 255, 0.82)";
 const bandHeight = 56;
 // Same limit as the upload (10 MB).
 const photoMaxBytes = mediaConfig.backgroundPhoto.maxMb * 1024 * 1024;
+const drawable = ["image/jpeg", "image/png", "image/webp"];
 
-type OgFont = { name: string; data: ArrayBuffer; weight: 400 | 500; style: "normal" | "italic" };
+type OgFont = { name: string; data: ArrayBuffer; weight: 400 | 500; style: "normal" };
 
 function toArrayBuffer(buf: Buffer): ArrayBuffer {
   return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer;
@@ -41,29 +44,31 @@ async function readFont(file: string): Promise<ArrayBuffer | null> {
 
 // Each font is optional. If none can be read, the default font is used.
 async function loadFonts(): Promise<OgFont[] | undefined> {
-  const [sansData, uprightData, italicData] = await Promise.all([
+  const [sansData, voiceData] = await Promise.all([
     readFont("instrument-sans-500.woff"),
     readFont("instrument-serif-regular.woff"),
-    readFont("instrument-serif-italic.woff"),
   ]);
   const fonts: OgFont[] = [];
   if (sansData) fonts.push({ name: sans, data: sansData, weight: 500, style: "normal" });
-  if (uprightData) fonts.push({ name: voice, data: uprightData, weight: 400, style: "normal" });
-  if (italicData) fonts.push({ name: voice, data: italicData, weight: 400, style: "italic" });
+  if (voiceData) fonts.push({ name: voice, data: voiceData, weight: 400, style: "normal" });
   return fonts.length > 0 ? fonts : undefined;
 }
 
-// The share image draws PNG and JPEG reliably. Anything else (video, GIF, WebP) is skipped.
+// The share image cannot draw WebP, so every picture is turned into a JPEG of the exact size (1200 x 630).
 async function loadPicture(url: string): Promise<string | null> {
   if (mediaKind(url) !== "image") return null;
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(9000) });
     const type = res.headers.get("content-type")?.split(";")[0] ?? "";
-    if (!res.ok || (type !== "image/jpeg" && type !== "image/png")) return null;
+    if (!res.ok || !drawable.includes(type)) return null;
     if (Number(res.headers.get("content-length") ?? 0) > photoMaxBytes) return null;
     const bytes = Buffer.from(await res.arrayBuffer());
     if (bytes.length > photoMaxBytes) return null;
-    return `data:${type};base64,${bytes.toString("base64")}`;
+    const jpeg = await sharp(bytes)
+      .resize(size.width, size.height, { fit: "cover" })
+      .jpeg({ quality: 80 })
+      .toBuffer();
+    return `data:image/jpeg;base64,${jpeg.toString("base64")}`;
   } catch {
     return null;
   }
