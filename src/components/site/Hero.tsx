@@ -25,8 +25,11 @@ const phoneWidths = [828, 1200];
 // enlarges a wide picture on a tall phone screen (about 1.9 x the height), so phones pick the original.
 function responsive(src: string): { srcSet?: string; sizes?: string } {
   if (!stillOnStorage.test(src)) return {};
-  const lighter = phoneWidths.map((w) => `/_next/image?url=${encodeURIComponent(src)}&w=${w}&q=90 ${w}w`);
-  return { srcSet: [...lighter, `${src} 2560w`].join(", "), sizes: "max(100vw, calc(100vh * 1.9))" };
+  const url = encodeURIComponent(src);
+  const lighter = phoneWidths.map((w) => `/_next/image?url=${url}&w=${w}&q=90 ${w}w`);
+  // The full size copy: w=3840 is wider than the file, so Vercel keeps every pixel and only re-encodes it at quality 80.
+  const full = `/_next/image?url=${url}&w=3840&q=80 2560w`;
+  return { srcSet: [...lighter, full].join(", "), sizes: "max(100vw, calc(100vh * 1.9))" };
 }
 
 // Full width media (video, GIF or photo) that can slide, with one small caption.

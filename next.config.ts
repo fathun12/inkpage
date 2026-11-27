@@ -12,8 +12,8 @@ const nextConfig: NextConfig = {
     remotePatterns: supabaseHost
       ? [{ protocol: "https", hostname: supabaseHost, pathname: "/storage/v1/object/public/media/**" }]
       : [],
-    // Only quality 90 is allowed. Files have random names and never change, so keep copies for a year.
-    qualities: [90],
+    // Only quality 80 and 90 are allowed. Files have random names and never change, so keep copies for a year.
+    qualities: [80, 90],
     minimumCacheTTL: 31536000,
   },
   experimental: {
