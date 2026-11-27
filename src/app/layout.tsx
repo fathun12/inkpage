@@ -4,10 +4,8 @@ import { fontVariables } from "@/config/fonts";
 import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
-  title: {
-    default: siteConfig.name,
-    template: `%s · ${siteConfig.name}`,
-  },
+  // No template: every page writes its own full title. "inkpage" is the name of the software, not of this site.
+  title: siteConfig.name,
   description: siteConfig.description,
 };
 
