@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArticleList } from "@/components/site/ArticleList";
 import { PageIntro } from "@/components/site/PageIntro";
+import { cleanUrl } from "@/config/seo";
 import { readSite } from "@/config/site-content";
 import { getPublicArticles } from "@/features/articles/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
@@ -12,7 +13,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const profile = await getProfileByUsername(slug.toLowerCase());
   if (!profile) return { title: "Not found" };
-  return { title: `${readSite(profile.site).articles.title ?? "Articles"} · ${profile.display_name}` };
+  const canonical = cleanUrl(profile.username, "/articles");
+  return {
+    title: `${readSite(profile.site).articles.title ?? "Articles"} · ${profile.display_name}`,
+    alternates: canonical ? { canonical } : undefined,
+  };
 }
 
 // Every article written inside inkpage, newest first, with a small preview of each.

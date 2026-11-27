@@ -1,12 +1,11 @@
 import type { MetadataRoute } from "next";
+import { seo } from "@/config/seo";
 import { hasAbout, readSite } from "@/config/site-content";
 import { getPublicArticles } from "@/features/articles/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
 
-// The main domain, with the clean addresses (no owner name in them, see next.config.ts).
-const origin = "https://mfniam.com";
-// The account the main domain shows.
-const owner = "zdtzer0";
+// The main domain and the account it shows live in config/seo.ts.
+const { origin, owner } = seo;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const profile = await getProfileByUsername(owner);
@@ -25,7 +24,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...pages.map((path) => ({ url: `${origin}${path}` })),
     ...articles.flatMap((article) =>
       article.slug
-        ? [{ url: `${origin}/writing/${article.slug}`, lastModified: article.published_at ?? undefined }]
+        ? [{ url: `${origin}/writing/${article.slug}`, lastModified: article.updated_at ?? article.published_at ?? undefined }]
         : [],
     ),
   ];

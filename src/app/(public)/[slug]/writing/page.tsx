@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { CardSlider } from "@/components/site/CardSlider";
 import { PageIntro } from "@/components/site/PageIntro";
 import { WritingList } from "@/components/site/WritingList";
+import { cleanUrl } from "@/config/seo";
 import { readSite } from "@/config/site-content";
 import { readSiteStyle } from "@/config/site-style";
 import { getPublicBlocks } from "@/features/blocks/queries";
@@ -15,7 +16,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const profile = await getProfileByUsername(slug.toLowerCase());
   if (!profile) return { title: "Not found" };
-  return { title: `${readSite(profile.site).writing.title ?? "Writing"} · ${profile.display_name}` };
+  const canonical = cleanUrl(profile.username, "/writing");
+  return {
+    title: `${readSite(profile.site).writing.title ?? "Writing"} · ${profile.display_name}`,
+    alternates: canonical ? { canonical } : undefined,
+  };
 }
 
 export default async function WritingPage({ params }: Props) {
