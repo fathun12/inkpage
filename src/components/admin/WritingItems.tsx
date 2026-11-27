@@ -25,7 +25,7 @@ function WritingForm({ item, visible, save, sign }: FormProps) {
     <form action={save} className="flex flex-col gap-5">
       {item && <input type="hidden" name="id" value={item.id} />}
       <Field label="Title" htmlFor={`w-title-${uid}`}>
-        <Input id={`w-title-${uid}`} name="title" defaultValue={item?.title ?? ""} required maxLength={80} />
+        <Input id={`w-title-${uid}`} name="title" defaultValue={item?.title ?? ""} required maxLength={300} />
       </Field>
       <Field label="Link" htmlFor={`w-url-${uid}`} hint="The article. A click opens it (Blogspot, Medium, skrib.my.id ...).">
         <Input id={`w-url-${uid}`} name="url" type="url" placeholder="https://" defaultValue={item?.url ?? ""} required />
