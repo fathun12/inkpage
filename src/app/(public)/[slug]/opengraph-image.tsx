@@ -2,6 +2,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { mediaConfig } from "@/config/media";
+import { cleanUrl } from "@/config/seo";
 import { resolveTheme, siteConfig } from "@/config/site";
 import { getProfileByUsername } from "@/features/profile/queries";
 import { readCustomTheme } from "@/config/custom-theme";
@@ -88,6 +89,9 @@ export default async function OpengraphImage({ params }: { params: Promise<{ slu
   const initial = name.trim().charAt(0).toUpperCase();
   const handle = profile ? `@${profile.username}` : "";
   const bio = profile?.bio ? profile.bio.slice(0, 140) : "";
+  // The address of the website (mfniam.com), not the name of the software. Other accounts get an empty line.
+  const home = profile ? cleanUrl(profile.username, "/") : null;
+  const site = home ? new URL(home).host : "";
 
   return new ImageResponse(
     (
@@ -172,7 +176,7 @@ export default async function OpengraphImage({ params }: { params: Promise<{ slu
           </div>
           {bio ? <div style={{ display: "flex", fontSize: 38, color: p.soft }}>{bio}</div> : null}
         </div>
-        <div style={{ display: "flex", fontSize: 30, color: p.soft }}>{siteConfig.name}</div>
+        <div style={{ display: "flex", fontSize: 30, color: p.soft }}>{site}</div>
       </div>
     ),
     { ...size, fonts },

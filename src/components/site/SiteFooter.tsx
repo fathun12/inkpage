@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { Credit } from "@/components/ui/Credit";
 import type { SocialItem } from "@/types/block";
 import { NewsTicker, type NewsProps } from "./NewsBar";
 import { Reveal } from "./Reveal";
@@ -107,7 +106,7 @@ export function SiteFooter({ brand, name, bio, note, socials, contactEmail = nul
       <div className="bg-band px-5 text-band-ink sm:px-8">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-2 py-2.5">
           <p className="text-xs opacity-70">
-            © {new Date().getFullYear()} {brand} · <Credit />
+            © {new Date().getFullYear()} {brand}
           </p>
           {news && (
             <div className="order-last flex min-w-0 basis-full justify-center sm:order-none sm:flex-1">
