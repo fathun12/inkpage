@@ -212,7 +212,7 @@ export async function saveWritingAction(formData: FormData): Promise<void> {
 
   const title = field(formData, "title");
   if (!title) return abort("Title is required.");
-  if (title.length > 80) return abort("Title can be at most 80 characters.");
+  if (title.length > 300) return abort("Title can be at most 300 characters.");
   const url = field(formData, "url");
   if (!url || !isHttpUrl(url)) return abort("The link is required and must start with http:// or https://");
   const body = field(formData, "body");
