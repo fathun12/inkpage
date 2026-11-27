@@ -411,6 +411,39 @@ export const githubWideViewHints: Record<GithubWideView, string> = {
   edge: "Like Index, but the rows and the lines run edge to edge.",
 };
 
+// The Links section of Home (the list of links over the Index media). Index is the original look.
+// Mode (Centered or Full width), the title place, the fonts and the title sizes reuse the names above.
+// No Size, Ratio, Crop or Photo height: the section is a list of titles over one background media, not photos to crop.
+export const linksViews = ["index", "table", "slider"] as const;
+export type LinksView = (typeof linksViews)[number];
+
+export const linksViewLabels: Record<LinksView, string> = {
+  index: "Index",
+  table: "Table",
+  slider: "Slider",
+};
+
+export const linksViewHints: Record<LinksView, string> = {
+  index: "Numbered rows with big titles and thin lines over the background media (the original).",
+  table: "Tight rows: the number, a medium title and the site name on the right. Best when there are many links.",
+  slider: "One link big at a time. It slides by itself and has arrows.",
+};
+
+export const linksWideViews = ["edge", "giant", "slide"] as const;
+export type LinksWideView = (typeof linksWideViews)[number];
+
+export const linksWideViewLabels: Record<LinksWideView, string> = {
+  edge: "Edge index",
+  giant: "Giant",
+  slide: "Link slide",
+};
+
+export const linksWideViewHints: Record<LinksWideView, string> = {
+  edge: "Like Index, but the rows and the lines run edge to edge.",
+  giant: "Huge titles stacked from edge to edge. A title moves a little to the side when you point at it.",
+  slide: "One link at a time across the whole screen, its title huge. It slides by itself and has arrows.",
+};
+
 // The Shop section of Home (product cards). Grid is the original look.
 // Mode (Centered or Full width), the title place, the fonts, the title sizes and the Stack ratio reuse the names above.
 // A product photo is square, so Ratio and Crop only matter in Stack and Stack slide.
@@ -550,6 +583,14 @@ export const layoutDefaults: {
   githubTitleSize: DesignTitleSize;
   githubIntroFont: DesignFont;
   githubIntroSize: DesignIntroSize;
+  linksMode: DesignMode;
+  linksView: LinksView;
+  linksWideView: LinksWideView;
+  linksTitleAlign: DesignTitleAlign;
+  linksTitleFont: DesignFont;
+  linksTitleSize: DesignTitleSize;
+  linksIntroFont: DesignFont;
+  linksIntroSize: DesignIntroSize;
   shopMode: DesignMode;
   shopView: ShopView;
   shopWideView: ShopWideView;
@@ -643,6 +684,14 @@ export const layoutDefaults: {
   githubTitleSize: "auto",
   githubIntroFont: "default",
   githubIntroSize: "auto",
+  linksMode: "centered",
+  linksView: "index",
+  linksWideView: "edge",
+  linksTitleAlign: "center",
+  linksTitleFont: "default",
+  linksTitleSize: "auto",
+  linksIntroFont: "default",
+  linksIntroSize: "auto",
   shopMode: "centered",
   shopView: "grid",
   shopWideView: "stack",

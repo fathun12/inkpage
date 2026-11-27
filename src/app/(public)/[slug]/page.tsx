@@ -124,7 +124,7 @@ export default async function HomePage({ params }: Props) {
     biblia: site.bibliaTitle ?? "Biblia",
     github: site.githubTitle ?? "GitHub",
     shop: shopTitle,
-    links: "Links",
+    links: site.linksTitle ?? "Links",
     showcase: site.showcaseTitle ?? "Showcase",
     designs: site.designsTitle ?? "Design",
     visit: site.visitTitle ?? "Visit website",

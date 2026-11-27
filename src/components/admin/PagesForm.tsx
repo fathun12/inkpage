@@ -140,6 +140,20 @@ export function HomeForm({ action, sign, site }: WithMedia) {
           <Textarea id="github_home_intro" name="github_home_intro" defaultValue={site.githubHomeIntro ?? ""} rows={3} maxLength={siteLimits.intro} />
         </Field>
         <Field
+          label="Links label"
+          htmlFor="links_title"
+          hint="Optional. The title above the list of links on Home. Empty = no title (the original). Its font, size and place are set in Customize, Sections, Links."
+        >
+          <Input id="links_title" name="links_title" defaultValue={site.linksTitle ?? ""} maxLength={siteLimits.title} />
+        </Field>
+        <Field
+          label="Links text under the title"
+          htmlFor="links_home_intro"
+          hint="Optional. Shows under the Links label on Home. Its font and size are set in Customize, Sections, Links. Up to 400 characters."
+        >
+          <Textarea id="links_home_intro" name="links_home_intro" defaultValue={site.linksHomeIntro ?? ""} rows={3} maxLength={siteLimits.intro} />
+        </Field>
+        <Field
           label="Shop text under the title"
           htmlFor="shop_home_intro"
           hint="Optional. Under the Shop label on Home (that label is set in the admin Shop, Settings). Its font, size and place are set in Customize, Sections, Shop. Up to 400 characters."

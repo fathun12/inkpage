@@ -1,6 +1,7 @@
 "use client";
 
 import { GithubControls } from "@/components/admin/studio/GithubControls";
+import { LinksControls } from "@/components/admin/studio/LinksControls";
 import { ShopControls } from "@/components/admin/studio/ShopControls";
 
 import Link from "next/link";
@@ -1771,6 +1772,14 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
       <input type="hidden" name="site_github_title_size" value={draft.style.githubTitleSize} />
       <input type="hidden" name="site_github_intro_font" value={draft.style.githubIntroFont} />
       <input type="hidden" name="site_github_intro_size" value={draft.style.githubIntroSize} />
+      <input type="hidden" name="site_links_mode" value={draft.style.linksMode} />
+      <input type="hidden" name="site_links_view" value={draft.style.linksView} />
+      <input type="hidden" name="site_links_wide_view" value={draft.style.linksWideView} />
+      <input type="hidden" name="site_links_title_align" value={draft.style.linksTitleAlign} />
+      <input type="hidden" name="site_links_title_font" value={draft.style.linksTitleFont} />
+      <input type="hidden" name="site_links_title_size" value={draft.style.linksTitleSize} />
+      <input type="hidden" name="site_links_intro_font" value={draft.style.linksIntroFont} />
+      <input type="hidden" name="site_links_intro_size" value={draft.style.linksIntroSize} />
       <input type="hidden" name="site_shop_mode" value={draft.style.shopMode} />
       <input type="hidden" name="site_shop_view" value={draft.style.shopView} />
       <input type="hidden" name="site_shop_wide_view" value={draft.style.shopWideView} />
@@ -1971,6 +1980,14 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
                 githubTitleSize: siteStyleDefaults.githubTitleSize,
                 githubIntroFont: siteStyleDefaults.githubIntroFont,
                 githubIntroSize: siteStyleDefaults.githubIntroSize,
+                linksMode: siteStyleDefaults.linksMode,
+                linksView: siteStyleDefaults.linksView,
+                linksWideView: siteStyleDefaults.linksWideView,
+                linksTitleAlign: siteStyleDefaults.linksTitleAlign,
+                linksTitleFont: siteStyleDefaults.linksTitleFont,
+                linksTitleSize: siteStyleDefaults.linksTitleSize,
+                linksIntroFont: siteStyleDefaults.linksIntroFont,
+                linksIntroSize: siteStyleDefaults.linksIntroSize,
                 shopMode: siteStyleDefaults.shopMode,
                 shopView: siteStyleDefaults.shopView,
                 shopWideView: siteStyleDefaults.shopWideView,
@@ -2002,6 +2019,7 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
                 projects: projectsAll,
                 biblia: bibliaControls,
                 github: <GithubControls style={draft.style} onChange={setStyle} />,
+                links: <LinksControls style={draft.style} onChange={setStyle} />,
                 shop: <ShopControls style={draft.style} onChange={setStyle} />,
                 countdown: countdownControls,
                 writing: writingControls,

@@ -29,6 +29,8 @@ import {
   bibliaWideViews,
   githubViews,
   githubWideViews,
+  linksViews,
+  linksWideViews,
   shopViews,
   shopWideViews,
   layoutDefaults,
@@ -63,6 +65,8 @@ import {
   type BibliaWideView,
   type GithubView,
   type GithubWideView,
+  type LinksView,
+  type LinksWideView,
   type ShopView,
   type ShopWideView,
   type ProjectSize,
@@ -215,6 +219,14 @@ export type SiteStyle = {
   githubTitleSize: DesignTitleSize;
   githubIntroFont: DesignFont;
   githubIntroSize: DesignIntroSize;
+  linksMode: DesignMode;
+  linksView: LinksView;
+  linksWideView: LinksWideView;
+  linksTitleAlign: DesignTitleAlign;
+  linksTitleFont: DesignFont;
+  linksTitleSize: DesignTitleSize;
+  linksIntroFont: DesignFont;
+  linksIntroSize: DesignIntroSize;
   shopMode: DesignMode;
   shopView: ShopView;
   shopWideView: ShopWideView;
@@ -338,6 +350,14 @@ export const siteStyleDefaults: SiteStyle = {
   githubTitleSize: layoutDefaults.githubTitleSize,
   githubIntroFont: layoutDefaults.githubIntroFont,
   githubIntroSize: layoutDefaults.githubIntroSize,
+  linksMode: layoutDefaults.linksMode,
+  linksView: layoutDefaults.linksView,
+  linksWideView: layoutDefaults.linksWideView,
+  linksTitleAlign: layoutDefaults.linksTitleAlign,
+  linksTitleFont: layoutDefaults.linksTitleFont,
+  linksTitleSize: layoutDefaults.linksTitleSize,
+  linksIntroFont: layoutDefaults.linksIntroFont,
+  linksIntroSize: layoutDefaults.linksIntroSize,
   shopMode: layoutDefaults.shopMode,
   shopView: layoutDefaults.shopView,
   shopWideView: layoutDefaults.shopWideView,
@@ -469,6 +489,14 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     githubTitleSize: readChoice(r.githubTitleSize, designTitleSizes, d.githubTitleSize),
     githubIntroFont: readChoice(r.githubIntroFont, designTextFonts, d.githubIntroFont),
     githubIntroSize: readChoice(r.githubIntroSize, designIntroSizes, d.githubIntroSize),
+    linksMode: readChoice(r.linksMode, designModes, d.linksMode),
+    linksView: readChoice(r.linksView, linksViews, d.linksView),
+    linksWideView: readChoice(r.linksWideView, linksWideViews, d.linksWideView),
+    linksTitleAlign: readChoice(r.linksTitleAlign, designTitleAligns, d.linksTitleAlign),
+    linksTitleFont: readChoice(r.linksTitleFont, designTextFonts, d.linksTitleFont),
+    linksTitleSize: readChoice(r.linksTitleSize, designTitleSizes, d.linksTitleSize),
+    linksIntroFont: readChoice(r.linksIntroFont, designTextFonts, d.linksIntroFont),
+    linksIntroSize: readChoice(r.linksIntroSize, designIntroSizes, d.linksIntroSize),
     shopMode: readChoice(r.shopMode, designModes, d.shopMode),
     shopView: readChoice(r.shopView, shopViews, d.shopView),
     shopWideView: readChoice(r.shopWideView, shopWideViews, d.shopWideView),

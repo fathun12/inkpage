@@ -65,6 +65,8 @@ const textSchema = z.object({
   projects_home_intro: text("The Projects text on Home", siteLimits.intro),
   biblia_home_intro: text("The Biblia text on Home", siteLimits.intro),
   github_home_intro: text("The GitHub text on Home", siteLimits.intro),
+  links_title: text("The Links label", siteLimits.title),
+  links_home_intro: text("The Links text on Home", siteLimits.intro),
   shop_home_intro: text("The Shop text on Home", siteLimits.intro),
   showcase_title: text("The Showcase label", siteLimits.title),
   showcase_intro: text("The Showcase text", siteLimits.intro),
@@ -184,6 +186,8 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     projects_home_intro: field(formData, "projects_home_intro"),
     biblia_home_intro: field(formData, "biblia_home_intro"),
     github_home_intro: field(formData, "github_home_intro"),
+    links_title: field(formData, "links_title"),
+    links_home_intro: field(formData, "links_home_intro"),
     shop_home_intro: field(formData, "shop_home_intro"),
     showcase_title: field(formData, "showcase_title"),
     showcase_intro: field(formData, "showcase_intro"),
@@ -240,6 +244,8 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     next.projectsHomeIntro = v.projects_home_intro ?? null;
     next.bibliaHomeIntro = v.biblia_home_intro ?? null;
     next.githubHomeIntro = v.github_home_intro ?? null;
+    next.linksTitle = v.links_title ?? null;
+    next.linksHomeIntro = v.links_home_intro ?? null;
     next.shopHomeIntro = v.shop_home_intro ?? null;
     next.showcaseTitle = v.showcase_title ?? null;
     next.showcaseIntro = v.showcase_intro ?? null;

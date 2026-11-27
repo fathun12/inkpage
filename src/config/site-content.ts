@@ -92,6 +92,9 @@ export type SiteSettings = {
   bibliaHomeIntro: string | null;
   // The text under the GitHub label on Home.
   githubHomeIntro: string | null;
+  // The label of the Links section on Home (empty = no title, the original) and the text under it.
+  linksTitle: string | null;
+  linksHomeIntro: string | null;
   // The text under the Shop label on Home.
   shopHomeIntro: string | null;
   highlightsTitle: string | null;
@@ -272,6 +275,8 @@ export function readSite(raw: unknown): SiteSettings {
     projectsHomeIntro: text(r.projectsHomeIntro, siteLimits.intro),
     bibliaHomeIntro: text(r.bibliaHomeIntro, siteLimits.intro),
     githubHomeIntro: text(r.githubHomeIntro, siteLimits.intro),
+    linksTitle: text(r.linksTitle, siteLimits.title),
+    linksHomeIntro: text(r.linksHomeIntro, siteLimits.intro),
     shopHomeIntro: text(r.shopHomeIntro, siteLimits.intro),
     highlightsTitle: text(r.highlightsTitle, siteLimits.title),
     showcaseTitle: text(r.showcaseTitle, siteLimits.title),
