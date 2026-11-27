@@ -118,6 +118,13 @@ export function HomeForm({ action, sign, site }: WithMedia) {
         >
           <Textarea id="articles_home_intro" name="articles_home_intro" defaultValue={site.articlesHomeIntro ?? ""} rows={3} maxLength={siteLimits.intro} />
         </Field>
+        <Field
+          label="Projects text under the title"
+          htmlFor="projects_home_intro"
+          hint="Optional. Under the Projects label on Home (the label is the title in the Projects tab). Its font, size and place are set in Customize, Sections, Projects. Up to 400 characters."
+        >
+          <Textarea id="projects_home_intro" name="projects_home_intro" defaultValue={site.projectsHomeIntro ?? ""} rows={3} maxLength={siteLimits.intro} />
+        </Field>
         <Field label="Showcase" htmlFor="showcase_title" hint="Above the Showcase section.">
           <Input id="showcase_title" name="showcase_title" defaultValue={site.showcaseTitle ?? ""} maxLength={siteLimits.title} />
         </Field>

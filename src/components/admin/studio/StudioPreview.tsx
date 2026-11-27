@@ -346,6 +346,16 @@ export function StudioPreview({
           title={site.projects.title ?? "Projects"}
           seeAll={routes.section(profile.username, "projects")}
           view={draft.style.projectView}
+          mode={draft.style.projectMode}
+          wideView={draft.style.projectWideView}
+          stackRatio={draft.style.projectStackRatio}
+          stackCrop={draft.style.projectStackCrop}
+          intro={site.projectsHomeIntro}
+          titleAlign={draft.style.projectTitleAlign}
+          titleFont={draft.style.projectTitleFont}
+          titleSize={draft.style.projectTitleSize}
+          introFont={draft.style.projectIntroFont}
+          introSize={draft.style.projectIntroSize}
           mediaHeight={draft.style.projectMedia}
           slide={{ seconds: draft.style.heroSeconds, autoplay }}
         />

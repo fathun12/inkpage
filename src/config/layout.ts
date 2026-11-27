@@ -319,6 +319,27 @@ export const articleWideViewHints: Record<ArticleWideView, string> = {
   lead: "Like a magazine front page: the newest article big, its cover running to the edge of the screen, and the others as a numbered list below.",
 };
 
+// The Projects section of Home. List, Grid and Slider (Centered) are the original forms.
+// Mode (Centered or Full width), the title place, the fonts, the title sizes and the Stack ratio reuse the names above.
+export const projectWideViews = ["stack", "stackslide", "split", "filmstrip", "sheet"] as const;
+export type ProjectWideView = (typeof projectWideViews)[number];
+
+export const projectWideViewLabels: Record<ProjectWideView, string> = {
+  stack: "Stack",
+  stackslide: "Stack slide",
+  split: "Split",
+  filmstrip: "Filmstrip",
+  sheet: "Contact sheet",
+};
+
+export const projectWideViewHints: Record<ProjectWideView, string> = {
+  stack: "One project per row: one photo across the whole screen, then its number, title, text and buttons.",
+  stackslide: "Like Stack, but one project at a time across the whole screen. It slides by itself and has arrows.",
+  split: "Photo on one half of the screen, text on the other half. The sides swap on each project.",
+  filmstrip: "One row of tall panels that slides by itself, with arrows.",
+  sheet: "Photos that touch each other. The title shows on hover (always on a phone).",
+};
+
 // How the Countdown section looks.
 export const countdownViews = ["section", "strip"] as const;
 export type CountdownView = (typeof countdownViews)[number];
@@ -389,6 +410,15 @@ export const layoutDefaults: {
   articlesIntroSize: DesignIntroSize;
   articlesStackRatio: StackRatio;
   articlesStackCrop: number;
+  projectMode: DesignMode;
+  projectWideView: ProjectWideView;
+  projectTitleAlign: DesignTitleAlign;
+  projectTitleFont: DesignFont;
+  projectTitleSize: DesignTitleSize;
+  projectIntroFont: DesignFont;
+  projectIntroSize: DesignIntroSize;
+  projectStackRatio: StackRatio;
+  projectStackCrop: number;
 } = {
   density: "comfortable",
   projectSize: "large",
@@ -444,6 +474,15 @@ export const layoutDefaults: {
   articlesIntroSize: "auto",
   articlesStackRatio: "default",
   articlesStackCrop: 50,
+  projectMode: "centered",
+  projectWideView: "stack",
+  projectTitleAlign: "center",
+  projectTitleFont: "default",
+  projectTitleSize: "auto",
+  projectIntroFont: "default",
+  projectIntroSize: "auto",
+  projectStackRatio: "default",
+  projectStackCrop: 50,
 };
 
 // Safe reader: an unknown or missing value falls back to the default.

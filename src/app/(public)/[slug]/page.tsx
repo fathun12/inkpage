@@ -202,6 +202,16 @@ export default async function HomePage({ params }: Props) {
           title={site.projects.title ?? "Projects"}
           seeAll={routes.section(profile.username, "projects")}
           view={style.projectView}
+          mode={style.projectMode}
+          wideView={style.projectWideView}
+          stackRatio={style.projectStackRatio}
+          stackCrop={style.projectStackCrop}
+          intro={site.projectsHomeIntro}
+          titleAlign={style.projectTitleAlign}
+          titleFont={style.projectTitleFont}
+          titleSize={style.projectTitleSize}
+          introFont={style.projectIntroFont}
+          introSize={style.projectIntroSize}
           mediaHeight={style.projectMedia}
           slide={{ seconds: style.heroSeconds, autoplay }}
         />

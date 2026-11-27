@@ -24,6 +24,7 @@ import {
   writingWideViews,
   articleViews,
   articleWideViews,
+  projectWideViews,
   layoutDefaults,
   projectSizes,
   projectViews,
@@ -51,6 +52,7 @@ import {
   type WritingWideView,
   type ArticleView,
   type ArticleWideView,
+  type ProjectWideView,
   type ProjectSize,
   type ProjectView,
   type SectionId,
@@ -174,6 +176,15 @@ export type SiteStyle = {
   articlesIntroSize: DesignIntroSize;
   articlesStackRatio: StackRatio;
   articlesStackCrop: number;
+  projectMode: DesignMode;
+  projectWideView: ProjectWideView;
+  projectTitleAlign: DesignTitleAlign;
+  projectTitleFont: DesignFont;
+  projectTitleSize: DesignTitleSize;
+  projectIntroFont: DesignFont;
+  projectIntroSize: DesignIntroSize;
+  projectStackRatio: StackRatio;
+  projectStackCrop: number;
   sections: SectionSettings;
   order: SectionId[];
   aboutLayout: AboutLayout;
@@ -259,6 +270,15 @@ export const siteStyleDefaults: SiteStyle = {
   articlesIntroSize: layoutDefaults.articlesIntroSize,
   articlesStackRatio: layoutDefaults.articlesStackRatio,
   articlesStackCrop: layoutDefaults.articlesStackCrop,
+  projectMode: layoutDefaults.projectMode,
+  projectWideView: layoutDefaults.projectWideView,
+  projectTitleAlign: layoutDefaults.projectTitleAlign,
+  projectTitleFont: layoutDefaults.projectTitleFont,
+  projectTitleSize: layoutDefaults.projectTitleSize,
+  projectIntroFont: layoutDefaults.projectIntroFont,
+  projectIntroSize: layoutDefaults.projectIntroSize,
+  projectStackRatio: layoutDefaults.projectStackRatio,
+  projectStackCrop: layoutDefaults.projectStackCrop,
   sections: sectionDefaults,
   order: [...sectionIds],
   aboutLayout: aboutDefaults.aboutLayout,
@@ -352,6 +372,15 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     articlesIntroSize: readChoice(r.articlesIntroSize, designIntroSizes, d.articlesIntroSize),
     articlesStackRatio: readChoice(r.articlesStackRatio, stackRatios, d.articlesStackRatio),
     articlesStackCrop: num(r.articlesStackCrop, styleRanges.stackCrop, d.articlesStackCrop),
+    projectMode: readChoice(r.projectMode, designModes, d.projectMode),
+    projectWideView: readChoice(r.projectWideView, projectWideViews, d.projectWideView),
+    projectTitleAlign: readChoice(r.projectTitleAlign, designTitleAligns, d.projectTitleAlign),
+    projectTitleFont: readChoice(r.projectTitleFont, designTextFonts, d.projectTitleFont),
+    projectTitleSize: readChoice(r.projectTitleSize, designTitleSizes, d.projectTitleSize),
+    projectIntroFont: readChoice(r.projectIntroFont, designTextFonts, d.projectIntroFont),
+    projectIntroSize: readChoice(r.projectIntroSize, designIntroSizes, d.projectIntroSize),
+    projectStackRatio: readChoice(r.projectStackRatio, stackRatios, d.projectStackRatio),
+    projectStackCrop: num(r.projectStackCrop, styleRanges.stackCrop, d.projectStackCrop),
     designMedia: num(r.designMedia, styleRanges.designMedia, d.designMedia),
     designCount: num(r.designCount, styleRanges.designCount, d.designCount),
     sections: readSections(r.sections),

@@ -75,6 +75,9 @@ import {
   articleWideViewHints,
   articleWideViewLabels,
   articleWideViews,
+  projectWideViewHints,
+  projectWideViewLabels,
+  projectWideViews,
   showcaseSizeHints,
   showcaseSizeLabels,
   showcaseSizes,
@@ -1142,6 +1145,168 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
       </div>
     </>
   );
+  const projectWide = draft.style.projectMode === "full";
+  const projectStack =
+    projectWide && (draft.style.projectWideView === "stack" || draft.style.projectWideView === "stackslide");
+  const projectsAll = (
+    <>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-ink-soft">Mode on Home</span>
+        <div className="flex flex-wrap gap-2">
+          {designModes.map((m) => (
+            <label key={m} className={pill}>
+              <input
+                type="radio"
+                value={m}
+                checked={draft.style.projectMode === m}
+                onChange={() => setStyle({ projectMode: m })}
+                className="sr-only"
+              />
+              {designModeLabels[m]}
+            </label>
+          ))}
+        </div>
+        <p className="text-xs text-ink-soft">{designModeHints[draft.style.projectMode]}</p>
+      </div>
+      {projectWide && (
+        <>
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium text-ink-soft">Layout on Home</span>
+            <div className="flex flex-wrap gap-2">
+              {projectWideViews.map((m) => (
+                <label key={m} className={pill}>
+                  <input
+                    type="radio"
+                    value={m}
+                    checked={draft.style.projectWideView === m}
+                    onChange={() => setStyle({ projectWideView: m })}
+                    className="sr-only"
+                  />
+                  {projectWideViewLabels[m]}
+                </label>
+              ))}
+            </div>
+            <p className="text-xs text-ink-soft">{projectWideViewHints[draft.style.projectWideView]}</p>
+          </div>
+          <Slider
+            id="ui_project_media_wide"
+            label="Photo height"
+            value={draft.style.projectMedia}
+            range={styleRanges.projectMedia}
+            format={(v) => (v === 0 ? "Auto" : `${v} rem`)}
+            hint="Height of the big photos. Auto uses the shape that suits the layout."
+            onChange={(projectMedia) => setStyle({ projectMedia })}
+          />
+        </>
+      )}
+      {projectStack && (
+        <div className="flex flex-col gap-4 border-t border-line pt-4">
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium text-ink-soft">Ratio</span>
+            <div className="flex flex-wrap gap-2">
+              {stackRatios.map((m) => (
+                <label key={m} className={pill}>
+                  <input
+                    type="radio"
+                    value={m}
+                    checked={draft.style.projectStackRatio === m}
+                    onChange={() => setStyle({ projectStackRatio: m })}
+                    className="sr-only"
+                  />
+                  {stackRatioLabels[m]}
+                </label>
+              ))}
+            </div>
+            <p className="text-xs text-ink-soft">{stackRatioHints[draft.style.projectStackRatio]}</p>
+          </div>
+          {(draft.style.projectStackRatio === "wide" || draft.style.projectStackRatio === "ultra") && (
+            <Slider
+              id="ui_project_stack_crop"
+              label="Crop position"
+              value={draft.style.projectStackCrop}
+              range={styleRanges.stackCrop}
+              format={(v) => (v === 0 ? "Top" : v === 100 ? "Bottom" : v === 50 ? "Middle" : `${v}%`)}
+              hint="Which part of the photo shows: Top, Middle or Bottom."
+              onChange={(projectStackCrop) => setStyle({ projectStackCrop })}
+            />
+          )}
+        </div>
+      )}
+      <div className={projectWide ? "hidden" : "contents"}>{projectControls}</div>
+      <div className="flex flex-col gap-4 border-t border-line pt-4">
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Title place</span>
+          <div className="flex flex-wrap gap-2">
+            {designTitleAligns.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.projectTitleAlign === m}
+                  onChange={() => setStyle({ projectTitleAlign: m })}
+                  className="sr-only"
+                />
+                {designTitleAlignLabels[m]}
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-ink-soft">{designTitleAlignHints[draft.style.projectTitleAlign]}</p>
+        </div>
+        <TextFontSelect
+          id="ui_project_title_font"
+          label="Title font"
+          value={draft.style.projectTitleFont}
+          hint="Default is the small label. Pick a font or a size to turn the title into a big heading."
+          onChange={(projectTitleFont) => setStyle({ projectTitleFont })}
+        />
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Title size</span>
+          <div className="flex flex-wrap gap-2">
+            {designTitleSizes.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.projectTitleSize === m}
+                  onChange={() => setStyle({ projectTitleSize: m })}
+                  className="sr-only"
+                />
+                {designTitleSizeLabels[m]}
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-col gap-4 border-t border-line pt-4">
+        <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">Text under the title</span>
+        <TextFontSelect
+          id="ui_project_intro_font"
+          label="Font"
+          value={draft.style.projectIntroFont}
+          hint="Default is the font of the site. The text itself is written in Pages, tab Home, Section titles."
+          onChange={(projectIntroFont) => setStyle({ projectIntroFont })}
+        />
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Size</span>
+          <div className="flex flex-wrap gap-2">
+            {designIntroSizes.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.projectIntroSize === m}
+                  onChange={() => setStyle({ projectIntroSize: m })}
+                  className="sr-only"
+                />
+                {designIntroSizeLabels[m]}
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-ink-soft">Auto follows the size of the title.</p>
+        </div>
+      </div>
+    </>
+  );
   const showcaseWide = draft.style.showcaseMode === "full";
   const showcaseControls = (
     <>
@@ -1420,6 +1585,15 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
       <input type="hidden" name="site_articles_intro_size" value={draft.style.articlesIntroSize} />
       <input type="hidden" name="site_articles_stack_ratio" value={draft.style.articlesStackRatio} />
       <input type="hidden" name="site_articles_stack_crop" value={draft.style.articlesStackCrop} />
+      <input type="hidden" name="site_project_mode" value={draft.style.projectMode} />
+      <input type="hidden" name="site_project_wide_view" value={draft.style.projectWideView} />
+      <input type="hidden" name="site_project_title_align" value={draft.style.projectTitleAlign} />
+      <input type="hidden" name="site_project_title_font" value={draft.style.projectTitleFont} />
+      <input type="hidden" name="site_project_title_size" value={draft.style.projectTitleSize} />
+      <input type="hidden" name="site_project_intro_font" value={draft.style.projectIntroFont} />
+      <input type="hidden" name="site_project_intro_size" value={draft.style.projectIntroSize} />
+      <input type="hidden" name="site_project_stack_ratio" value={draft.style.projectStackRatio} />
+      <input type="hidden" name="site_project_stack_crop" value={draft.style.projectStackCrop} />
       <input type="hidden" name="site_design_stack_ratio" value={draft.style.designStackRatio} />
       <input type="hidden" name="site_design_stack_crop" value={draft.style.designStackCrop} />
       <input type="hidden" name="site_about_layout" value={draft.style.aboutLayout} />
@@ -1582,6 +1756,15 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
                 articlesIntroSize: siteStyleDefaults.articlesIntroSize,
                 articlesStackRatio: siteStyleDefaults.articlesStackRatio,
                 articlesStackCrop: siteStyleDefaults.articlesStackCrop,
+                projectMode: siteStyleDefaults.projectMode,
+                projectWideView: siteStyleDefaults.projectWideView,
+                projectTitleAlign: siteStyleDefaults.projectTitleAlign,
+                projectTitleFont: siteStyleDefaults.projectTitleFont,
+                projectTitleSize: siteStyleDefaults.projectTitleSize,
+                projectIntroFont: siteStyleDefaults.projectIntroFont,
+                projectIntroSize: siteStyleDefaults.projectIntroSize,
+                projectStackRatio: siteStyleDefaults.projectStackRatio,
+                projectStackCrop: siteStyleDefaults.projectStackCrop,
                 designStackRatio: siteStyleDefaults.designStackRatio,
                 designStackCrop: siteStyleDefaults.designStackCrop,
               })
@@ -1598,7 +1781,7 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
               sections={sec}
               selected={picked}
               extra={{
-                projects: projectControls,
+                projects: projectsAll,
                 countdown: countdownControls,
                 writing: writingControls,
                 articles: articlesControls,
