@@ -229,6 +229,13 @@ export function HomeForm({ action, sign, site }: WithMedia) {
         <Field label="Label" htmlFor="visit_title" hint="Optional. Default: Visit website.">
           <Input id="visit_title" name="visit_title" defaultValue={site.visitTitle ?? ""} maxLength={siteLimits.title} />
         </Field>
+        <Field
+          label="Visit website text under the title"
+          htmlFor="visit_home_intro"
+          hint="Optional. Under the Visit website label on Home. Its font, size and place are set in Customize, Sections, Visit website. Up to 400 characters."
+        >
+          <Textarea id="visit_home_intro" name="visit_home_intro" defaultValue={site.visitHomeIntro ?? ""} rows={3} maxLength={siteLimits.intro} />
+        </Field>
         {Array.from({ length: siteLimits.visits }, (_, i) => site.visits[i]).map((item, i) => (
           <div key={i} className="flex flex-col gap-3 border border-line p-3">
             <p className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">Site {i + 1}</p>

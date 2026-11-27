@@ -120,6 +120,8 @@ export type SiteSettings = {
   musicUrl: string | null;
   // The "Visit website" cards of Home and the label above them.
   visitTitle: string | null;
+  // The text under the Visit website label on Home.
+  visitHomeIntro: string | null;
   visits: VisitItem[];
   highlights: Highlight[];
   // Credit (source) text of a media, by the file name of the media.
@@ -293,6 +295,7 @@ export function readSite(raw: unknown): SiteSettings {
     steamMedia: link(r.steamMedia),
     musicUrl: link(r.musicUrl),
     visitTitle: text(r.visitTitle, siteLimits.title),
+    visitHomeIntro: text(r.visitHomeIntro, siteLimits.intro),
     visits: readVisits(r.visits),
     highlights: readHighlights(r.highlights),
     credits: creditMap(r.credits),

@@ -77,6 +77,7 @@ const textSchema = z.object({
   github_title: text("The GitHub label", siteLimits.title),
   steam_id: text("The Steam ID", 120),
   visit_title: text("The Visit website label", siteLimits.title),
+  visit_home_intro: text("The Visit website text on Home", siteLimits.intro),
   projects_title: text("The Projects title", siteLimits.title),
   projects_intro: text("The Projects text", siteLimits.intro),
   writing_title: text("The Writing title", siteLimits.title),
@@ -198,6 +199,7 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     github_title: field(formData, "github_title"),
     steam_id: field(formData, "steam_id"),
     visit_title: field(formData, "visit_title"),
+    visit_home_intro: field(formData, "visit_home_intro"),
     projects_title: field(formData, "projects_title"),
     projects_intro: field(formData, "projects_intro"),
     writing_title: field(formData, "writing_title"),
@@ -273,6 +275,7 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     if ("error" in visits) return abort(visits.error);
     next.visits = visits.items;
     next.visitTitle = v.visit_title ?? null;
+    next.visitHomeIntro = v.visit_home_intro ?? null;
     const music = field(formData, "music_url");
     if (music && !musicEmbed(music)) {
       return abort("The music link must be a YouTube or Spotify link (a video, a song or a playlist).");

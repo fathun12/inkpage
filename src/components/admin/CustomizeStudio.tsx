@@ -2,6 +2,7 @@
 
 import { GithubControls } from "@/components/admin/studio/GithubControls";
 import { LinksControls } from "@/components/admin/studio/LinksControls";
+import { VisitControls } from "@/components/admin/studio/VisitControls";
 import { ShopControls } from "@/components/admin/studio/ShopControls";
 
 import Link from "next/link";
@@ -1780,6 +1781,15 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
       <input type="hidden" name="site_links_title_size" value={draft.style.linksTitleSize} />
       <input type="hidden" name="site_links_intro_font" value={draft.style.linksIntroFont} />
       <input type="hidden" name="site_links_intro_size" value={draft.style.linksIntroSize} />
+      <input type="hidden" name="site_visit_mode" value={draft.style.visitMode} />
+      <input type="hidden" name="site_visit_view" value={draft.style.visitView} />
+      <input type="hidden" name="site_visit_wide_view" value={draft.style.visitWideView} />
+      <input type="hidden" name="site_visit_size" value={draft.style.visitSize} />
+      <input type="hidden" name="site_visit_title_align" value={draft.style.visitTitleAlign} />
+      <input type="hidden" name="site_visit_title_font" value={draft.style.visitTitleFont} />
+      <input type="hidden" name="site_visit_title_size" value={draft.style.visitTitleSize} />
+      <input type="hidden" name="site_visit_intro_font" value={draft.style.visitIntroFont} />
+      <input type="hidden" name="site_visit_intro_size" value={draft.style.visitIntroSize} />
       <input type="hidden" name="site_shop_mode" value={draft.style.shopMode} />
       <input type="hidden" name="site_shop_view" value={draft.style.shopView} />
       <input type="hidden" name="site_shop_wide_view" value={draft.style.shopWideView} />
@@ -1988,6 +1998,15 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
                 linksTitleSize: siteStyleDefaults.linksTitleSize,
                 linksIntroFont: siteStyleDefaults.linksIntroFont,
                 linksIntroSize: siteStyleDefaults.linksIntroSize,
+                visitMode: siteStyleDefaults.visitMode,
+                visitView: siteStyleDefaults.visitView,
+                visitWideView: siteStyleDefaults.visitWideView,
+                visitSize: siteStyleDefaults.visitSize,
+                visitTitleAlign: siteStyleDefaults.visitTitleAlign,
+                visitTitleFont: siteStyleDefaults.visitTitleFont,
+                visitTitleSize: siteStyleDefaults.visitTitleSize,
+                visitIntroFont: siteStyleDefaults.visitIntroFont,
+                visitIntroSize: siteStyleDefaults.visitIntroSize,
                 shopMode: siteStyleDefaults.shopMode,
                 shopView: siteStyleDefaults.shopView,
                 shopWideView: siteStyleDefaults.shopWideView,
@@ -2020,6 +2039,7 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
                 biblia: bibliaControls,
                 github: <GithubControls style={draft.style} onChange={setStyle} />,
                 links: <LinksControls style={draft.style} onChange={setStyle} />,
+                visit: <VisitControls style={draft.style} onChange={setStyle} />,
                 shop: <ShopControls style={draft.style} onChange={setStyle} />,
                 countdown: countdownControls,
                 writing: writingControls,

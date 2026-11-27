@@ -31,6 +31,9 @@ import {
   githubWideViews,
   linksViews,
   linksWideViews,
+  visitViews,
+  visitWideViews,
+  visitSizes,
   shopViews,
   shopWideViews,
   layoutDefaults,
@@ -67,6 +70,9 @@ import {
   type GithubWideView,
   type LinksView,
   type LinksWideView,
+  type VisitView,
+  type VisitWideView,
+  type VisitSize,
   type ShopView,
   type ShopWideView,
   type ProjectSize,
@@ -227,6 +233,15 @@ export type SiteStyle = {
   linksTitleSize: DesignTitleSize;
   linksIntroFont: DesignFont;
   linksIntroSize: DesignIntroSize;
+  visitMode: DesignMode;
+  visitView: VisitView;
+  visitWideView: VisitWideView;
+  visitSize: VisitSize;
+  visitTitleAlign: DesignTitleAlign;
+  visitTitleFont: DesignFont;
+  visitTitleSize: DesignTitleSize;
+  visitIntroFont: DesignFont;
+  visitIntroSize: DesignIntroSize;
   shopMode: DesignMode;
   shopView: ShopView;
   shopWideView: ShopWideView;
@@ -358,6 +373,15 @@ export const siteStyleDefaults: SiteStyle = {
   linksTitleSize: layoutDefaults.linksTitleSize,
   linksIntroFont: layoutDefaults.linksIntroFont,
   linksIntroSize: layoutDefaults.linksIntroSize,
+  visitMode: layoutDefaults.visitMode,
+  visitView: layoutDefaults.visitView,
+  visitWideView: layoutDefaults.visitWideView,
+  visitSize: layoutDefaults.visitSize,
+  visitTitleAlign: layoutDefaults.visitTitleAlign,
+  visitTitleFont: layoutDefaults.visitTitleFont,
+  visitTitleSize: layoutDefaults.visitTitleSize,
+  visitIntroFont: layoutDefaults.visitIntroFont,
+  visitIntroSize: layoutDefaults.visitIntroSize,
   shopMode: layoutDefaults.shopMode,
   shopView: layoutDefaults.shopView,
   shopWideView: layoutDefaults.shopWideView,
@@ -497,6 +521,15 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     linksTitleSize: readChoice(r.linksTitleSize, designTitleSizes, d.linksTitleSize),
     linksIntroFont: readChoice(r.linksIntroFont, designTextFonts, d.linksIntroFont),
     linksIntroSize: readChoice(r.linksIntroSize, designIntroSizes, d.linksIntroSize),
+    visitMode: readChoice(r.visitMode, designModes, d.visitMode),
+    visitView: readChoice(r.visitView, visitViews, d.visitView),
+    visitWideView: readChoice(r.visitWideView, visitWideViews, d.visitWideView),
+    visitSize: readChoice(r.visitSize, visitSizes, d.visitSize),
+    visitTitleAlign: readChoice(r.visitTitleAlign, designTitleAligns, d.visitTitleAlign),
+    visitTitleFont: readChoice(r.visitTitleFont, designTextFonts, d.visitTitleFont),
+    visitTitleSize: readChoice(r.visitTitleSize, designTitleSizes, d.visitTitleSize),
+    visitIntroFont: readChoice(r.visitIntroFont, designTextFonts, d.visitIntroFont),
+    visitIntroSize: readChoice(r.visitIntroSize, designIntroSizes, d.visitIntroSize),
     shopMode: readChoice(r.shopMode, designModes, d.shopMode),
     shopView: readChoice(r.shopView, shopViews, d.shopView),
     shopWideView: readChoice(r.shopWideView, shopWideViews, d.shopWideView),

@@ -444,6 +444,54 @@ export const linksWideViewHints: Record<LinksWideView, string> = {
   slide: "One link at a time across the whole screen, its title huge. It slides by itself and has arrows.",
 };
 
+// The Visit website section of Home (cards that point to other websites). Grid is the original look.
+// Mode (Centered or Full width), the title place, the fonts and the title sizes reuse the names above.
+// No Ratio, Crop or Photo height: the cards have no photos. Size (cards per row) only for Centered + Grid.
+export const visitViews = ["grid", "index", "slider"] as const;
+export type VisitView = (typeof visitViews)[number];
+
+export const visitViewLabels: Record<VisitView, string> = {
+  grid: "Grid",
+  index: "Index",
+  slider: "Slider",
+};
+
+export const visitViewHints: Record<VisitView, string> = {
+  grid: "Cards in a grid, each with a thin line on top, the name, the text and a Visit button (the original).",
+  index: "One site per row: a number, its name big, the text, and Visit on the right.",
+  slider: "One site big at a time. It slides by itself and has arrows.",
+};
+
+export const visitWideViews = ["edge", "stack", "slide"] as const;
+export type VisitWideView = (typeof visitWideViews)[number];
+
+export const visitWideViewLabels: Record<VisitWideView, string> = {
+  edge: "Edge index",
+  stack: "Stack",
+  slide: "Site slide",
+};
+
+export const visitWideViewHints: Record<VisitWideView, string> = {
+  edge: "Like Index, but the rows and the lines run edge to edge.",
+  stack: "Every site is a block across the whole screen, its name huge, with the text and Visit under it.",
+  slide: "One site at a time across the whole screen, its name huge. It slides by itself and has arrows.",
+};
+
+export const visitSizes = ["small", "medium", "large"] as const;
+export type VisitSize = (typeof visitSizes)[number];
+
+export const visitSizeLabels: Record<VisitSize, string> = {
+  small: "Small",
+  medium: "Medium",
+  large: "Large",
+};
+
+export const visitSizeHints: Record<VisitSize, string> = {
+  small: "4 cards in a row on a wide screen.",
+  medium: "3 cards in a row (the original).",
+  large: "2 cards in a row.",
+};
+
 // The Shop section of Home (product cards). Grid is the original look.
 // Mode (Centered or Full width), the title place, the fonts, the title sizes and the Stack ratio reuse the names above.
 // A product photo is square, so Ratio and Crop only matter in Stack and Stack slide.
@@ -591,6 +639,15 @@ export const layoutDefaults: {
   linksTitleSize: DesignTitleSize;
   linksIntroFont: DesignFont;
   linksIntroSize: DesignIntroSize;
+  visitMode: DesignMode;
+  visitView: VisitView;
+  visitWideView: VisitWideView;
+  visitSize: VisitSize;
+  visitTitleAlign: DesignTitleAlign;
+  visitTitleFont: DesignFont;
+  visitTitleSize: DesignTitleSize;
+  visitIntroFont: DesignFont;
+  visitIntroSize: DesignIntroSize;
   shopMode: DesignMode;
   shopView: ShopView;
   shopWideView: ShopWideView;
@@ -692,6 +749,15 @@ export const layoutDefaults: {
   linksTitleSize: "auto",
   linksIntroFont: "default",
   linksIntroSize: "auto",
+  visitMode: "centered",
+  visitView: "grid",
+  visitWideView: "edge",
+  visitSize: "medium",
+  visitTitleAlign: "center",
+  visitTitleFont: "default",
+  visitTitleSize: "auto",
+  visitIntroFont: "default",
+  visitIntroSize: "auto",
   shopMode: "centered",
   shopView: "grid",
   shopWideView: "stack",

@@ -19,7 +19,7 @@ import { HomeShowcase } from "@/components/site/HomeShowcase";
 import { HomeLinks } from "@/components/site/HomeLinks";
 import { Reveal } from "@/components/site/Reveal";
 import { SectionBox } from "@/components/site/SectionBox";
-import { VisitCards } from "@/components/site/VisitCards";
+import { HomeVisit } from "@/components/site/HomeVisit";
 import { readBackground } from "@/config/background";
 import type { SectionId } from "@/config/layout";
 import { cleanUrl } from "@/config/seo";
@@ -350,7 +350,21 @@ export default async function HomePage({ params }: Props) {
     ),
     visit: on("visit") && (
       <SectionBox setting={sec.visit}>
-        <VisitCards items={site.visits} title={site.visitTitle ?? "Visit website"} />
+        <HomeVisit
+          items={site.visits}
+          title={site.visitTitle ?? "Visit website"}
+          intro={site.visitHomeIntro}
+          seconds={style.heroSeconds}
+          mode={style.visitMode}
+          view={style.visitView}
+          wideView={style.visitWideView}
+          size={style.visitSize}
+          titleAlign={style.visitTitleAlign}
+          titleFont={style.visitTitleFont}
+          titleSize={style.visitTitleSize}
+          introFont={style.visitIntroFont}
+          introSize={style.visitIntroSize}
+        />
       </SectionBox>
     ),
     gallery: on("gallery") && (

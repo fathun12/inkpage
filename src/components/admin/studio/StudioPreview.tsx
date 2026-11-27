@@ -23,7 +23,7 @@ import { SiteFooter } from "@/components/site/SiteFooter";
 import { SiteFrame } from "@/components/site/SiteFrame";
 import { SiteHeader } from "@/components/site/SiteHeader";
 import type { Mode } from "@/components/site/ThemeSwitch";
-import { VisitCards } from "@/components/site/VisitCards";
+import { HomeVisit } from "@/components/site/HomeVisit";
 import { fontIds, type FontId, type FontPair } from "@/config/font-choices";
 import { resolveGreetings } from "@/config/intro";
 import { sectionLabels, type SectionId } from "@/config/layout";
@@ -494,7 +494,21 @@ export function StudioPreview({
     ),
     visit: on("visit") && (
       <SectionBox setting={sec.visit}>
-        <VisitCards items={site.visits} title={site.visitTitle ?? "Visit website"} />
+        <HomeVisit
+          items={site.visits}
+          title={site.visitTitle ?? "Visit website"}
+          intro={site.visitHomeIntro}
+          seconds={draft.style.heroSeconds}
+          mode={draft.style.visitMode}
+          view={draft.style.visitView}
+          wideView={draft.style.visitWideView}
+          size={draft.style.visitSize}
+          titleAlign={draft.style.visitTitleAlign}
+          titleFont={draft.style.visitTitleFont}
+          titleSize={draft.style.visitTitleSize}
+          introFont={draft.style.visitIntroFont}
+          introSize={draft.style.visitIntroSize}
+        />
       </SectionBox>
     ),
     gallery: on("gallery") && (
