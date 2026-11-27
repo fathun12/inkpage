@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { AboutSection } from "@/components/site/AboutSection";
+import { AboutSteam } from "@/components/site/AboutSteam";
 import { JsonLd } from "@/components/site/JsonLd";
 import { PageIntro } from "@/components/site/PageIntro";
 import { cleanUrl } from "@/config/seo";
 import { hasAbout, readSite } from "@/config/site-content";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
+import { fetchSteam } from "@/features/site/steam";
 import { personLd } from "@/lib/person-ld";
 import { socialsOf } from "@/lib/site-view";
 
@@ -31,7 +33,8 @@ export default async function AboutPage({ params }: Props) {
   const site = readSite(profile.site);
   if (!hasAbout(site)) notFound();
 
-  const person = personLd(profile, site, socialsOf(await getPublicBlocks(profile.id)));
+  const [blocks, steam] = await Promise.all([getPublicBlocks(profile.id), fetchSteam(site.steamId)]);
+  const person = personLd(profile, site, socialsOf(blocks));
   const url = cleanUrl(profile.username, "/about");
 
   return (
@@ -46,6 +49,7 @@ export default async function AboutPage({ params }: Props) {
         body={site.about.body}
         photo={site.about.photo}
       />
+      {steam && <AboutSteam data={steam} />}
     </>
   );
 }
