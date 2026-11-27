@@ -6,6 +6,7 @@ import {
   emailAddress,
   fileKey,
   githubName,
+  steamIdNumber,
   whatsappNumber,
   readSite,
   siteLimits,
@@ -64,6 +65,7 @@ const textSchema = z.object({
   designs_title: text("The design projects label", siteLimits.title),
   designs_intro: text("The design projects text", siteLimits.intro),
   github_title: text("The GitHub label", siteLimits.title),
+  steam_id: text("The Steam ID", 120),
   visit_title: text("The Visit website label", siteLimits.title),
   projects_title: text("The Projects title", siteLimits.title),
   projects_intro: text("The Projects text", siteLimits.intro),
@@ -176,6 +178,7 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     designs_title: field(formData, "designs_title"),
     designs_intro: field(formData, "designs_intro"),
     github_title: field(formData, "github_title"),
+    steam_id: field(formData, "steam_id"),
     visit_title: field(formData, "visit_title"),
     projects_title: field(formData, "projects_title"),
     projects_intro: field(formData, "projects_intro"),
@@ -286,6 +289,16 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
       return abort(`Each other name can be at most ${siteLimits.altName} characters.`);
     }
     next.alternateNames = [...new Set(names)];
+    // A pasted profile address is accepted: only the 17 digits are kept.
+    const steam = v.steam_id
+      ?.replace(/^https?:\/\/(www\.)?steamcommunity\.com\/profiles\//i, "")
+      .replace(/[/?#].*$/, "");
+    if (steam && !steamIdNumber(steam)) {
+      return abort(
+        "The Steam ID must be 17 digits that start with 7656119. Example: 76561198324590157. A custom address (/id/name) does not work here.",
+      );
+    }
+    next.steamId = steam ? steam : null;
   }
   if (tab === "footer") {
     next.footerNote = v.footer_note ?? null;

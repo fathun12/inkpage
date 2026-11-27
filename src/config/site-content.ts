@@ -97,6 +97,8 @@ export type SiteSettings = {
   // GitHub username (empty = no GitHub section) and its label.
   githubUser: string | null;
   githubTitle: string | null;
+  // Steam profile (SteamID64, 17 digits). Empty = no Steam section on the About page.
+  steamId: string | null;
   // YouTube or Spotify link of the music player (empty = no player).
   musicUrl: string | null;
   // The "Visit website" cards of Home and the label above them.
@@ -155,6 +157,11 @@ function creditMap(v: unknown): Record<string, string> {
 // A GitHub username: letters, numbers and single hyphens, 1 to 39 characters.
 export function githubName(v: unknown): string | null {
   return typeof v === "string" && /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})$/.test(v) ? v : null;
+}
+
+// A SteamID64: 17 digits that start with 7656119.
+export function steamIdNumber(v: unknown): string | null {
+  return typeof v === "string" && /^7656119\d{10}$/.test(v) ? v : null;
 }
 
 // An email address: one @, a dot in the domain, no spaces.
@@ -257,6 +264,7 @@ export function readSite(raw: unknown): SiteSettings {
     designsIntro: text(r.designsIntro, siteLimits.intro),
     githubUser: githubName(r.githubUser),
     githubTitle: text(r.githubTitle, siteLimits.title),
+    steamId: steamIdNumber(r.steamId),
     musicUrl: link(r.musicUrl),
     visitTitle: text(r.visitTitle, siteLimits.title),
     visits: readVisits(r.visits),

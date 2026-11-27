@@ -46,4 +46,8 @@ export const env = {
   get dodoWebhookKey() {
     return process.env.DODO_PAYMENTS_WEBHOOK_KEY || undefined;
   },
+  // Steam Web API key, server only. Optional: without it the Steam section stays hidden.
+  get steamApiKey() {
+    return process.env.STEAM_API_KEY || undefined;
+  },
 };
