@@ -340,6 +340,44 @@ export const projectWideViewHints: Record<ProjectWideView, string> = {
   sheet: "Photos that touch each other. The title shows on hover (always on a phone).",
 };
 
+// The Biblia section of Home (book covers from the library). Grid is the original look.
+// Mode (Centered or Full width), the grid size, the title place, the fonts and the title sizes reuse the names above.
+// No Ratio, Crop or Photo height: a cover is always shown whole.
+export const bibliaViews = ["grid", "shelf", "list"] as const;
+export type BibliaView = (typeof bibliaViews)[number];
+
+export const bibliaViewLabels: Record<BibliaView, string> = {
+  grid: "Grid",
+  shelf: "Shelf",
+  list: "List",
+};
+
+export const bibliaViewHints: Record<BibliaView, string> = {
+  grid: "Covers in a grid (the original): 2 columns on a phone, up to 6 on a wide screen.",
+  shelf: "One row of covers that slides by itself and has arrows.",
+  list: "One book per row: a small cover, the big title, the author and year. A quiet library list.",
+};
+
+export const bibliaSizeHints: Record<WritingSize, string> = {
+  small: "Six covers per row on a wide screen (the original).",
+  medium: "Four covers per row on a wide screen.",
+  large: "Three covers per row on a wide screen.",
+};
+
+export const bibliaWideViews = ["row", "feature"] as const;
+export type BibliaWideView = (typeof bibliaWideViews)[number];
+
+export const bibliaWideViewLabels: Record<BibliaWideView, string> = {
+  row: "Row",
+  feature: "Feature",
+};
+
+export const bibliaWideViewHints: Record<BibliaWideView, string> = {
+  row: "All covers in one row, edge to edge. The title shows on hover (always on a phone).",
+  feature:
+    "One book big at a time across the whole screen, its cover whole and never cropped. It slides by itself and has arrows.",
+};
+
 // How the Countdown section looks.
 export const countdownViews = ["section", "strip"] as const;
 export type CountdownView = (typeof countdownViews)[number];
@@ -419,6 +457,15 @@ export const layoutDefaults: {
   projectIntroSize: DesignIntroSize;
   projectStackRatio: StackRatio;
   projectStackCrop: number;
+  bibliaMode: DesignMode;
+  bibliaView: BibliaView;
+  bibliaWideView: BibliaWideView;
+  bibliaSize: WritingSize;
+  bibliaTitleAlign: DesignTitleAlign;
+  bibliaTitleFont: DesignFont;
+  bibliaTitleSize: DesignTitleSize;
+  bibliaIntroFont: DesignFont;
+  bibliaIntroSize: DesignIntroSize;
 } = {
   density: "comfortable",
   projectSize: "large",
@@ -483,6 +530,15 @@ export const layoutDefaults: {
   projectIntroSize: "auto",
   projectStackRatio: "default",
   projectStackCrop: 50,
+  bibliaMode: "centered",
+  bibliaView: "grid",
+  bibliaWideView: "row",
+  bibliaSize: "small",
+  bibliaTitleAlign: "center",
+  bibliaTitleFont: "default",
+  bibliaTitleSize: "auto",
+  bibliaIntroFont: "default",
+  bibliaIntroSize: "auto",
 };
 
 // Safe reader: an unknown or missing value falls back to the default.

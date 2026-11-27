@@ -3,7 +3,7 @@ import type { BibliaBook } from "@/types/biblia";
 import { Reveal } from "./Reveal";
 
 // One book as a cover card. It opens the book page on Biblia in a new tab.
-function BibliaCard({ book }: { book: BibliaBook }) {
+export function BibliaCard({ book }: { book: BibliaBook }) {
   const by = `${book.authors.join(", ") || "Unknown author"}${book.year ? ` (${book.year})` : ""}`;
   return (
     <a href={book.href} target="_blank" rel="noopener noreferrer" className="group block">
@@ -33,11 +33,17 @@ function BibliaCard({ book }: { book: BibliaBook }) {
 }
 
 // The book covers in a grid: 2 columns on a phone, 3 on a tablet, 6 on a wide screen.
-export function BibliaGrid({ books, bottom }: { books: BibliaBook[]; bottom: string }) {
+export function BibliaGrid({
+  books,
+  bottom,
+  columns = "sm:grid-cols-3 lg:grid-cols-6",
+}: {
+  books: BibliaBook[];
+  bottom: string;
+  columns?: string;
+}) {
   return (
-    <ul
-      className={`mx-auto grid max-w-5xl grid-cols-2 gap-x-5 gap-y-10 px-5 sm:grid-cols-3 sm:px-8 lg:grid-cols-6 ${bottom}`}
-    >
+    <ul className={`mx-auto grid max-w-5xl grid-cols-2 gap-x-5 gap-y-10 px-5 sm:px-8 ${columns} ${bottom}`}>
       {books.map((book) => (
         <li key={book.slug}>
           <Reveal variant="still">

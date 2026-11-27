@@ -78,6 +78,13 @@ import {
   projectWideViewHints,
   projectWideViewLabels,
   projectWideViews,
+  bibliaSizeHints,
+  bibliaViewHints,
+  bibliaViewLabels,
+  bibliaViews,
+  bibliaWideViewHints,
+  bibliaWideViewLabels,
+  bibliaWideViews,
   showcaseSizeHints,
   showcaseSizeLabels,
   showcaseSizes,
@@ -1307,6 +1314,156 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
       </div>
     </>
   );
+  const bibliaWide = draft.style.bibliaMode === "full";
+  const bibliaControls = (
+    <>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-ink-soft">Mode on Home</span>
+        <div className="flex flex-wrap gap-2">
+          {designModes.map((m) => (
+            <label key={m} className={pill}>
+              <input
+                type="radio"
+                value={m}
+                checked={draft.style.bibliaMode === m}
+                onChange={() => setStyle({ bibliaMode: m })}
+                className="sr-only"
+              />
+              {designModeLabels[m]}
+            </label>
+          ))}
+        </div>
+        <p className="text-xs text-ink-soft">{designModeHints[draft.style.bibliaMode]}</p>
+      </div>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-ink-soft">Layout on Home</span>
+        <div className="flex flex-wrap gap-2">
+          {bibliaWide
+            ? bibliaWideViews.map((m) => (
+                <label key={m} className={pill}>
+                  <input
+                    type="radio"
+                    value={m}
+                    checked={draft.style.bibliaWideView === m}
+                    onChange={() => setStyle({ bibliaWideView: m })}
+                    className="sr-only"
+                  />
+                  {bibliaWideViewLabels[m]}
+                </label>
+              ))
+            : bibliaViews.map((m) => (
+                <label key={m} className={pill}>
+                  <input
+                    type="radio"
+                    value={m}
+                    checked={draft.style.bibliaView === m}
+                    onChange={() => setStyle({ bibliaView: m })}
+                    className="sr-only"
+                  />
+                  {bibliaViewLabels[m]}
+                </label>
+              ))}
+        </div>
+        <p className="text-xs text-ink-soft">
+          {bibliaWide
+            ? bibliaWideViewHints[draft.style.bibliaWideView]
+            : bibliaViewHints[draft.style.bibliaView]}
+        </p>
+      </div>
+      {!bibliaWide && draft.style.bibliaView === "grid" && (
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Size on Home</span>
+          <div className="flex flex-wrap gap-2">
+            {writingSizes.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.bibliaSize === m}
+                  onChange={() => setStyle({ bibliaSize: m })}
+                  className="sr-only"
+                />
+                {writingSizeLabels[m]}
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-ink-soft">{bibliaSizeHints[draft.style.bibliaSize]}</p>
+        </div>
+      )}
+      <div className="flex flex-col gap-4 border-t border-line pt-4">
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Title place</span>
+          <div className="flex flex-wrap gap-2">
+            {designTitleAligns.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.bibliaTitleAlign === m}
+                  onChange={() => setStyle({ bibliaTitleAlign: m })}
+                  className="sr-only"
+                />
+                {designTitleAlignLabels[m]}
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-ink-soft">{designTitleAlignHints[draft.style.bibliaTitleAlign]}</p>
+        </div>
+        <TextFontSelect
+          id="ui_biblia_title_font"
+          label="Title font"
+          value={draft.style.bibliaTitleFont}
+          hint="Default is the small label. Pick a font or a size to turn the title into a big heading."
+          onChange={(bibliaTitleFont) => setStyle({ bibliaTitleFont })}
+        />
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Title size</span>
+          <div className="flex flex-wrap gap-2">
+            {designTitleSizes.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.bibliaTitleSize === m}
+                  onChange={() => setStyle({ bibliaTitleSize: m })}
+                  className="sr-only"
+                />
+                {designTitleSizeLabels[m]}
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-col gap-4 border-t border-line pt-4">
+        <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">Text under the title</span>
+        <TextFontSelect
+          id="ui_biblia_intro_font"
+          label="Font"
+          value={draft.style.bibliaIntroFont}
+          hint="Default is the font of the site. The text itself is written in Pages, tab Home, Section titles."
+          onChange={(bibliaIntroFont) => setStyle({ bibliaIntroFont })}
+        />
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Size</span>
+          <div className="flex flex-wrap gap-2">
+            {designIntroSizes.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.bibliaIntroSize === m}
+                  onChange={() => setStyle({ bibliaIntroSize: m })}
+                  className="sr-only"
+                />
+                {designIntroSizeLabels[m]}
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-ink-soft">Auto follows the size of the title.</p>
+        </div>
+      </div>
+    </>
+  );
   const showcaseWide = draft.style.showcaseMode === "full";
   const showcaseControls = (
     <>
@@ -1594,6 +1751,15 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
       <input type="hidden" name="site_project_intro_size" value={draft.style.projectIntroSize} />
       <input type="hidden" name="site_project_stack_ratio" value={draft.style.projectStackRatio} />
       <input type="hidden" name="site_project_stack_crop" value={draft.style.projectStackCrop} />
+      <input type="hidden" name="site_biblia_mode" value={draft.style.bibliaMode} />
+      <input type="hidden" name="site_biblia_view" value={draft.style.bibliaView} />
+      <input type="hidden" name="site_biblia_wide_view" value={draft.style.bibliaWideView} />
+      <input type="hidden" name="site_biblia_size" value={draft.style.bibliaSize} />
+      <input type="hidden" name="site_biblia_title_align" value={draft.style.bibliaTitleAlign} />
+      <input type="hidden" name="site_biblia_title_font" value={draft.style.bibliaTitleFont} />
+      <input type="hidden" name="site_biblia_title_size" value={draft.style.bibliaTitleSize} />
+      <input type="hidden" name="site_biblia_intro_font" value={draft.style.bibliaIntroFont} />
+      <input type="hidden" name="site_biblia_intro_size" value={draft.style.bibliaIntroSize} />
       <input type="hidden" name="site_design_stack_ratio" value={draft.style.designStackRatio} />
       <input type="hidden" name="site_design_stack_crop" value={draft.style.designStackCrop} />
       <input type="hidden" name="site_about_layout" value={draft.style.aboutLayout} />
@@ -1765,6 +1931,15 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
                 projectIntroSize: siteStyleDefaults.projectIntroSize,
                 projectStackRatio: siteStyleDefaults.projectStackRatio,
                 projectStackCrop: siteStyleDefaults.projectStackCrop,
+                bibliaMode: siteStyleDefaults.bibliaMode,
+                bibliaView: siteStyleDefaults.bibliaView,
+                bibliaWideView: siteStyleDefaults.bibliaWideView,
+                bibliaSize: siteStyleDefaults.bibliaSize,
+                bibliaTitleAlign: siteStyleDefaults.bibliaTitleAlign,
+                bibliaTitleFont: siteStyleDefaults.bibliaTitleFont,
+                bibliaTitleSize: siteStyleDefaults.bibliaTitleSize,
+                bibliaIntroFont: siteStyleDefaults.bibliaIntroFont,
+                bibliaIntroSize: siteStyleDefaults.bibliaIntroSize,
                 designStackRatio: siteStyleDefaults.designStackRatio,
                 designStackCrop: siteStyleDefaults.designStackCrop,
               })
@@ -1782,6 +1957,7 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
               selected={picked}
               extra={{
                 projects: projectsAll,
+                biblia: bibliaControls,
                 countdown: countdownControls,
                 writing: writingControls,
                 articles: articlesControls,

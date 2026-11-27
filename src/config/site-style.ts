@@ -25,6 +25,8 @@ import {
   articleViews,
   articleWideViews,
   projectWideViews,
+  bibliaViews,
+  bibliaWideViews,
   layoutDefaults,
   projectSizes,
   projectViews,
@@ -53,6 +55,8 @@ import {
   type ArticleView,
   type ArticleWideView,
   type ProjectWideView,
+  type BibliaView,
+  type BibliaWideView,
   type ProjectSize,
   type ProjectView,
   type SectionId,
@@ -185,6 +189,15 @@ export type SiteStyle = {
   projectIntroSize: DesignIntroSize;
   projectStackRatio: StackRatio;
   projectStackCrop: number;
+  bibliaMode: DesignMode;
+  bibliaView: BibliaView;
+  bibliaWideView: BibliaWideView;
+  bibliaSize: WritingSize;
+  bibliaTitleAlign: DesignTitleAlign;
+  bibliaTitleFont: DesignFont;
+  bibliaTitleSize: DesignTitleSize;
+  bibliaIntroFont: DesignFont;
+  bibliaIntroSize: DesignIntroSize;
   sections: SectionSettings;
   order: SectionId[];
   aboutLayout: AboutLayout;
@@ -279,6 +292,15 @@ export const siteStyleDefaults: SiteStyle = {
   projectIntroSize: layoutDefaults.projectIntroSize,
   projectStackRatio: layoutDefaults.projectStackRatio,
   projectStackCrop: layoutDefaults.projectStackCrop,
+  bibliaMode: layoutDefaults.bibliaMode,
+  bibliaView: layoutDefaults.bibliaView,
+  bibliaWideView: layoutDefaults.bibliaWideView,
+  bibliaSize: layoutDefaults.bibliaSize,
+  bibliaTitleAlign: layoutDefaults.bibliaTitleAlign,
+  bibliaTitleFont: layoutDefaults.bibliaTitleFont,
+  bibliaTitleSize: layoutDefaults.bibliaTitleSize,
+  bibliaIntroFont: layoutDefaults.bibliaIntroFont,
+  bibliaIntroSize: layoutDefaults.bibliaIntroSize,
   sections: sectionDefaults,
   order: [...sectionIds],
   aboutLayout: aboutDefaults.aboutLayout,
@@ -381,6 +403,15 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     projectIntroSize: readChoice(r.projectIntroSize, designIntroSizes, d.projectIntroSize),
     projectStackRatio: readChoice(r.projectStackRatio, stackRatios, d.projectStackRatio),
     projectStackCrop: num(r.projectStackCrop, styleRanges.stackCrop, d.projectStackCrop),
+    bibliaMode: readChoice(r.bibliaMode, designModes, d.bibliaMode),
+    bibliaView: readChoice(r.bibliaView, bibliaViews, d.bibliaView),
+    bibliaWideView: readChoice(r.bibliaWideView, bibliaWideViews, d.bibliaWideView),
+    bibliaSize: readChoice(r.bibliaSize, writingSizes, d.bibliaSize),
+    bibliaTitleAlign: readChoice(r.bibliaTitleAlign, designTitleAligns, d.bibliaTitleAlign),
+    bibliaTitleFont: readChoice(r.bibliaTitleFont, designTextFonts, d.bibliaTitleFont),
+    bibliaTitleSize: readChoice(r.bibliaTitleSize, designTitleSizes, d.bibliaTitleSize),
+    bibliaIntroFont: readChoice(r.bibliaIntroFont, designTextFonts, d.bibliaIntroFont),
+    bibliaIntroSize: readChoice(r.bibliaIntroSize, designIntroSizes, d.bibliaIntroSize),
     designMedia: num(r.designMedia, styleRanges.designMedia, d.designMedia),
     designCount: num(r.designCount, styleRanges.designCount, d.designCount),
     sections: readSections(r.sections),

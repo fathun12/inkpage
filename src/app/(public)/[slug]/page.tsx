@@ -219,7 +219,22 @@ export default async function HomePage({ params }: Props) {
     ),
     biblia: biblia && on("biblia") && (
       <SectionBox setting={sec.biblia}>
-        <HomeBiblia data={biblia} title={site.bibliaTitle ?? "Biblia"} seeAll={`/${profile.username}/biblia`} />
+        <HomeBiblia
+          data={biblia}
+          title={site.bibliaTitle ?? "Biblia"}
+          seeAll={`/${profile.username}/biblia`}
+          seconds={style.heroSeconds}
+          mode={style.bibliaMode}
+          view={style.bibliaView}
+          wideView={style.bibliaWideView}
+          size={style.bibliaSize}
+          intro={site.bibliaHomeIntro}
+          titleAlign={style.bibliaTitleAlign}
+          titleFont={style.bibliaTitleFont}
+          titleSize={style.bibliaTitleSize}
+          introFont={style.bibliaIntroFont}
+          introSize={style.bibliaIntroSize}
+        />
       </SectionBox>
     ),
     github: github && on("github") && (

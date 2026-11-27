@@ -363,7 +363,22 @@ export function StudioPreview({
     ),
     biblia: biblia && on("biblia") && (
       <SectionBox setting={sec.biblia}>
-        <HomeBiblia data={biblia} title={site.bibliaTitle ?? "Biblia"} seeAll={`${base}/biblia`} />
+        <HomeBiblia
+          data={biblia}
+          title={site.bibliaTitle ?? "Biblia"}
+          seeAll={`${base}/biblia`}
+          seconds={draft.style.heroSeconds}
+          mode={draft.style.bibliaMode}
+          view={draft.style.bibliaView}
+          wideView={draft.style.bibliaWideView}
+          size={draft.style.bibliaSize}
+          intro={site.bibliaHomeIntro}
+          titleAlign={draft.style.bibliaTitleAlign}
+          titleFont={draft.style.bibliaTitleFont}
+          titleSize={draft.style.bibliaTitleSize}
+          introFont={draft.style.bibliaIntroFont}
+          introSize={draft.style.bibliaIntroSize}
+        />
       </SectionBox>
     ),
     github: github && on("github") && (
