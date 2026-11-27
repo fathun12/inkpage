@@ -322,6 +322,20 @@ export function StudioPreview({
           username={profile.username}
           title={site.articles.title ?? "Articles"}
           joined={joined}
+          mode={draft.style.articlesMode}
+          view={draft.style.articlesView}
+          wideView={draft.style.articlesWideView}
+          size={draft.style.articlesSize}
+          mediaHeight={draft.style.articlesMedia}
+          stackRatio={draft.style.articlesStackRatio}
+          stackCrop={draft.style.articlesStackCrop}
+          seconds={draft.style.heroSeconds}
+          intro={site.articlesHomeIntro}
+          titleAlign={draft.style.articlesTitleAlign}
+          titleFont={draft.style.articlesTitleFont}
+          titleSize={draft.style.articlesTitleSize}
+          introFont={draft.style.articlesIntroFont}
+          introSize={draft.style.articlesIntroSize}
         />
       </SectionBox>
     ),

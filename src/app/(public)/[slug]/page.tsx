@@ -178,6 +178,20 @@ export default async function HomePage({ params }: Props) {
           username={profile.username}
           title={site.articles.title ?? "Articles"}
           joined={joined}
+          mode={style.articlesMode}
+          view={style.articlesView}
+          wideView={style.articlesWideView}
+          size={style.articlesSize}
+          mediaHeight={style.articlesMedia}
+          stackRatio={style.articlesStackRatio}
+          stackCrop={style.articlesStackCrop}
+          seconds={style.heroSeconds}
+          intro={site.articlesHomeIntro}
+          titleAlign={style.articlesTitleAlign}
+          titleFont={style.articlesTitleFont}
+          titleSize={style.articlesTitleSize}
+          introFont={style.articlesIntroFont}
+          introSize={style.articlesIntroSize}
         />
       </SectionBox>
     ),
