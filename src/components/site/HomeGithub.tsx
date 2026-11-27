@@ -39,7 +39,7 @@ function Bars({ data, className }: { data: GithubData; className: string }) {
   const max = Math.max(1, ...data.days);
   return (
     <div
-      className={`flex items-end gap-[3px] ${className}`}
+      className={`flex items-end gap-0.75 ${className}`}
       role="img"
       aria-label={`${data.commits} public commits in the last 30 days`}
     >
@@ -157,7 +157,7 @@ function Rows({ repos, edge }: { repos: GithubRepo[]; edge: boolean }) {
             >
               <span className="font-mono text-[11px] tracking-widest opacity-60">{two(i + 1)}</span>
               <span className="min-w-0">
-                <span className="block break-words font-display text-2xl leading-tight underline-offset-4 group-hover:underline sm:text-4xl">
+                <span className="block wrap-break-word font-display text-2xl leading-tight underline-offset-4 group-hover:underline sm:text-4xl">
                   {repo.name}
                 </span>
                 {repo.description && (
@@ -230,7 +230,7 @@ function Stats({ data }: { data: GithubData }) {
           {numbers.map((item) => (
             <div key={item.label} className="min-w-0">
               <p className="font-display text-[clamp(2.25rem,13vw,8rem)] leading-none tabular-nums">{item.n}</p>
-              <p className="mt-3 break-words font-mono text-[10px] uppercase tracking-widest opacity-70">
+              <p className="mt-3 wrap-break-word font-mono text-[10px] uppercase tracking-widest opacity-70">
                 {item.label}
               </p>
             </div>
@@ -285,13 +285,13 @@ function RepoSlide({ data, seconds }: { data: GithubData; seconds: number }) {
                 href={repo.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex min-h-[22rem] flex-col justify-between gap-10 border-y border-band-line px-5 py-8 sm:min-h-[26rem] sm:px-8 sm:py-12"
+                className="group flex min-h-88 flex-col justify-between gap-10 border-y border-band-line px-5 py-8 sm:min-h-104 sm:px-8 sm:py-12"
               >
                 <span className="font-mono text-[11px] tracking-widest opacity-70">
                   {two(i + 1)} / {two(repos.length)}
                 </span>
                 <span className="block min-w-0">
-                  <span className="block break-words font-display text-[clamp(2.5rem,11vw,9rem)] leading-[0.95] tracking-tight underline-offset-8 group-hover:underline">
+                  <span className="block wrap-break-word font-display text-[clamp(2.5rem,11vw,9rem)] leading-[0.95] tracking-tight underline-offset-8 group-hover:underline">
                     {repo.name}
                   </span>
                   {repo.description && (

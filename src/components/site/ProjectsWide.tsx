@@ -152,7 +152,7 @@ function Stack({
 // The second media (B) is a thin strip under the photo.
 function Split({ entries, height }: Shape) {
   const style = height > 0 ? { height: `${height}rem` } : undefined;
-  const ratio = height > 0 ? "" : "aspect-[4/3] md:aspect-[4/5]";
+  const ratio = height > 0 ? "" : "aspect-4/3 md:aspect-[4/5]";
   return (
     <ul className="flex flex-col gap-16 sm:gap-24">
       {entries.map((e, i) => (
@@ -160,7 +160,7 @@ function Split({ entries, height }: Shape) {
           <Reveal variant="still" className={i % 2 === 1 ? "md:order-2" : undefined}>
             <Frame entry={e} eager={i === 0} className={ratio} style={style} />
             {e.b && (
-              <div className="relative mt-px aspect-[16/9] w-full overflow-hidden bg-surface">
+              <div className="relative mt-px aspect-video w-full overflow-hidden bg-surface">
                 <ItemMedia file={e.b} eager={false} inFrame index={1} />
               </div>
             )}

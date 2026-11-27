@@ -129,7 +129,7 @@ function ListRows({ products, open, base }: Common) {
                 href={`${base}/${product.slug}`}
                 className="group grid grid-cols-[4.5rem_minmax(0,1fr)] items-center gap-x-5 gap-y-3 py-5 sm:grid-cols-[6rem_minmax(0,1fr)_auto] sm:gap-x-8 sm:py-6"
               >
-                <div className="row-span-2 w-[4.5rem] sm:row-span-1 sm:w-24">
+                <div className="row-span-2 w-18 sm:row-span-1 sm:w-24">
                   <Cover product={product} aspect={productCrop.css} eager={i === 0} />
                 </div>
                 <div className="min-w-0">
@@ -242,7 +242,7 @@ function StackItem({
           <span className="block font-mono text-[11px] tracking-widest text-ink-soft">
             {two(index + 1)} / {two(total)}
           </span>
-          <span className="mt-2 block break-words font-display text-3xl leading-[1.05] decoration-accent decoration-1 underline-offset-4 group-hover:underline sm:text-5xl">
+          <span className="mt-2 block wrap-break-word font-display text-3xl leading-[1.05] decoration-accent decoration-1 underline-offset-4 group-hover:underline sm:text-5xl">
             {product.title}
           </span>
           <div className="mt-3">
@@ -330,7 +330,7 @@ function Split({ products, open, base }: Common) {
                   <span className="block font-mono text-[11px] tracking-widest text-ink-soft">
                     {two(i + 1)} / {two(products.length)}
                   </span>
-                  <span className="block break-words font-display text-4xl leading-[1.05] decoration-accent decoration-1 underline-offset-4 group-hover:underline lg:text-6xl">
+                  <span className="block wrap-break-word font-display text-4xl leading-[1.05] decoration-accent decoration-1 underline-offset-4 group-hover:underline lg:text-6xl">
                     {product.title}
                   </span>
                   {product.description && (

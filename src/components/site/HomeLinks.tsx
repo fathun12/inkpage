@@ -52,7 +52,7 @@ const titleClass: Record<RowKind, string> = {
   edge:
     "block font-display text-3xl leading-tight transition-transform duration-(--dur-base) group-hover:translate-x-2 sm:text-5xl",
   giant:
-    "block break-words font-display text-[clamp(2.5rem,11vw,9rem)] leading-[0.95] tracking-tight transition-transform duration-(--dur-base) group-hover:translate-x-4",
+    "block wrap-break-word font-display text-[clamp(2.5rem,11vw,9rem)] leading-[0.95] tracking-tight transition-transform duration-(--dur-base) group-hover:translate-x-4",
 };
 
 // One row of the list: a thin line on top, the number, the title and the site name. Clicks go through /go/<id>.
@@ -128,7 +128,7 @@ function Slides({ items, seconds, wide }: { items: Item[]; seconds: number; wide
   const links = items.filter((item) => item.number !== null);
   if (links.length === 0) return null;
   const tile = `group flex flex-col justify-between gap-10 border-y border-white/25 py-8 sm:py-12 ${
-    wide ? "min-h-[22rem] px-5 sm:min-h-[26rem] sm:px-8" : "min-h-[16rem] sm:min-h-[20rem]"
+    wide ? "min-h-88 px-5 sm:min-h-104 sm:px-8" : "min-h-64 sm:min-h-80"
   }`;
   const titleSize = wide ? "text-[clamp(2.5rem,11vw,9rem)]" : "text-[clamp(2rem,7vw,4.5rem)]";
   return (
@@ -143,7 +143,7 @@ function Slides({ items, seconds, wide }: { items: Item[]; seconds: number; wide
               </span>
               <span className="block min-w-0">
                 <span
-                  className={`block break-words font-display leading-[0.95] tracking-tight underline-offset-8 group-hover:underline ${titleSize}`}
+                  className={`block wrap-break-word font-display leading-[0.95] tracking-tight underline-offset-8 group-hover:underline ${titleSize}`}
                 >
                   {block.title}
                 </span>

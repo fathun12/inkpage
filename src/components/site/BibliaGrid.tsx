@@ -12,10 +12,10 @@ export function BibliaCard({ book }: { book: BibliaBook }) {
           <Img
             src={book.cover}
             alt={`Cover of ${book.title}`}
-            className="site-media-reveal aspect-[2/3] w-full object-cover"
+            className="site-media-reveal aspect-2/3 w-full object-cover"
           />
         ) : (
-          <span className="flex aspect-[2/3] w-full items-end bg-surface p-3 font-display text-xl leading-tight">
+          <span className="flex aspect-2/3 w-full items-end bg-surface p-3 font-display text-xl leading-tight">
             {book.title}
           </span>
         )}

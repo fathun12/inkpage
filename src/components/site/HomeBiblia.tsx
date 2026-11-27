@@ -63,11 +63,11 @@ function ListRows({ books }: { books: BibliaBook[] }) {
               rel="noopener noreferrer"
               className="group grid grid-cols-[3.5rem_minmax(0,1fr)] items-center gap-x-5 gap-y-1 py-5 sm:grid-cols-[4.5rem_minmax(0,1fr)_auto] sm:gap-x-8 sm:py-6"
             >
-              <span className="row-span-2 block w-14 sm:row-span-1 sm:w-[4.5rem]">
+              <span className="row-span-2 block w-14 sm:row-span-1 sm:w-18">
                 {book.cover ? (
-                  <Img src={book.cover} alt={`Cover of ${book.title}`} className="aspect-[2/3] w-full object-cover" />
+                  <Img src={book.cover} alt={`Cover of ${book.title}`} className="aspect-2/3 w-full object-cover" />
                 ) : (
-                  <span className="block aspect-[2/3] w-full bg-surface" />
+                  <span className="block aspect-2/3 w-full bg-surface" />
                 )}
               </span>
               <span className="block min-w-0">
@@ -116,9 +116,9 @@ function Row({ books }: { books: BibliaBook[] }) {
               className="group relative block overflow-hidden bg-surface"
             >
               {book.cover ? (
-                <Img src={book.cover} alt={`Cover of ${book.title}`} className="aspect-[2/3] w-full object-cover" />
+                <Img src={book.cover} alt={`Cover of ${book.title}`} className="aspect-2/3 w-full object-cover" />
               ) : (
-                <span className="flex aspect-[2/3] w-full items-end p-3 font-display text-xl leading-tight">
+                <span className="flex aspect-2/3 w-full items-end p-3 font-display text-xl leading-tight">
                   {book.title}
                 </span>
               )}
@@ -151,7 +151,7 @@ function Feature({ books, seconds }: { books: BibliaBook[]; seconds: number }) {
                 <Img
                   src={book.cover}
                   alt={`Cover of ${book.title}`}
-                  className="h-[22rem] w-auto max-w-full object-contain sm:h-[28rem]"
+                  className="h-88 w-auto max-w-full object-contain sm:h-112"
                 />
               ) : (
                 <span className="font-display text-4xl leading-tight">{book.title}</span>

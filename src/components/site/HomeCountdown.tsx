@@ -68,7 +68,7 @@ function Head({
         <span aria-hidden className="size-1.5 rounded-full bg-accent" />
         <span>{message}</span>
       </p>
-      <h2 className="mt-5 break-words font-voice text-4xl leading-none sm:text-6xl" style={titleStyle}>
+      <h2 className="mt-5 wrap-break-word font-voice text-4xl leading-none sm:text-6xl" style={titleStyle}>
         {title}
       </h2>
     </>
@@ -206,7 +206,7 @@ export function HomeCountdown({
                 <p className="font-voice tabular-nums leading-none" style={{ fontSize: giant }}>
                   {ready ? pad(value) : "--"}
                 </p>
-                <p className="mt-3 font-mono text-[clamp(7px,2.2vw,11px)] uppercase tracking-[0.1em] text-ink-soft sm:tracking-[0.2em]">
+                <p className="mt-3 font-mono text-[clamp(7px,2.2vw,11px)] uppercase tracking-widest text-ink-soft sm:tracking-[0.2em]">
                   {name}
                 </p>
               </div>
@@ -250,7 +250,7 @@ export function HomeCountdown({
               <p className="font-voice text-[clamp(1.75rem,9.5vw,3.75rem)] tabular-nums leading-none">
                 {ready ? pad(value) : "--"}
               </p>
-              <p className="mt-2 font-mono text-[clamp(7px,2.2vw,11px)] uppercase tracking-[0.1em] text-ink-soft sm:tracking-[0.2em]">
+              <p className="mt-2 font-mono text-[clamp(7px,2.2vw,11px)] uppercase tracking-widest text-ink-soft sm:tracking-[0.2em]">
                 {name}
               </p>
             </div>

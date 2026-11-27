@@ -1874,7 +1874,7 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
       {notice && <div className="px-5 pt-3">{notice}</div>}
 
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-        <aside className="relative order-2 min-h-0 flex-1 overflow-y-auto border-t border-line lg:order-1 lg:w-[360px] lg:flex-none lg:border-r lg:border-t-0">
+        <aside className="relative order-2 min-h-0 flex-1 overflow-y-auto border-t border-line lg:order-1 lg:w-90 lg:flex-none lg:border-r lg:border-t-0">
           <div className="border-b border-line px-5 py-4">
             <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">Page</span>
             <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Page">

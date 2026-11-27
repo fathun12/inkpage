@@ -615,7 +615,7 @@ export function StudioPreview({
       <div
         ref={hoverBox}
         aria-hidden
-        className="pointer-events-none absolute z-[60] hidden border border-accent bg-accent/15"
+        className="pointer-events-none absolute z-60 hidden border border-accent bg-accent/15"
       >
         <span
           ref={hoverTag}

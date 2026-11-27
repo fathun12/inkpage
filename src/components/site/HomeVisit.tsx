@@ -70,7 +70,7 @@ function Rows({ items, edge }: { items: VisitItem[]; edge: boolean }) {
             >
               <span className="font-mono text-[11px] tracking-widest text-ink-soft">{two(i + 1)}</span>
               <span className="min-w-0">
-                <span className="block break-words font-display text-2xl leading-tight underline-offset-4 group-hover:underline sm:text-4xl">
+                <span className="block wrap-break-word font-display text-2xl leading-tight underline-offset-4 group-hover:underline sm:text-4xl">
                   {item.name}
                 </span>
                 {item.body && (
@@ -98,13 +98,13 @@ function Stack({ items }: { items: VisitItem[] }) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={`Visit ${item.name}`}
-              className="group flex min-h-[16rem] flex-col justify-between gap-10 px-5 py-8 sm:min-h-[20rem] sm:px-8 sm:py-12"
+              className="group flex min-h-64 flex-col justify-between gap-10 px-5 py-8 sm:min-h-80 sm:px-8 sm:py-12"
             >
               <span className="font-mono text-[11px] tracking-widest text-ink-soft">
                 {two(i + 1)} / {two(items.length)}
               </span>
               <span className="block min-w-0">
-                <span className="block break-words font-display text-[clamp(2.5rem,11vw,9rem)] leading-[0.95] tracking-tight underline-offset-8 group-hover:underline">
+                <span className="block wrap-break-word font-display text-[clamp(2.5rem,11vw,9rem)] leading-[0.95] tracking-tight underline-offset-8 group-hover:underline">
                   {item.name}
                 </span>
                 {item.body && (
@@ -123,7 +123,7 @@ function Stack({ items }: { items: VisitItem[] }) {
 // Centered Slider and Full width Site slide: one site at a time. It slides by itself (MediaSlider).
 function Slides({ items, seconds, wide }: { items: VisitItem[]; seconds: number; wide: boolean }) {
   const tile = `group flex flex-col justify-between gap-10 border-y border-line py-8 sm:py-12 ${
-    wide ? "min-h-[22rem] px-5 sm:min-h-[26rem] sm:px-8" : "min-h-[16rem] sm:min-h-[20rem]"
+    wide ? "min-h-88 px-5 sm:min-h-104 sm:px-8" : "min-h-64 sm:min-h-80"
   }`;
   const titleSize = wide ? "text-[clamp(2.5rem,11vw,9rem)]" : "text-[clamp(2rem,7vw,4.5rem)]";
   return (
@@ -143,7 +143,7 @@ function Slides({ items, seconds, wide }: { items: VisitItem[]; seconds: number;
               </span>
               <span className="block min-w-0">
                 <span
-                  className={`block break-words font-display leading-[0.95] tracking-tight underline-offset-8 group-hover:underline ${titleSize}`}
+                  className={`block wrap-break-word font-display leading-[0.95] tracking-tight underline-offset-8 group-hover:underline ${titleSize}`}
                 >
                   {item.name}
                 </span>

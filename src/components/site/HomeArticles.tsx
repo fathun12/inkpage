@@ -124,10 +124,10 @@ function GridCards({ entries, username, size }: { entries: Entry[]; username: st
                   <Img
                     src={cover}
                     {...storageImage(cover, GRID_SIZES)}
-                    className="aspect-[16/10] w-full bg-surface object-cover"
+                    className="aspect-16/10 w-full bg-surface object-cover"
                   />
                 ) : (
-                  <span className="flex aspect-[16/10] w-full items-end bg-surface p-4 font-mono text-[11px] uppercase tracking-widest text-ink-soft">
+                  <span className="flex aspect-16/10 w-full items-end bg-surface p-4 font-mono text-[11px] uppercase tracking-widest text-ink-soft">
                     {metaOf(article)}
                   </span>
                 )}
@@ -180,7 +180,7 @@ function Stack({
                   src={cover}
                   {...storageImage(cover, WIDE_SIZES)}
                   loading={i === 0 ? "eager" : "lazy"}
-                  className="absolute inset-0 size-full object-cover [object-position:var(--crop,50%_50%)]"
+                  className="absolute inset-0 size-full object-cover object-(--crop,50%_50%)"
                 />
               ) : (
                 <span className="absolute inset-0 flex items-end px-5 pb-6 font-display text-4xl leading-tight sm:px-8 sm:pb-10 sm:text-6xl">
@@ -231,7 +231,7 @@ function Lead({ entries, username }: { entries: Entry[]; username: string }) {
     <div>
       <Reveal variant="still">
         <Link href={routes.article(username, first.slug)} className="group grid md:grid-cols-2 md:items-stretch">
-          <span className="relative block aspect-[4/3] w-full bg-surface md:aspect-auto md:min-h-[30rem]">
+          <span className="relative block aspect-4/3 w-full bg-surface md:aspect-auto md:min-h-120">
             {cover && (
               <Img
                 src={cover}
