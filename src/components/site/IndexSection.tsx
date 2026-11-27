@@ -7,7 +7,7 @@ import { Reveal } from "./Reveal";
 
 type Props = { blocks: Block[]; mediaUrl: string | null; tone?: "dark" | "light"; credit?: string | null };
 
-function hostOf(url: string | null): string {
+export function hostOf(url: string | null): string {
   try {
     return new URL(url ?? "").host.replace(/^www\./, "");
   } catch {
@@ -16,7 +16,7 @@ function hostOf(url: string | null): string {
 }
 
 // Nexus Mods, GitHub releases and plain files count as downloads.
-function isDownload(url: string | null): boolean {
+export function isDownload(url: string | null): boolean {
   try {
     const u = new URL(url ?? "");
     return (

@@ -14,7 +14,7 @@ import { HomeDesigns } from "@/components/site/HomeDesigns";
 import { HomeGithub } from "@/components/site/HomeGithub";
 import { HomeProjects } from "@/components/site/HomeProjects";
 import { HomeShowcase } from "@/components/site/HomeShowcase";
-import { IndexSection } from "@/components/site/IndexSection";
+import { HomeLinks } from "@/components/site/HomeLinks";
 import { Intro } from "@/components/site/Intro";
 import { NewsBar } from "@/components/site/NewsBar";
 import { Reveal } from "@/components/site/Reveal";
@@ -426,10 +426,21 @@ export function StudioPreview({
     links: on("links") && (
       <SectionBox setting={sec.links}>
         <span id="links" className="block" />
-        <IndexSection
+        <HomeLinks
           blocks={previewRows}
           mediaUrl={media.indexMedia}
           credit={creditOf(site.credits, media.indexMedia)}
+          title={site.linksTitle}
+          intro={site.linksHomeIntro}
+          seconds={draft.style.heroSeconds}
+          mode={draft.style.linksMode}
+          view={draft.style.linksView}
+          wideView={draft.style.linksWideView}
+          titleAlign={draft.style.linksTitleAlign}
+          titleFont={draft.style.linksTitleFont}
+          titleSize={draft.style.linksTitleSize}
+          introFont={draft.style.linksIntroFont}
+          introSize={draft.style.linksIntroSize}
         />
       </SectionBox>
     ),

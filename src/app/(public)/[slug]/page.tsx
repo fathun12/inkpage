@@ -16,7 +16,7 @@ import { HomeDesigns } from "@/components/site/HomeDesigns";
 import { HomeGithub } from "@/components/site/HomeGithub";
 import { HomeProjects } from "@/components/site/HomeProjects";
 import { HomeShowcase } from "@/components/site/HomeShowcase";
-import { IndexSection } from "@/components/site/IndexSection";
+import { HomeLinks } from "@/components/site/HomeLinks";
 import { Reveal } from "@/components/site/Reveal";
 import { SectionBox } from "@/components/site/SectionBox";
 import { VisitCards } from "@/components/site/VisitCards";
@@ -282,7 +282,22 @@ export default async function HomePage({ params }: Props) {
     links: rows.length > 0 && on("links") && (
       <SectionBox setting={sec.links}>
         <span id="links" className="block" />
-        <IndexSection blocks={rows} mediaUrl={media.indexMedia} credit={creditOf(site.credits, media.indexMedia)} />
+        <HomeLinks
+          blocks={rows}
+          mediaUrl={media.indexMedia}
+          credit={creditOf(site.credits, media.indexMedia)}
+          title={site.linksTitle}
+          intro={site.linksHomeIntro}
+          seconds={style.heroSeconds}
+          mode={style.linksMode}
+          view={style.linksView}
+          wideView={style.linksWideView}
+          titleAlign={style.linksTitleAlign}
+          titleFont={style.linksTitleFont}
+          titleSize={style.linksTitleSize}
+          introFont={style.linksIntroFont}
+          introSize={style.linksIntroSize}
+        />
       </SectionBox>
     ),
     showcase: on("showcase") && (
