@@ -19,6 +19,9 @@ const nextConfig: NextConfig = {
   experimental: {
     // Gallery uploads: up to 6 images of 2 MB each travel in one request.
     serverActions: { bodySizeLimit: "14mb" },
+    // The stylesheet (about 17 KiB) travels inside the page, so the browser does not wait for a second download
+    // before it paints. Production builds only. To undo, delete this line.
+    inlineCss: true,
   },
   turbopack: {
     rules: {
