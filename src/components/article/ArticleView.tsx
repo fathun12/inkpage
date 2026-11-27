@@ -16,10 +16,18 @@ type Props = {
   backLabel: string;
   // Who wrote it. href = the About page, or null when there is none.
   author?: { name: string; href: string | null };
+  // The article's tags. href = the Articles page filtered by that tag.
+  tags?: { label: string; href: string }[];
+  // The series the article belongs to, with every live part in order.
+  series?: {
+    title: string;
+    href: string;
+    parts: { title: string; href: string; number: number; current: boolean }[];
+  };
 };
 
 // One clean page: a single reading column. The reader can change font, size, alignment and width.
-export function ArticleView({ title, subtitle, publishedAt, minutes, cover, doc, back, backLabel, author }: Props) {
+export function ArticleView({ title, subtitle, publishedAt, minutes, cover, doc, back, backLabel, author, tags, series }: Props) {
   const meta = [formatArticleDate(publishedAt), `${minutes} min read`].filter(Boolean).join(" · ");
   return (
     <ReaderShell
@@ -55,6 +63,45 @@ export function ArticleView({ title, subtitle, publishedAt, minutes, cover, doc,
       <div className="mt-10">
         <ArticleBody doc={doc} />
       </div>
+      {tags && tags.length > 0 && (
+        <div className="mt-10 flex flex-wrap gap-x-4 gap-y-2">
+          {tags.map((tag) => (
+            <Link
+              key={tag.label}
+              href={tag.href}
+              className="font-mono text-[11px] tracking-wide text-ink-soft hover:text-ink"
+            >
+              #{tag.label}
+            </Link>
+          ))}
+        </div>
+      )}
+      {series && (
+        <nav aria-label="Series" className="mt-10 border-t border-line pt-6">
+          <p className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">
+            Series:{" "}
+            <Link href={series.href} className="underline underline-offset-4 hover:text-ink">
+              {series.title}
+            </Link>
+          </p>
+          <ol className="mt-4 flex flex-col gap-2">
+            {series.parts.map((part) => (
+              <li key={part.href} className="flex gap-3 text-sm">
+                <span className="w-6 shrink-0 font-mono text-ink-soft">{part.number}.</span>
+                {part.current ? (
+                  <span aria-current="page" className="font-semibold">
+                    {part.title}
+                  </span>
+                ) : (
+                  <Link href={part.href} className="hover:underline">
+                    {part.title}
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )}
     </ReaderShell>
   );
 }

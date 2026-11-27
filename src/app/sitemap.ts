@@ -3,6 +3,8 @@ import { seo } from "@/config/seo";
 import { hasAbout, readSite } from "@/config/site-content";
 import { getPublicArticles } from "@/features/articles/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
+import { getSeriesByIds } from "@/features/series/queries";
+import { seriesIdsOf } from "@/lib/series-view";
 
 // The main domain and the account it shows live in config/seo.ts.
 const { origin, owner } = seo;
@@ -13,6 +15,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const site = readSite(profile.site);
   const articles = await getPublicArticles(profile.id);
+  const seriesList = await getSeriesByIds(seriesIdsOf(articles));
 
   // The same pages the menu shows: Articles once one is published, Biblia and About once they have content.
   const pages = ["/", "/projects", "/writing"];
@@ -22,6 +25,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   return [
     ...pages.map((path) => ({ url: `${origin}${path}` })),
+    ...seriesList.map((s) => ({ url: `${origin}/series/${s.slug}`, lastModified: s.updated_at })),
     ...articles.flatMap((article) =>
       article.slug
         ? [{ url: `${origin}/writing/${article.slug}`, lastModified: article.updated_at ?? article.published_at ?? undefined }]

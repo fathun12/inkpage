@@ -39,6 +39,8 @@ export const routes = {
   writeEdit: (id: string) => `/admin/write/${id}`,
   series: "/admin/series",
   article: (username: string, slug: string) => `/${username}/writing/${slug}`,
+  articleTag: (username: string, tag: string) => `/${username}/articles?tag=${encodeURIComponent(tag)}`,
+  seriesPage: (username: string, slug: string) => `/${username}/series/${slug}`,
   articlePreview: (username: string, id: string) => `/${username}/preview/${id}`,
   track: "/api/track",
   profile: (username: string) => `/${username}`,

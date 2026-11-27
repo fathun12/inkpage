@@ -6,7 +6,8 @@ const cell =
   "border border-line px-3 py-1 font-mono text-sm transition-colors duration-(--dur-base) hover:border-ink";
 
 function at(base: string, page: number): string {
-  return page <= 1 ? base : `${base}?page=${page}`;
+  if (page <= 1) return base;
+  return `${base}${base.includes("?") ? "&" : "?"}page=${page}`;
 }
 
 // The numbers shown: first, last, the current one and its two neighbours. A gap between them shows as "...".

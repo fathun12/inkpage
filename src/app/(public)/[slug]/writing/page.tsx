@@ -3,15 +3,19 @@ import { notFound } from "next/navigation";
 import { CardSlider } from "@/components/site/CardSlider";
 import { PageIntro } from "@/components/site/PageIntro";
 import { Pager } from "@/components/site/Pager";
+import { SeriesStack } from "@/components/site/SeriesStack";
 import { WritingList } from "@/components/site/WritingList";
 import { pageSizes } from "@/config/paging";
 import { cleanUrl } from "@/config/seo";
 import { routes } from "@/config/site";
 import { readSite } from "@/config/site-content";
 import { readSiteStyle } from "@/config/site-style";
+import { getPublicArticles } from "@/features/articles/queries";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
+import { getSeriesByIds } from "@/features/series/queries";
 import { paginate, readPage } from "@/lib/paging";
+import { buildSeriesCards, seriesIdsOf } from "@/lib/series-view";
 import { listBlocks, newestFirst, recentWriting } from "@/lib/site-view";
 
 type Props = {
@@ -46,6 +50,10 @@ export default async function WritingPage({ params, searchParams }: Props) {
   const paged = paginate(rows, page, pageSizes.writing);
   if (page > paged.pages) notFound();
 
+  // Series cards only on page 1. Here they are links to the series pages.
+  const articles = page === 1 ? await getPublicArticles(profile.id) : [];
+  const seriesCards = buildSeriesCards(await getSeriesByIds(seriesIdsOf(articles)), articles);
+
   return (
     <>
       <PageIntro title={site.writing.title ?? "Writing"} intro={site.writing.intro} />
@@ -60,6 +68,7 @@ export default async function WritingPage({ params, searchParams }: Props) {
               spacing="pt-4 pb-10 sm:pt-6 sm:pb-12"
             />
           )}
+          <SeriesStack cards={seriesCards} username={profile.username} />
           <WritingList blocks={paged.items} />
           <Pager
             base={routes.section(profile.username, "writing")}

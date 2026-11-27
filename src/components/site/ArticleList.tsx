@@ -13,15 +13,21 @@ type Props = {
   previews?: boolean;
   // Home: only the cover is added (at the right, when the article has one).
   covers?: boolean;
+  // A series page: the line above the title starts with "Part N".
+  parts?: boolean;
 };
 
 // Articles written inside inkpage. Newest first (the query sorts).
-export function ArticleList({ articles, username, previews = false, covers = false }: Props) {
+export function ArticleList({ articles, username, previews = false, covers = false, parts = false }: Props) {
   return (
     <ul className="mx-auto flex max-w-5xl flex-col px-5 pt-4 sm:px-8 site-pb-m">
       {articles.map((article, index) => {
         if (!article.slug) return null;
-        const meta = [formatArticleDate(article.published_at), `${article.reading_minutes} min read`]
+        const meta = [
+          parts ? `Part ${article.series_position ?? index + 1}` : null,
+          formatArticleDate(article.published_at),
+          `${article.reading_minutes} min read`,
+        ]
           .filter(Boolean)
           .join(" · ");
         const lead = article.subtitle ?? article.excerpt;
@@ -53,6 +59,19 @@ export function ArticleList({ articles, username, previews = false, covers = fal
                   )}
                 </span>
               </Link>
+              {previews && article.tags.length > 0 && (
+                <div className="-mt-5 flex flex-wrap gap-x-3 gap-y-1 pb-8">
+                  {article.tags.map((tag) => (
+                    <Link
+                      key={tag}
+                      href={routes.articleTag(username, tag)}
+                      className="font-mono text-[11px] tracking-wide text-ink-soft hover:text-ink"
+                    >
+                      #{tag}
+                    </Link>
+                  ))}
+                </div>
+              )}
             </Reveal>
           </li>
         );

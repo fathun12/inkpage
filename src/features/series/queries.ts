@@ -35,3 +35,31 @@ export async function getOwnSeries(userId: string): Promise<OwnSeries[]> {
   }
   return ((data ?? []) as unknown as Series[]).map((s) => ({ ...s, articleCount: counts.get(s.id) ?? 0 }));
 }
+
+// Public: the series with these ids. A failure gives an empty list, so the public pages never break.
+export async function getSeriesByIds(ids: string[]): Promise<Series[]> {
+  if (ids.length === 0) return [];
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("series").select(columns).in("id", ids);
+  if (error) {
+    console.error("getSeriesByIds failed", error.message);
+    return [];
+  }
+  return (data ?? []) as unknown as Series[];
+}
+
+// Public: one series of this author by its address. The caller checks that it has a live article.
+export async function getSeriesBySlug(userId: string, slug: string): Promise<Series | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("series")
+    .select(columns)
+    .eq("user_id", userId)
+    .eq("slug", slug)
+    .maybeSingle();
+  if (error) {
+    console.error("getSeriesBySlug failed", error.message);
+    return null;
+  }
+  return (data as unknown as Series | null) ?? null;
+}

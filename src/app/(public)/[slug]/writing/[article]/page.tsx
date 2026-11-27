@@ -5,10 +5,12 @@ import { JsonLd } from "@/components/site/JsonLd";
 import { cleanUrl } from "@/config/seo";
 import { routes } from "@/config/site";
 import { hasAbout, readSite } from "@/config/site-content";
-import { getPublicArticle } from "@/features/articles/queries";
+import { getPublicArticle, getPublicArticles } from "@/features/articles/queries";
 import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
+import { getSeriesByIds } from "@/features/series/queries";
 import { personLd } from "@/lib/person-ld";
+import { sortParts } from "@/lib/series-view";
 import { socialsOf } from "@/lib/site-view";
 
 type Props = { params: Promise<{ slug: string; article: string }> };
@@ -46,6 +48,13 @@ export default async function ArticlePage({ params }: Props) {
   const person = personLd(profile, site, socialsOf(await getPublicBlocks(profile.id)));
   const url = cleanUrl(profile.username, `/writing/${articleSlug}`);
 
+  // The series of this article (if any) with every live part in order.
+  const seriesRow = article.series_id ? ((await getSeriesByIds([article.series_id]))[0] ?? null) : null;
+  const seriesParts = seriesRow
+    ? sortParts((await getPublicArticles(profile.id)).filter((a) => a.series_id === seriesRow.id))
+    : [];
+  const seriesUrl = seriesRow ? cleanUrl(profile.username, `/series/${seriesRow.slug}`) : null;
+
   return (
     <>
       {person && url && (
@@ -59,6 +68,11 @@ export default async function ArticlePage({ params }: Props) {
             datePublished: article.published_at ?? undefined,
             dateModified: article.updated_at,
             mainEntityOfPage: { "@type": "WebPage", "@id": url },
+            keywords: article.tags.length > 0 ? article.tags.join(", ") : undefined,
+            isPartOf:
+              seriesRow && seriesUrl
+                ? { "@type": "CreativeWorkSeries", name: seriesRow.title, url: seriesUrl }
+                : undefined,
             author: person,
           }}
         />
@@ -72,6 +86,21 @@ export default async function ArticlePage({ params }: Props) {
         doc={article.content}
         back={routes.section(profile.username, "articles")}
         backLabel="Articles"
+        tags={article.tags.map((tag) => ({ label: tag, href: routes.articleTag(profile.username, tag) }))}
+        series={
+          seriesRow && seriesParts.length > 0
+            ? {
+                title: seriesRow.title,
+                href: routes.seriesPage(profile.username, seriesRow.slug),
+                parts: seriesParts.map((p, i) => ({
+                  title: p.title,
+                  href: routes.article(profile.username, p.slug ?? ""),
+                  number: p.series_position ?? i + 1,
+                  current: p.id === article.id,
+                })),
+              }
+            : undefined
+        }
         author={{
           name: profile.display_name,
           href: aboutPage ? `${routes.profile(profile.username)}/about` : null,
