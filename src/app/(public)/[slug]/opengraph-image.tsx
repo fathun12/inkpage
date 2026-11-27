@@ -2,12 +2,13 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { mediaConfig } from "@/config/media";
+import { readBackground } from "@/config/background";
+import { readSite } from "@/config/site-content";
 import { cleanUrl } from "@/config/seo";
-import { resolveTheme, siteConfig } from "@/config/site";
+import { siteConfig } from "@/config/site";
+import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
-import { readCustomTheme } from "@/config/custom-theme";
-import { photoModes, readBackground } from "@/config/background";
-import { ogColors } from "@/styles/og-palette";
+import { mediaKind, resolveHomeMedia } from "@/lib/site-view";
 
 export const alt = "Profile preview";
 export const size = { width: 1200, height: 630 };
@@ -16,49 +17,45 @@ export const contentType = "image/png";
 const sans = "Instrument Sans";
 const voice = "Instrument Serif";
 
+// Same dark look as the Home hero. Used when there is no hero picture that can be drawn.
+const fallbackBg = "#140a0c";
+const ink = "#ffffff";
+const soft = "rgba(255, 255, 255, 0.82)";
+const bandHeight = 56;
+// Same limit as the upload (10 MB).
+const photoMaxBytes = mediaConfig.backgroundPhoto.maxMb * 1024 * 1024;
+
+type OgFont = { name: string; data: ArrayBuffer; weight: 400 | 500; style: "normal" | "italic" };
+
 function toArrayBuffer(buf: Buffer): ArrayBuffer {
   return buf.buffer.slice(buf.byteOffset, buf.byteOffset + buf.byteLength) as ArrayBuffer;
 }
 
-// Fonts are copied into src/assets/fonts. If they cannot be read, the default font is used.
-async function loadFonts() {
+async function readFont(file: string): Promise<ArrayBuffer | null> {
   try {
-    const [sansFile, voiceFile] = await Promise.all([
-      readFile(join(process.cwd(), "src/assets/fonts/instrument-sans-500.woff")),
-      readFile(join(process.cwd(), "src/assets/fonts/instrument-serif-italic.woff")),
-    ]);
-    return [
-      { name: sans, data: toArrayBuffer(sansFile), weight: 500 as const, style: "normal" as const },
-      { name: voice, data: toArrayBuffer(voiceFile), weight: 400 as const, style: "italic" as const },
-    ];
-  } catch {
-    return undefined;
-  }
-}
-
-// The share image draws PNG and JPEG reliably, so other formats fall back to the initial.
-async function loadAvatar(url: string | null | undefined): Promise<string | null> {
-  if (!url) return null;
-  try {
-    const res = await fetch(url, { signal: AbortSignal.timeout(4000) });
-    const type = res.headers.get("content-type")?.split(";")[0] ?? "";
-    if (!res.ok || (type !== "image/jpeg" && type !== "image/png")) return null;
-    const bytes = Buffer.from(await res.arrayBuffer());
-    if (bytes.length > mediaConfig.maxBytes) return null;
-    return `data:${type};base64,${bytes.toString("base64")}`;
+    return toArrayBuffer(await readFile(join(process.cwd(), "src/assets/fonts", file)));
   } catch {
     return null;
   }
 }
 
-// Text colors on top of a background photo. The photo is always darkened, so the text is always light.
-const photoColors = { ink: "#f3eee3", soft: "#e6e0d2" };
-// Same limit as the upload (10 MB), so any background photo that can be uploaded can be drawn here.
-const photoMaxBytes = mediaConfig.backgroundPhoto.maxMb * 1024 * 1024;
+// Each font is optional. If none can be read, the default font is used.
+async function loadFonts(): Promise<OgFont[] | undefined> {
+  const [sansData, uprightData, italicData] = await Promise.all([
+    readFont("instrument-sans-500.woff"),
+    readFont("instrument-serif-regular.woff"),
+    readFont("instrument-serif-italic.woff"),
+  ]);
+  const fonts: OgFont[] = [];
+  if (sansData) fonts.push({ name: sans, data: sansData, weight: 500, style: "normal" });
+  if (uprightData) fonts.push({ name: voice, data: uprightData, weight: 400, style: "normal" });
+  if (italicData) fonts.push({ name: voice, data: italicData, weight: 400, style: "italic" });
+  return fonts.length > 0 ? fonts : undefined;
+}
 
-// Same rule as the avatar: only JPEG and PNG are drawn reliably, anything else falls back to the theme color.
-async function loadBackgroundPhoto(url: string | null): Promise<string | null> {
-  if (!url) return null;
+// The share image draws PNG and JPEG reliably. Anything else (video, GIF, WebP) is skipped.
+async function loadPicture(url: string): Promise<string | null> {
+  if (mediaKind(url) !== "image") return null;
   try {
     const res = await fetch(url, { signal: AbortSignal.timeout(9000) });
     const type = res.headers.get("content-type")?.split(";")[0] ?? "";
@@ -72,26 +69,35 @@ async function loadBackgroundPhoto(url: string | null): Promise<string | null> {
   }
 }
 
+// The first hero slide (of the first three) that can be drawn.
+async function loadHero(slides: string[]): Promise<string | null> {
+  for (const url of slides.slice(0, 3)) {
+    const picture = await loadPicture(url);
+    if (picture) return picture;
+  }
+  return null;
+}
+
 export default async function OpengraphImage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const profile = await getProfileByUsername(slug.toLowerCase());
-  const base = ogColors(resolveTheme(profile?.theme), readCustomTheme(profile ?? {}));
-  const bg = profile ? readBackground(profile) : null;
-  const usePhoto = bg !== null && photoModes.includes(bg.mode);
-  const [fonts, avatar, photo] = await Promise.all([
-    loadFonts(),
-    loadAvatar(profile?.avatar_url),
-    usePhoto ? loadBackgroundPhoto(bg?.imageUrl ?? null) : Promise.resolve(null),
-  ]);
-  const p = photo ? { ...base, ink: photoColors.ink, soft: photoColors.soft } : base;
+
+  let slides: string[] = [];
+  let caption = "";
+  if (profile) {
+    const site = readSite(profile.site);
+    const blocks = await getPublicBlocks(profile.id);
+    slides = resolveHomeMedia(site, readBackground(profile), blocks).hero;
+    caption = (site.heroCaption ?? profile.bio ?? "").slice(0, 140);
+  }
+
+  const [fonts, hero] = await Promise.all([loadFonts(), loadHero(slides)]);
 
   const name = (profile?.display_name ?? siteConfig.name).slice(0, 40);
-  const initial = name.trim().charAt(0).toUpperCase();
-  const handle = profile ? `@${profile.username}` : "";
-  const bio = profile?.bio ? profile.bio.slice(0, 140) : "";
-  // The address of the website (mfniam.com), not the name of the software. Other accounts get an empty line.
+  const brand = profile?.username ?? "";
+  // The address of the website (mfniam.com). Other accounts get an empty line.
   const home = profile ? cleanUrl(profile.username, "/") : null;
-  const site = home ? new URL(home).host : "";
+  const host = home ? new URL(home).host : "";
 
   return new ImageResponse(
     (
@@ -103,17 +109,17 @@ export default async function OpengraphImage({ params }: { params: Promise<{ slu
           flexDirection: "column",
           justifyContent: "space-between",
           position: "relative",
-          background: p.bg,
-          color: p.ink,
-          padding: 80,
+          background: fallbackBg,
+          color: ink,
+          padding: `40px 64px ${bandHeight + 40}px 64px`,
           fontFamily: sans,
         }}
       >
-        {photo ? (
+        {hero ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={photo}
+              src={hero}
               alt=""
               width={1200}
               height={630}
@@ -127,56 +133,41 @@ export default async function OpengraphImage({ params }: { params: Promise<{ slu
                 left: 0,
                 width: 1200,
                 height: 630,
-                background: "rgba(0, 0, 0, 0.6)",
-              }}
-            />
-            <div
-              style={{
-                display: "flex",
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: 1200,
-                height: 630,
-                background: "linear-gradient(to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.35))",
+                background: "linear-gradient(to bottom, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.7))",
               }}
             />
           </>
         ) : null}
-        <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              width: 120,
-              height: 120,
-              borderRadius: 60,
-              background: p.accent,
-              color: p.bg,
-              overflow: "hidden",
-              fontSize: 64,
-              fontWeight: 500,
-            }}
-          >
-            {avatar ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={avatar} alt="" width={120} height={120} style={{ width: 120, height: 120, objectFit: "cover" }} />
-            ) : (
-              initial
-            )}
-          </div>
-          <div style={{ display: "flex", fontFamily: voice, fontStyle: "italic", fontSize: 42, color: p.soft }}>
-            {handle}
-          </div>
+
+        <div style={{ display: "flex", fontFamily: voice, fontSize: 132, lineHeight: 1, letterSpacing: -2 }}>
+          {brand}
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          <div style={{ display: "flex", fontSize: 112, fontWeight: 500, letterSpacing: -3, lineHeight: 1.02 }}>
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+          <div style={{ display: "flex", fontSize: 84, fontWeight: 500, letterSpacing: -2, lineHeight: 1.05 }}>
             {name}
           </div>
-          {bio ? <div style={{ display: "flex", fontSize: 38, color: p.soft }}>{bio}</div> : null}
+          {caption ? <div style={{ display: "flex", fontSize: 32, color: soft }}>{caption}</div> : null}
         </div>
-        <div style={{ display: "flex", fontSize: 30, color: p.soft }}>{site}</div>
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            position: "absolute",
+            left: 0,
+            bottom: 0,
+            width: 1200,
+            height: bandHeight,
+            background: "#000000",
+            color: ink,
+            padding: "0 64px",
+            fontSize: 24,
+            letterSpacing: 2,
+          }}
+        >
+          {host}
+        </div>
       </div>
     ),
     { ...size, fonts },
