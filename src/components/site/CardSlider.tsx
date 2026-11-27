@@ -5,7 +5,9 @@ import type { Block } from "@/types/block";
 import { Reveal } from "./Reveal";
 import { WritingCard } from "./WritingCard";
 
-type Props = { items: Block[]; title: string | null; seconds: number; autoplay: boolean; spacing?: string; id?: string };
+// "autoplay" is not used any more: a row with more than one card always slides by itself (only a visitor's own
+// "reduce motion" setting stops it). It stays in the props so the callers do not need to change.
+type Props = { items: Block[]; title: string | null; seconds: number; autoplay?: boolean; spacing?: string; id?: string };
 
 const GLIDE_MS = 700;
 const DRAG_START_PX = 6;
@@ -38,7 +40,7 @@ function nearest(points: number[], v: number) {
 // dragging (mouse, finger or pen: press, move, release, then it glides on and stops exactly on a card) and by the
 // arrows. The wheel and the touchpad do NOT move it, so the page always scrolls freely over it (the row is
 // overflow hidden, not a scroll box). Same model as MediaSlider.
-export function CardSlider({ items, title, seconds, autoplay, spacing = "site-py", id = "selected" }: Props) {
+export function CardSlider({ items, title, seconds, spacing = "site-py", id = "selected" }: Props) {
   const track = useRef<HTMLUListElement>(null);
   const paused = useRef(false);
   const raf = useRef(0);
@@ -106,7 +108,7 @@ export function CardSlider({ items, title, seconds, autoplay, spacing = "site-py
   // Slides by itself after "seconds" of stillness. Paused while the pointer is over it, while dragging,
   // while it glides, in a hidden tab, and with reduced motion.
   useEffect(() => {
-    if (!autoplay || count < 2) return;
+    if (count < 2) return;
     if (window.matchMedia(REDUCED).matches) return;
     lastActive.current = Date.now();
     const id = window.setInterval(() => {
@@ -116,7 +118,7 @@ export function CardSlider({ items, title, seconds, autoplay, spacing = "site-py
       step(1);
     }, 200);
     return () => window.clearInterval(id);
-  }, [autoplay, count, seconds, step]);
+  }, [count, seconds, step]);
 
   useEffect(() => () => stop(), [stop]);
 

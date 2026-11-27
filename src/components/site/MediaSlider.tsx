@@ -11,7 +11,9 @@ import {
 type Props = {
   count: number;
   seconds: number;
-  autoplay: boolean;
+  // Not used any more: a row with more than one tile always slides by itself (only a visitor's own
+  // "reduce motion" setting stops it). Kept so the callers do not need to change.
+  autoplay?: boolean;
   // Full width use: the arrows and the first photo keep the side space of the page.
   inset?: boolean;
   // Full width use: only the arrows keep the side space; the tiles run to the edges of the screen.
@@ -51,7 +53,7 @@ function nearest(points: number[], v: number) {
 // NOT move it, so the page always scrolls freely over it (the row is overflow hidden, not a scroll box).
 // The height of the row follows the tile in view, so a short tile does not leave empty space under it.
 // The tiles come in as children (made on the server), so this file stays small.
-export function MediaSlider({ count, seconds, autoplay, inset = false, bleed = false, children }: Props) {
+export function MediaSlider({ count, seconds, inset = false, bleed = false, children }: Props) {
   const track = useRef<HTMLUListElement>(null);
   const paused = useRef(false);
   const raf = useRef(0);
@@ -118,7 +120,7 @@ export function MediaSlider({ count, seconds, autoplay, inset = false, bleed = f
   // Slides by itself after "seconds" of stillness. Paused while the pointer is over it, while dragging,
   // while it glides, in a hidden tab, and with reduced motion.
   useEffect(() => {
-    if (!autoplay || count < 2) return;
+    if (count < 2) return;
     if (window.matchMedia(REDUCED).matches) return;
     lastActive.current = Date.now();
     const id = window.setInterval(() => {
@@ -128,7 +130,7 @@ export function MediaSlider({ count, seconds, autoplay, inset = false, bleed = f
       stepBy(1);
     }, 200);
     return () => window.clearInterval(id);
-  }, [autoplay, count, seconds, stepBy]);
+  }, [count, seconds, stepBy]);
 
   useEffect(() => () => stop(), [stop]);
 
