@@ -258,6 +258,13 @@ export function AboutForm({ action, sign, site }: WithMedia) {
         <Field label="Text" htmlFor="about_body">
           <Textarea id="about_body" name="about_body" defaultValue={site.about.body ?? ""} rows={8} maxLength={siteLimits.aboutBody} />
         </Field>
+        <Field
+          label="Other names"
+          htmlFor="alt_names"
+          hint="Optional. Other ways your name is written, one per line, up to 5 (a nickname, or your name without a title). Search engines use them to connect your articles to you. Visitors do not see them."
+        >
+          <Textarea id="alt_names" name="alt_names" defaultValue={site.alternateNames.join("\n")} rows={3} maxLength={320} />
+        </Field>
         <Field label="Photo" htmlFor="site-about" hint={`Optional. ${mediaHint}`}>
           <SiteMediaInput slot="about" current={site.about.photo ? [site.about.photo] : []} max={1} sign={sign} credits={site.credits} />
         </Field>

@@ -73,6 +73,7 @@ const textSchema = z.object({
   articles_intro: text("The Articles text", siteLimits.intro),
   about_title: text("The About title", siteLimits.title),
   about_body: text("The About text", siteLimits.aboutBody),
+  alt_names: text("The other names", siteLimits.altNames * (siteLimits.altName + 1)),
   footer_note: text("The footer note", siteLimits.footerNote),
   contact_email: text("The email address", siteLimits.email),
   whatsapp: text("The WhatsApp number", 40),
@@ -184,6 +185,7 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     articles_intro: field(formData, "articles_intro"),
     about_title: field(formData, "about_title"),
     about_body: field(formData, "about_body"),
+    alt_names: field(formData, "alt_names"),
     footer_note: field(formData, "footer_note"),
     contact_email: field(formData, "contact_email"),
     whatsapp: field(formData, "whatsapp"),
@@ -272,6 +274,18 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
   if (tab === "articles") next.articles = { title: v.articles_title ?? null, intro: v.articles_intro ?? null };
   if (tab === "about") {
     next.about = { title: v.about_title ?? null, body: v.about_body ?? null, photo: got("about")[0] ?? null };
+    // One name per line. Empty lines and repeats are dropped.
+    const names = (v.alt_names ?? "")
+      .split(/\r?\n/)
+      .map((n) => n.trim())
+      .filter(Boolean);
+    if (names.length > siteLimits.altNames) {
+      return abort(`Write at most ${siteLimits.altNames} other names, one per line.`);
+    }
+    if (names.some((n) => n.length > siteLimits.altName)) {
+      return abort(`Each other name can be at most ${siteLimits.altName} characters.`);
+    }
+    next.alternateNames = [...new Set(names)];
   }
   if (tab === "footer") {
     next.footerNote = v.footer_note ?? null;

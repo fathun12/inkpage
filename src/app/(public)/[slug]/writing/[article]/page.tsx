@@ -7,6 +7,7 @@ import { routes } from "@/config/site";
 import { hasAbout, readSite } from "@/config/site-content";
 import { getPublicArticle } from "@/features/articles/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
+import { personLd } from "@/lib/person-ld";
 
 type Props = { params: Promise<{ slug: string; article: string }> };
 
@@ -40,13 +41,12 @@ export default async function ArticlePage({ params }: Props) {
 
   const site = readSite(profile.site);
   const aboutPage = hasAbout(site);
-  const home = cleanUrl(profile.username, "/");
+  const person = personLd(profile, site);
   const url = cleanUrl(profile.username, `/writing/${articleSlug}`);
-  const aboutUrl = aboutPage ? cleanUrl(profile.username, "/about") : null;
 
   return (
     <>
-      {home && url && (
+      {person && url && (
         <JsonLd
           data={{
             "@context": "https://schema.org",
@@ -57,13 +57,7 @@ export default async function ArticlePage({ params }: Props) {
             datePublished: article.published_at ?? undefined,
             dateModified: article.updated_at,
             mainEntityOfPage: { "@type": "WebPage", "@id": url },
-            author: {
-              "@type": "Person",
-              "@id": `${home}#person`,
-              name: profile.display_name,
-              url: aboutUrl ?? home,
-              sameAs: site.githubUser ? [`https://github.com/${site.githubUser}`] : undefined,
-            },
+            author: person,
           }}
         />
       )}

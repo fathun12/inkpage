@@ -46,6 +46,8 @@ export const siteLimits = {
   visits: 6,
   visitName: 60,
   visitBody: 300,
+  altNames: 5,
+  altName: 60,
 } as const;
 
 export type IntroSettings = {
@@ -107,6 +109,8 @@ export type SiteSettings = {
   writing: PageText;
   articles: PageText;
   about: AboutText;
+  // Other ways the owner's name is written. Only search engines see them (structured data), not visitors.
+  alternateNames: string[];
   footerNote: string | null;
   // Email and WhatsApp number (digits with country code) of the footer Connect column.
   contactEmail: string | null;
@@ -161,6 +165,18 @@ export function emailAddress(v: unknown): string | null {
 // A WhatsApp number for wa.me: digits only, country code first, no 0 and no + in front, 8 to 15 digits.
 export function whatsappNumber(v: unknown): string | null {
   return typeof v === "string" && /^[1-9]\d{7,14}$/.test(v) ? v : null;
+}
+
+// Other ways the owner's name is written: trimmed, no repeats, no empty lines.
+export function nameList(v: unknown): string[] {
+  if (!Array.isArray(v)) return [];
+  const out: string[] = [];
+  for (const item of v) {
+    const t = text(item, siteLimits.altName);
+    if (t && !out.includes(t)) out.push(t);
+    if (out.length >= siteLimits.altNames) break;
+  }
+  return out;
 }
 
 function readHighlights(v: unknown): Highlight[] {
@@ -254,6 +270,7 @@ export function readSite(raw: unknown): SiteSettings {
       body: text(about.body, siteLimits.aboutBody),
       photo: link(about.photo),
     },
+    alternateNames: nameList(r.alternateNames),
     footerNote: text(r.footerNote, siteLimits.footerNote),
     contactEmail: emailAddress(r.contactEmail),
     whatsapp: whatsappNumber(r.whatsapp),
