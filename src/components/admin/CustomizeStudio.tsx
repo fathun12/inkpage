@@ -69,6 +69,12 @@ import {
   writingWideViewHints,
   writingWideViewLabels,
   writingWideViews,
+  articleViewHints,
+  articleViewLabels,
+  articleViews,
+  articleWideViewHints,
+  articleWideViewLabels,
+  articleWideViews,
   showcaseSizeHints,
   showcaseSizeLabels,
   showcaseSizes,
@@ -942,6 +948,200 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
       </div>
     </>
   );
+  const articlesWide = draft.style.articlesMode === "full";
+  const articlesStack =
+    articlesWide && (draft.style.articlesWideView === "stack" || draft.style.articlesWideView === "stackslide");
+  const articlesControls = (
+    <>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-ink-soft">Mode on Home</span>
+        <div className="flex flex-wrap gap-2">
+          {designModes.map((m) => (
+            <label key={m} className={pill}>
+              <input
+                type="radio"
+                value={m}
+                checked={draft.style.articlesMode === m}
+                onChange={() => setStyle({ articlesMode: m })}
+                className="sr-only"
+              />
+              {designModeLabels[m]}
+            </label>
+          ))}
+        </div>
+        <p className="text-xs text-ink-soft">{designModeHints[draft.style.articlesMode]}</p>
+      </div>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-ink-soft">Layout on Home</span>
+        <div className="flex flex-wrap gap-2">
+          {articlesWide
+            ? articleWideViews.map((m) => (
+                <label key={m} className={pill}>
+                  <input
+                    type="radio"
+                    value={m}
+                    checked={draft.style.articlesWideView === m}
+                    onChange={() => setStyle({ articlesWideView: m })}
+                    className="sr-only"
+                  />
+                  {articleWideViewLabels[m]}
+                </label>
+              ))
+            : articleViews.map((m) => (
+                <label key={m} className={pill}>
+                  <input
+                    type="radio"
+                    value={m}
+                    checked={draft.style.articlesView === m}
+                    onChange={() => setStyle({ articlesView: m })}
+                    className="sr-only"
+                  />
+                  {articleViewLabels[m]}
+                </label>
+              ))}
+        </div>
+        <p className="text-xs text-ink-soft">
+          {articlesWide
+            ? articleWideViewHints[draft.style.articlesWideView]
+            : articleViewHints[draft.style.articlesView]}
+        </p>
+      </div>
+      {!articlesWide && draft.style.articlesView === "grid" && (
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Size on Home</span>
+          <div className="flex flex-wrap gap-2">
+            {writingSizes.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.articlesSize === m}
+                  onChange={() => setStyle({ articlesSize: m })}
+                  className="sr-only"
+                />
+                {writingSizeLabels[m]}
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-ink-soft">{writingSizeHints[draft.style.articlesSize]}</p>
+        </div>
+      )}
+      {articlesStack && (
+        <div className="flex flex-col gap-4 border-t border-line pt-4">
+          <Slider
+            id="ui_articles_media"
+            label="Photo height"
+            value={draft.style.articlesMedia}
+            range={styleRanges.articlesMedia}
+            format={(v) => (v === 0 ? "Auto" : `${v} rem`)}
+            hint="Height of the photo. Auto uses 16:9, or the Ratio below."
+            onChange={(articlesMedia) => setStyle({ articlesMedia })}
+          />
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium text-ink-soft">Ratio</span>
+            <div className="flex flex-wrap gap-2">
+              {stackRatios.map((m) => (
+                <label key={m} className={pill}>
+                  <input
+                    type="radio"
+                    value={m}
+                    checked={draft.style.articlesStackRatio === m}
+                    onChange={() => setStyle({ articlesStackRatio: m })}
+                    className="sr-only"
+                  />
+                  {stackRatioLabels[m]}
+                </label>
+              ))}
+            </div>
+            <p className="text-xs text-ink-soft">{stackRatioHints[draft.style.articlesStackRatio]}</p>
+          </div>
+          {(draft.style.articlesStackRatio === "wide" || draft.style.articlesStackRatio === "ultra") && (
+            <Slider
+              id="ui_articles_stack_crop"
+              label="Crop position"
+              value={draft.style.articlesStackCrop}
+              range={styleRanges.stackCrop}
+              format={(v) => (v === 0 ? "Top" : v === 100 ? "Bottom" : v === 50 ? "Middle" : `${v}%`)}
+              hint="Which part of the photo shows: Top, Middle or Bottom."
+              onChange={(articlesStackCrop) => setStyle({ articlesStackCrop })}
+            />
+          )}
+        </div>
+      )}
+      <div className="flex flex-col gap-4 border-t border-line pt-4">
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Title place</span>
+          <div className="flex flex-wrap gap-2">
+            {designTitleAligns.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.articlesTitleAlign === m}
+                  onChange={() => setStyle({ articlesTitleAlign: m })}
+                  className="sr-only"
+                />
+                {designTitleAlignLabels[m]}
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-ink-soft">{designTitleAlignHints[draft.style.articlesTitleAlign]}</p>
+        </div>
+        <TextFontSelect
+          id="ui_articles_title_font"
+          label="Title font"
+          value={draft.style.articlesTitleFont}
+          hint="Default is the small label. Pick a font or a size to turn the title into a big heading."
+          onChange={(articlesTitleFont) => setStyle({ articlesTitleFont })}
+        />
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Title size</span>
+          <div className="flex flex-wrap gap-2">
+            {designTitleSizes.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.articlesTitleSize === m}
+                  onChange={() => setStyle({ articlesTitleSize: m })}
+                  className="sr-only"
+                />
+                {designTitleSizeLabels[m]}
+              </label>
+            ))}
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-col gap-4 border-t border-line pt-4">
+        <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">Text under the title</span>
+        <TextFontSelect
+          id="ui_articles_intro_font"
+          label="Font"
+          value={draft.style.articlesIntroFont}
+          hint="Default is the font of the site. The text itself is written in Pages, tab Home, Section titles."
+          onChange={(articlesIntroFont) => setStyle({ articlesIntroFont })}
+        />
+        <div className="flex flex-col gap-2">
+          <span className="text-sm font-medium text-ink-soft">Size</span>
+          <div className="flex flex-wrap gap-2">
+            {designIntroSizes.map((m) => (
+              <label key={m} className={pill}>
+                <input
+                  type="radio"
+                  value={m}
+                  checked={draft.style.articlesIntroSize === m}
+                  onChange={() => setStyle({ articlesIntroSize: m })}
+                  className="sr-only"
+                />
+                {designIntroSizeLabels[m]}
+              </label>
+            ))}
+          </div>
+          <p className="text-xs text-ink-soft">Auto follows the size of the title.</p>
+        </div>
+      </div>
+    </>
+  );
   const showcaseWide = draft.style.showcaseMode === "full";
   const showcaseControls = (
     <>
@@ -1208,6 +1408,18 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
       <input type="hidden" name="site_writing_intro_size" value={draft.style.writingIntroSize} />
       <input type="hidden" name="site_writing_stack_ratio" value={draft.style.writingStackRatio} />
       <input type="hidden" name="site_writing_stack_crop" value={draft.style.writingStackCrop} />
+      <input type="hidden" name="site_articles_mode" value={draft.style.articlesMode} />
+      <input type="hidden" name="site_articles_view" value={draft.style.articlesView} />
+      <input type="hidden" name="site_articles_wide_view" value={draft.style.articlesWideView} />
+      <input type="hidden" name="site_articles_size" value={draft.style.articlesSize} />
+      <input type="hidden" name="site_articles_media" value={draft.style.articlesMedia} />
+      <input type="hidden" name="site_articles_title_align" value={draft.style.articlesTitleAlign} />
+      <input type="hidden" name="site_articles_title_font" value={draft.style.articlesTitleFont} />
+      <input type="hidden" name="site_articles_title_size" value={draft.style.articlesTitleSize} />
+      <input type="hidden" name="site_articles_intro_font" value={draft.style.articlesIntroFont} />
+      <input type="hidden" name="site_articles_intro_size" value={draft.style.articlesIntroSize} />
+      <input type="hidden" name="site_articles_stack_ratio" value={draft.style.articlesStackRatio} />
+      <input type="hidden" name="site_articles_stack_crop" value={draft.style.articlesStackCrop} />
       <input type="hidden" name="site_design_stack_ratio" value={draft.style.designStackRatio} />
       <input type="hidden" name="site_design_stack_crop" value={draft.style.designStackCrop} />
       <input type="hidden" name="site_about_layout" value={draft.style.aboutLayout} />
@@ -1358,6 +1570,18 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
                 writingIntroSize: siteStyleDefaults.writingIntroSize,
                 writingStackRatio: siteStyleDefaults.writingStackRatio,
                 writingStackCrop: siteStyleDefaults.writingStackCrop,
+                articlesMode: siteStyleDefaults.articlesMode,
+                articlesView: siteStyleDefaults.articlesView,
+                articlesWideView: siteStyleDefaults.articlesWideView,
+                articlesSize: siteStyleDefaults.articlesSize,
+                articlesMedia: siteStyleDefaults.articlesMedia,
+                articlesTitleAlign: siteStyleDefaults.articlesTitleAlign,
+                articlesTitleFont: siteStyleDefaults.articlesTitleFont,
+                articlesTitleSize: siteStyleDefaults.articlesTitleSize,
+                articlesIntroFont: siteStyleDefaults.articlesIntroFont,
+                articlesIntroSize: siteStyleDefaults.articlesIntroSize,
+                articlesStackRatio: siteStyleDefaults.articlesStackRatio,
+                articlesStackCrop: siteStyleDefaults.articlesStackCrop,
                 designStackRatio: siteStyleDefaults.designStackRatio,
                 designStackCrop: siteStyleDefaults.designStackCrop,
               })
@@ -1377,6 +1601,7 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
                 projects: projectControls,
                 countdown: countdownControls,
                 writing: writingControls,
+                articles: articlesControls,
                 showcase: showcaseControls,
                 designs: designControls,
               }}

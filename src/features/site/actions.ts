@@ -61,6 +61,7 @@ const textSchema = z.object({
   hero_caption: text("The hero caption", siteLimits.caption),
   cards_title: text("The Writing label", siteLimits.title),
   cards_intro: text("The Writing text on Home", siteLimits.intro),
+  articles_home_intro: text("The Articles text on Home", siteLimits.intro),
   showcase_title: text("The Showcase label", siteLimits.title),
   showcase_intro: text("The Showcase text", siteLimits.intro),
   biblia_title: text("The Biblia label", siteLimits.title),
@@ -175,6 +176,7 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     hero_caption: field(formData, "hero_caption"),
     cards_title: field(formData, "cards_title"),
     cards_intro: field(formData, "cards_intro"),
+    articles_home_intro: field(formData, "articles_home_intro"),
     showcase_title: field(formData, "showcase_title"),
     showcase_intro: field(formData, "showcase_intro"),
     biblia_title: field(formData, "biblia_title"),
@@ -226,6 +228,7 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     next.heroCaption = v.hero_caption ?? null;
     next.cardsTitle = v.cards_title ?? null;
     next.cardsIntro = v.cards_intro ?? null;
+    next.articlesHomeIntro = v.articles_home_intro ?? null;
     next.showcaseTitle = v.showcase_title ?? null;
     next.showcaseIntro = v.showcase_intro ?? null;
     const biblia = field(formData, "biblia_url");

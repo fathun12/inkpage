@@ -286,6 +286,39 @@ export const writingWideViewHints: Record<WritingWideView, string> = {
   filmstrip: "One row of cards that runs to the edges of the screen. It slides by itself and has arrows.",
 };
 
+// The Articles section of Home (articles written inside the site). List is the original look.
+// Mode, the title place, the fonts and the title sizes reuse the Design names above.
+// The grid size reuses the Writing sizes.
+export const articleViews = ["list", "index", "grid"] as const;
+export type ArticleView = (typeof articleViews)[number];
+
+export const articleViewLabels: Record<ArticleView, string> = {
+  list: "List",
+  index: "Index",
+  grid: "Grid",
+};
+
+export const articleViewHints: Record<ArticleView, string> = {
+  list: "The original: the newest articles in rows, each with its cover.",
+  index: "Only type: a number, the big title and the date on one line. A quiet table of contents, like a book.",
+  grid: "Cards side by side: cover on top, title and text below. One column on a phone.",
+};
+
+export const articleWideViews = ["stack", "stackslide", "lead"] as const;
+export type ArticleWideView = (typeof articleWideViews)[number];
+
+export const articleWideViewLabels: Record<ArticleWideView, string> = {
+  stack: "Stack",
+  stackslide: "Stack slide",
+  lead: "Lead",
+};
+
+export const articleWideViewHints: Record<ArticleWideView, string> = {
+  stack: "One article per row: one cover across the whole screen, then the title and text.",
+  stackslide: "Like Stack, but one article at a time across the whole screen. It slides by itself and has arrows.",
+  lead: "Like a magazine front page: the newest article big, its cover running to the edge of the screen, and the others as a numbered list below.",
+};
+
 // How the Countdown section looks.
 export const countdownViews = ["section", "strip"] as const;
 export type CountdownView = (typeof countdownViews)[number];
@@ -344,6 +377,18 @@ export const layoutDefaults: {
   writingIntroSize: DesignIntroSize;
   writingStackRatio: StackRatio;
   writingStackCrop: number;
+  articlesMode: DesignMode;
+  articlesView: ArticleView;
+  articlesWideView: ArticleWideView;
+  articlesSize: WritingSize;
+  articlesMedia: number;
+  articlesTitleAlign: DesignTitleAlign;
+  articlesTitleFont: DesignFont;
+  articlesTitleSize: DesignTitleSize;
+  articlesIntroFont: DesignFont;
+  articlesIntroSize: DesignIntroSize;
+  articlesStackRatio: StackRatio;
+  articlesStackCrop: number;
 } = {
   density: "comfortable",
   projectSize: "large",
@@ -387,6 +432,18 @@ export const layoutDefaults: {
   writingIntroSize: "auto",
   writingStackRatio: "default",
   writingStackCrop: 50,
+  articlesMode: "centered",
+  articlesView: "list",
+  articlesWideView: "stack",
+  articlesSize: "medium",
+  articlesMedia: 0,
+  articlesTitleAlign: "center",
+  articlesTitleFont: "default",
+  articlesTitleSize: "auto",
+  articlesIntroFont: "default",
+  articlesIntroSize: "auto",
+  articlesStackRatio: "default",
+  articlesStackCrop: 50,
 };
 
 // Safe reader: an unknown or missing value falls back to the default.
