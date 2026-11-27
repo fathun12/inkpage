@@ -1,37 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type ComponentProps,
-  type MouseEvent,
-  type ReactNode,
-} from "react";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { SectionControls } from "@/components/admin/studio/SectionControls";
-import { HomeShop } from "@/components/shop/HomeShop";
-import { CardSlider } from "@/components/site/CardSlider";
-import { FadeGallery } from "@/components/site/FadeGallery";
-import { Hero } from "@/components/site/Hero";
-import { HeroContents, type ContentsItem } from "@/components/site/HeroContents";
-import { HomeArticles } from "@/components/site/HomeArticles";
-import { HomeBiblia } from "@/components/site/HomeBiblia";
-import { HomeCountdown } from "@/components/site/HomeCountdown";
-import { HomeDesigns } from "@/components/site/HomeDesigns";
-import { HomeGithub } from "@/components/site/HomeGithub";
-import { HomeProjects } from "@/components/site/HomeProjects";
-import { HomeShowcase } from "@/components/site/HomeShowcase";
-import { IndexSection } from "@/components/site/IndexSection";
-import { Intro } from "@/components/site/Intro";
-import { NewsBar } from "@/components/site/NewsBar";
-import { SectionBox } from "@/components/site/SectionBox";
-import { SiteFooter } from "@/components/site/SiteFooter";
-import { SiteFrame } from "@/components/site/SiteFrame";
-import { SiteHeader } from "@/components/site/SiteHeader";
-import type { Mode } from "@/components/site/ThemeSwitch";
-import { VisitCards } from "@/components/site/VisitCards";
 import { Field } from "@/components/ui/Field";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 import {
@@ -51,7 +22,6 @@ import {
   heroItemLabels,
   heroMotionDefaults,
   heroMotionRanges,
-  resolveGreetings,
   type HeroItemId,
   type HeroItemMotion,
 } from "@/config/intro";
@@ -88,7 +58,6 @@ import {
   projectViewHints,
   projectViewLabels,
   projectViews,
-  sectionLabels,
   showcaseSizeHints,
   showcaseSizeLabels,
   showcaseSizes,
@@ -102,7 +71,7 @@ import {
   type SectionId,
   type SectionSetting,
 } from "@/config/layout";
-import type { SiteSettings } from "@/config/site-content";
+import { previewMessages, previewPath } from "@/config/preview";
 import {
   motionHints,
   motionLabels,
@@ -113,34 +82,14 @@ import {
   type SiteStyle,
 } from "@/config/site-style";
 import { routes } from "@/config/site";
-import { creditOf, type HomeMedia } from "@/lib/site-view";
 import { cn } from "@/lib/utils";
-import type { Block, SocialItem } from "@/types/block";
 import type { FormAction } from "@/types/form";
 
 type Props = {
   action: FormAction;
-  profile: { username: string; displayName: string; bio: string | null };
+  username: string;
   fonts: FontPair;
   style: SiteStyle;
-  site: SiteSettings;
-  media: HomeMedia;
-  rows: Block[];
-  projects: Block[];
-  showcase: Block[];
-  countdown: Block | null;
-  articles: ComponentProps<typeof HomeArticles>["articles"];
-  cards: Block[];
-  socials: SocialItem[];
-  nav: { label: string; href: string }[];
-  biblia: ComponentProps<typeof HomeBiblia>["data"] | null;
-  designs: ComponentProps<typeof HomeDesigns>["data"] | null;
-  github: ComponentProps<typeof HomeGithub>["data"] | null;
-  shopItems: ComponentProps<typeof HomeShop>["products"];
-  shopOpen: boolean;
-  shopTitle: string;
-  shopBase: string;
-  contents: ContentsItem[];
   notice?: ReactNode;
 };
 
@@ -158,73 +107,6 @@ const pill =
 const colorInput = "ink-border h-10 w-20 cursor-pointer rounded-md bg-surface p-1";
 const resetButton =
   "self-start font-mono text-xs uppercase tracking-widest text-ink-soft underline underline-offset-4 hover:text-ink";
-
-// The area of one section in the preview: every box inside its marker (the marker itself has no box).
-function sectionArea(marker: Element) {
-  const area = { top: Infinity, bottom: -Infinity };
-  const walk = (parent: Element) => {
-    for (const child of Array.from(parent.children)) {
-      if (getComputedStyle(child).display === "contents") {
-        walk(child);
-        continue;
-      }
-      const rect = child.getBoundingClientRect();
-      if (rect.height < 1) continue;
-      area.top = Math.min(area.top, rect.top);
-      area.bottom = Math.max(area.bottom, rect.bottom);
-    }
-  };
-  walk(marker);
-  return Number.isFinite(area.top) ? area : null;
-}
-
-// Puts a highlight box over one section of the preview, or hides it.
-function place(
-  box: HTMLDivElement | null,
-  tag: HTMLSpanElement | null,
-  id: SectionId | null,
-  scroll: HTMLElement,
-  frame: HTMLElement,
-) {
-  if (!box) return;
-  const marker = id ? scroll.querySelector(`[data-studio-section="${id}"]`) : null;
-  const area = marker ? sectionArea(marker) : null;
-  if (!id || !area) {
-    box.style.display = "none";
-    return;
-  }
-  const frameRect = frame.getBoundingClientRect();
-  const scrollRect = scroll.getBoundingClientRect();
-  box.style.display = "block";
-  box.style.top = `${area.top - frameRect.top}px`;
-  box.style.left = `${scrollRect.left - frameRect.left}px`;
-  box.style.width = `${scroll.clientWidth}px`;
-  box.style.height = `${area.bottom - area.top}px`;
-  if (tag) tag.textContent = sectionLabels[id];
-}
-
-// Shown in the preview when no link is on Home yet.
-function sampleRows(): Block[] {
-  return ["Your first project", "An article you wrote", "A download"].map(
-    (title, index): Block => ({
-      id: `sample-${index}`,
-      user_id: "",
-      type: "link",
-      title,
-      url: "https://example.com",
-      body: null,
-      image_url: null,
-      data: {},
-      position: index,
-      page: "home",
-      is_visible: true,
-      is_pinned: false,
-      publish_at: null,
-      expire_at: null,
-      created_at: "",
-    }),
-  );
-}
 
 function Section({
   id,
@@ -463,31 +345,7 @@ function FontPicker({
   );
 }
 
-export function CustomizeStudio({
-  action,
-  profile,
-  fonts,
-  style,
-  site,
-  media,
-  rows,
-  projects,
-  showcase,
-  countdown,
-  articles,
-  cards,
-  socials,
-  nav,
-  biblia,
-  designs,
-  github,
-  shopItems,
-  shopOpen,
-  shopTitle,
-  shopBase,
-  contents,
-  notice,
-}: Props) {
+export function CustomizeStudio({ action, username, fonts, style, notice }: Props) {
   const [initial] = useState<Draft>(() => ({
     fontHeading: fonts.heading,
     fontBody: fonts.body,
@@ -495,66 +353,30 @@ export function CustomizeStudio({
   }));
   const [draft, setDraft] = useState<Draft>(initial);
   const [device, setDevice] = useState<"phone" | "desktop">("phone");
-  // System / Light / Dark inside the preview box only. Not saved.
-  const [previewMode, setPreviewMode] = useState<Mode>("system");
-  // Counts up to play the entrance of the top of Home again (the preview page is made fresh).
-  const [replay, setReplay] = useState(0);
-
-  // Inspect mode in the preview, like the inspector of a browser: hover shows a section, click selects it.
-  // The two highlight boxes are moved by hand (no state), so moving the mouse does not render the studio again.
+  // The section selected by a click in the preview (the Sections panel opens its row).
   const [picked, setPicked] = useState<SectionId | null>(null);
-  const frameRef = useRef<HTMLDivElement>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const hoverBox = useRef<HTMLDivElement>(null);
-  const hoverTag = useRef<HTMLSpanElement>(null);
-  const pickBox = useRef<HTMLDivElement>(null);
-  const hoverId = useRef<SectionId | null>(null);
-  const pickedId = useRef<SectionId | null>(null);
+  // True once the preview page is loaded and has said it is ready.
+  const [loaded, setLoaded] = useState(false);
 
-  const paint = useCallback(() => {
-    const frame = frameRef.current;
-    const scroll = scrollRef.current;
-    if (!frame || !scroll) return;
-    const hover = hoverId.current === pickedId.current ? null : hoverId.current;
-    place(hoverBox.current, hoverTag.current, hover, scroll, frame);
-    place(pickBox.current, null, pickedId.current, scroll, frame);
+  // The preview is the page /admin/preview in a frame. The draft is sent to it with postMessage.
+  const frameRef = useRef<HTMLIFrameElement>(null);
+  const draftRef = useRef(draft);
+
+  const send = useCallback(() => {
+    frameRef.current?.contentWindow?.postMessage(
+      { type: previewMessages.draft, draft: draftRef.current },
+      window.location.origin,
+    );
   }, []);
 
-  // Keeps the boxes on their sections when anything changes (settings, device, size of the page).
   useEffect(() => {
-    paint();
-  });
-  useEffect(() => {
-    const frame = frameRef.current;
-    const page = scrollRef.current?.firstElementChild;
-    if (!frame) return;
-    const observer = new ResizeObserver(() => paint());
-    observer.observe(frame);
-    if (page) observer.observe(page);
-    return () => observer.disconnect();
-  }, [paint]);
+    draftRef.current = draft;
+    send();
+  }, [draft, send]);
 
-  function sectionAt(target: EventTarget): SectionId | null {
-    if (!(target instanceof Element)) return null;
-    const id = target.closest("[data-studio-section]")?.getAttribute("data-studio-section");
-    return draft.style.order.find((s) => s === id) ?? null;
-  }
-  function hoverMove(event: MouseEvent<HTMLDivElement>) {
-    const id = sectionAt(event.target);
-    if (id !== hoverId.current) {
-      hoverId.current = id;
-      paint();
-    }
-  }
-  function hoverLeave() {
-    hoverId.current = null;
-    paint();
-  }
   // Selects a section: opens the Sections panel and the row of that section, and scrolls to it.
-  function pick(id: SectionId) {
-    pickedId.current = id;
+  const pick = useCallback((id: SectionId) => {
     setPicked(id);
-    paint();
     const panel = document.getElementById("studio-sections");
     if (panel instanceof HTMLDetailsElement) panel.open = true;
     const row = document.getElementById(`studio-row-${id}`);
@@ -562,6 +384,29 @@ export function CustomizeStudio({
     if (details) details.open = true;
     const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     row?.scrollIntoView({ block: "center", behavior: calm ? "auto" : "smooth" });
+  }, []);
+
+  // Messages from the preview: it is ready (send the draft), or a section was clicked.
+  useEffect(() => {
+    function onMessage(event: MessageEvent) {
+      if (event.origin !== window.location.origin || event.source !== frameRef.current?.contentWindow) return;
+      const data: unknown = event.data;
+      if (typeof data !== "object" || data === null) return;
+      const msg = data as { type?: unknown; id?: unknown };
+      if (msg.type === previewMessages.ready) {
+        setLoaded(true);
+        send();
+      } else if (msg.type === previewMessages.pick) {
+        const id = draftRef.current.style.order.find((s) => s === msg.id);
+        if (id) pick(id);
+      }
+    }
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [pick, send]);
+
+  function replayEntrance() {
+    frameRef.current?.contentWindow?.postMessage({ type: previewMessages.replay }, window.location.origin);
   }
 
   function set<K extends keyof Draft>(key: K, value: Draft[K]) {
@@ -581,155 +426,8 @@ export function CustomizeStudio({
   }
 
   const dirty = JSON.stringify(draft) !== JSON.stringify(initial);
-  const previewRows = rows.length > 0 ? rows : sampleRows();
-  const autoplay = draft.style.motion !== "off";
-  const base = routes.profile(profile.username);
+  const base = routes.profile(username);
   const sec = draft.style.sections;
-  const on = (id: SectionId) => !sec[id].hidden;
-  // Sections that have something to show and are not hidden, in the order of the draft.
-  const withData = new Set(contents.map((item) => item.id));
-  const sequence = draft.style.order.filter((id) => on(id) && withData.has(id));
-  const shownContents = sequence
-    .map((id) => contents.find((item) => item.id === id))
-    .filter((item): item is ContentsItem => Boolean(item));
-  // Writing and Articles touch only when Articles comes right after Writing.
-  const writingAt = sequence.indexOf("writing");
-  const joined = writingAt >= 0 && sequence[writingAt + 1] === "articles";
-
-  // A click in the preview: links must not leave the studio, and the section under the mouse is selected.
-  function previewClick(event: MouseEvent<HTMLDivElement>) {
-    if ((event.target as HTMLElement).closest("a")) event.preventDefault();
-    const id = sectionAt(event.target);
-    if (id) pick(id);
-  }
-
-  // Each section of Home, ready to place. The order comes from the draft (Sections panel).
-  const parts: Record<SectionId, ReactNode> = {
-    countdown: countdown && on("countdown") && (
-      <SectionBox setting={sec.countdown}>
-        <HomeCountdown
-          title={countdown.title}
-          description={countdown.body}
-          target={countdown.data.target ?? ""}
-          start={countdown.created_at}
-          variant={draft.style.countdownView}
-        />
-      </SectionBox>
-    ),
-    writing: cards.length > 0 && on("writing") && (
-      <SectionBox setting={sec.writing}>
-        <CardSlider
-          items={cards}
-          title={site.cardsTitle ?? site.writing.title ?? "Writing"}
-          seconds={draft.style.heroSeconds}
-          autoplay={autoplay}
-          spacing={joined ? "site-pt pb-6 sm:pb-8" : undefined}
-        />
-      </SectionBox>
-    ),
-    articles: on("articles") && (
-      <SectionBox setting={sec.articles}>
-        <HomeArticles
-          articles={articles}
-          username={profile.username}
-          title={site.articles.title ?? "Articles"}
-          joined={joined}
-        />
-      </SectionBox>
-    ),
-    projects: on("projects") && (
-      <SectionBox setting={sec.projects}>
-        <HomeProjects
-          items={projects}
-          title={site.projects.title ?? "Projects"}
-          seeAll={routes.section(profile.username, "projects")}
-          view={draft.style.projectView}
-          mediaHeight={draft.style.projectMedia}
-          slide={{ seconds: draft.style.heroSeconds, autoplay }}
-        />
-      </SectionBox>
-    ),
-    biblia: biblia && on("biblia") && (
-      <SectionBox setting={sec.biblia}>
-        <HomeBiblia data={biblia} title={site.bibliaTitle ?? "Biblia"} seeAll={`${base}/biblia`} />
-      </SectionBox>
-    ),
-    github: github && on("github") && (
-      <SectionBox setting={sec.github}>
-        <HomeGithub data={github} title={site.githubTitle ?? "GitHub"} />
-      </SectionBox>
-    ),
-    shop: on("shop") && (
-      <SectionBox setting={sec.shop}>
-        <HomeShop products={shopItems} open={shopOpen} title={shopTitle} base={shopBase} />
-      </SectionBox>
-    ),
-    links: on("links") && (
-      <SectionBox setting={sec.links}>
-        <IndexSection
-          blocks={previewRows}
-          mediaUrl={media.indexMedia}
-          credit={creditOf(site.credits, media.indexMedia)}
-        />
-      </SectionBox>
-    ),
-    showcase: on("showcase") && (
-      <SectionBox setting={sec.showcase}>
-        <HomeShowcase
-          items={showcase}
-          title={site.showcaseTitle ?? "Showcase"}
-          mode={draft.style.showcaseMode}
-          view={draft.style.showcaseView}
-          wideView={draft.style.showcaseWideView}
-          size={draft.style.showcaseSize}
-          mediaHeight={draft.style.showcaseMedia}
-          slide={{ seconds: draft.style.heroSeconds, autoplay }}
-          intro={site.showcaseIntro}
-          titleAlign={draft.style.showcaseTitleAlign}
-          titleFont={draft.style.showcaseTitleFont}
-          titleSize={draft.style.showcaseTitleSize}
-          introFont={draft.style.showcaseIntroFont}
-          introSize={draft.style.showcaseIntroSize}
-        />
-      </SectionBox>
-    ),
-    designs: designs && on("designs") && (
-      <SectionBox setting={sec.designs}>
-        <HomeDesigns
-          data={{ ...designs, projects: designs.projects.slice(0, draft.style.designCount) }}
-          title={site.designsTitle ?? "Design"}
-          href={site.designsUrl}
-          seconds={draft.style.gallerySeconds}
-          autoplay={autoplay}
-          mode={draft.style.designMode}
-          view={draft.style.designView}
-          wideView={draft.style.designWideView}
-          intro={site.designsIntro}
-          titleAlign={draft.style.designTitleAlign}
-          titleFont={draft.style.designTitleFont}
-          titleSize={draft.style.designTitleSize}
-          introFont={draft.style.designIntroFont}
-          introSize={draft.style.designIntroSize}
-          size={draft.style.designSize}
-          mediaHeight={draft.style.designMedia}
-          slide={{ seconds: draft.style.heroSeconds, autoplay }}
-        />
-      </SectionBox>
-    ),
-    visit: on("visit") && (
-      <SectionBox setting={sec.visit}>
-        <VisitCards items={site.visits} title={site.visitTitle ?? "Visit website"} />
-      </SectionBox>
-    ),
-    gallery: on("gallery") && (
-      <FadeGallery
-        images={media.gallery}
-        seconds={draft.style.gallerySeconds}
-        autoplay={autoplay}
-        credits={site.credits}
-      />
-    ),
-  };
 
   // Settings that belong to one section only. They sit inside that section's row in the Sections panel.
   const projectControls = (
@@ -1490,10 +1188,7 @@ export function CustomizeStudio({
               </p>
               <button
                 type="button"
-                onClick={() => {
-                  scrollRef.current?.scrollTo({ top: 0 });
-                  setReplay((n) => n + 1);
-                }}
+                onClick={replayEntrance}
                 className="ink-border cursor-pointer self-start rounded-full px-3 py-1.5 text-sm"
               >
                 ▶ Play the entrance in the preview
@@ -1551,89 +1246,23 @@ export function CustomizeStudio({
           aria-label="Preview"
           className="order-1 h-[45dvh] shrink-0 bg-highlight p-3 lg:order-2 lg:h-auto lg:min-w-0 lg:flex-1 lg:shrink lg:p-6"
         >
-          {/* translateZ(0) keeps everything of the page inside this box. */}
+          {/* The preview is the real page /admin/preview in a frame: the frame is its screen, so the height,
+              the width of a phone and the scroll behave like the website. */}
           <div
-            ref={frameRef}
-            className="relative mx-auto h-full overflow-hidden border border-line [transform:translateZ(0)]"
+            className="relative mx-auto h-full overflow-hidden border border-line bg-bg"
             style={{ maxWidth: device === "phone" ? phoneWidth : undefined }}
           >
-            <div
-              ref={scrollRef}
-              className="absolute inset-0 overflow-y-auto"
-              onClickCapture={previewClick}
-              onMouseMove={hoverMove}
-              onMouseLeave={hoverLeave}
-              onScroll={paint}
-            >
-              <SiteFrame
-                key={replay}
-                fonts={{ heading: draft.fontHeading, body: draft.fontBody }}
-                style={draft.style}
-                viewportHeight={device === "phone" ? "620px" : "560px"}
-                mode={previewMode}
-              >
-                <NewsBar items={site.news} seconds={draft.style.heroSeconds} autoplay={autoplay} showClock={site.showClock} />
-                <SiteHeader brand={profile.username} home={base} items={nav} overlay />
-                <Hero
-                  slides={media.hero}
-                  name={profile.displayName}
-                  caption={site.heroCaption ?? profile.bio}
-                  seconds={draft.style.heroSeconds}
-                  autoplay={autoplay}
-                  gray={draft.style.heroGray}
-                  credits={site.credits}
-                >
-                  {site.intro.enabled && site.intro.headlines.length > 0 && (
-                    <Intro
-                      greetings={resolveGreetings(site.intro.greetings)}
-                      note={site.intro.note}
-                      headlines={site.intro.headlines}
-                      seconds={draft.style.heroSeconds}
-                      autoplay={autoplay}
-                    />
-                  )}
-                  <HeroContents items={shownContents} />
-                </Hero>
-                {draft.style.order.map((id) =>
-                  parts[id] ? (
-                    <div key={id} data-studio-section={id} className="contents">
-                      {parts[id]}
-                    </div>
-                  ) : null,
-                )}
-                <SiteFooter
-                  brand={profile.username}
-                  note={site.footerNote}
-                  socials={socials}
-                  contactEmail={site.contactEmail}
-                  whatsapp={site.whatsapp}
-                  nav={nav}
-                  modeControl={{ value: previewMode, onChange: setPreviewMode }}
-                  news={{
-                    items: site.news,
-                    seconds: draft.style.heroSeconds,
-                    autoplay,
-                    showClock: site.showClock,
-                    countdown: null,
-                  }}
-                />
-              </SiteFrame>
-            </div>
-            <div
-              ref={pickBox}
-              aria-hidden
-              className="pointer-events-none absolute z-10 hidden border-2 border-accent"
+            <iframe
+              ref={frameRef}
+              src={previewPath}
+              title="Preview of your website"
+              className="absolute inset-0 size-full border-0"
             />
-            <div
-              ref={hoverBox}
-              aria-hidden
-              className="pointer-events-none absolute z-20 hidden border border-accent bg-accent/15"
-            >
-              <span
-                ref={hoverTag}
-                className="absolute left-0 top-0 bg-accent px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-accent-ink"
-              />
-            </div>
+            {!loaded && (
+              <p className="pointer-events-none absolute inset-0 flex items-center justify-center font-mono text-xs uppercase tracking-widest text-ink-soft">
+                Loading the preview...
+              </p>
+            )}
           </div>
         </section>
       </div>
