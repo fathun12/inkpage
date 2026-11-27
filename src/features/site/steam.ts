@@ -17,6 +17,12 @@ function num(v: unknown): number {
   return typeof v === "number" && Number.isFinite(v) ? v : 0;
 }
 
+// Why the Steam section is hidden. Shown in the terminal (npm run dev) and in the Vercel logs. Never prints the key.
+function hidden(reason: string): null {
+  console.error(`steam: section hidden, ${reason}`);
+  return null;
+}
+
 // One call to the Steam Web API. Cached for 30 minutes. The key stays on the server and is never logged.
 // Any failure gives null.
 async function steam(path: string, params: Record<string, string>, key: string): Promise<unknown> {
@@ -27,8 +33,14 @@ async function steam(path: string, params: Record<string, string>, key: string):
       signal: AbortSignal.timeout(5000),
       next: { revalidate: 1800 },
     });
-    return res.ok ? await res.json() : null;
-  } catch {
+    if (!res.ok) {
+      console.error(`steam: ${path} answered HTTP ${res.status}`);
+      return null;
+    }
+    return await res.json();
+  } catch (e) {
+    const cause = e instanceof Error && e.cause instanceof Error ? ` (${e.cause.message})` : "";
+    console.error(`steam: ${path} failed: ${e instanceof Error ? `${e.name}: ${e.message}` : "unknown"}${cause}`);
     return null;
   }
 }
@@ -57,8 +69,9 @@ function games(raw: unknown): SteamGame[] {
 // the profile is not public, or no game list could be read (so the section stays hidden).
 export async function fetchSteam(steamId: string | null): Promise<SteamData | null> {
   const key = env.steamApiKey;
+  if (!key) return hidden("STEAM_API_KEY is empty on this server");
   const id = steamIdNumber(steamId);
-  if (!key || !id) return null;
+  if (!id) return hidden(`the saved Steam ID is not valid (${steamId === null ? "empty" : "wrong format"})`);
 
   const [rawSummary, rawRecent, rawOwned, rawLevel] = await Promise.all([
     steam("/ISteamUser/GetPlayerSummaries/v0002/", { steamids: id }, key),
@@ -71,8 +84,10 @@ export async function fetchSteam(steamId: string | null): Promise<SteamData | nu
   const p = obj(Array.isArray(players) ? players[0] : null);
   const name = str(p.personaname);
   const avatar = str(p.avatarfull);
+  if (!name || !avatar) return hidden("the profile summary has no name or avatar");
+  if (!avatar.startsWith("https://")) return hidden("the avatar address is not https");
   // 3 = public. Anything else (private, friends only) stays hidden.
-  if (!name || !avatar || !avatar.startsWith("https://") || num(p.communityvisibilitystate) !== 3) return null;
+  if (num(p.communityvisibilitystate) !== 3) return hidden("the Steam profile is not public");
 
   const recent = games(rawRecent)
     .filter((g) => g.recentMinutes > 0)
@@ -83,7 +98,7 @@ export async function fetchSteam(steamId: string | null): Promise<SteamData | nu
     .filter((g) => g.totalMinutes > 0)
     .sort((a, b) => b.totalMinutes - a.totalMinutes)
     .slice(0, 3);
-  if (recent.length === 0 && top.length === 0) return null;
+  if (recent.length === 0 && top.length === 0) return hidden("no games could be read (Game details not public?)");
 
   const profileUrl = str(p.profileurl);
   const playing = str(p.gameextrainfo)?.slice(0, 100) ?? null;
