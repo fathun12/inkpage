@@ -5,7 +5,7 @@ import type { Block } from "@/types/block";
 import { Reveal } from "./Reveal";
 import { WritingCard } from "./WritingCard";
 
-type Props = { items: Block[]; title: string | null; seconds: number; autoplay: boolean; spacing?: string };
+type Props = { items: Block[]; title: string | null; seconds: number; autoplay: boolean; spacing?: string; id?: string };
 
 const GLIDE_MS = 700;
 const DRAG_START_PX = 6;
@@ -38,7 +38,7 @@ function nearest(points: number[], v: number) {
 // dragging (mouse, finger or pen: press, move, release, then it glides on and stops exactly on a card) and by the
 // arrows. The wheel and the touchpad do NOT move it, so the page always scrolls freely over it (the row is
 // overflow hidden, not a scroll box). Same model as MediaSlider.
-export function CardSlider({ items, title, seconds, autoplay, spacing = "site-py" }: Props) {
+export function CardSlider({ items, title, seconds, autoplay, spacing = "site-py", id = "selected" }: Props) {
   const track = useRef<HTMLUListElement>(null);
   const paused = useRef(false);
   const raf = useRef(0);
@@ -210,7 +210,7 @@ export function CardSlider({ items, title, seconds, autoplay, spacing = "site-py
 
   return (
     <section
-      id="selected"
+      id={id}
       aria-label={title ?? "Selected"}
       className={spacing}
       onPointerEnter={pause}

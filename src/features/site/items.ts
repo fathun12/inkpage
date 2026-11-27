@@ -228,6 +228,8 @@ export async function saveWritingAction(formData: FormData): Promise<void> {
   const data: BlockData = { ...(current?.data ?? {}) };
   if (formData.get("home") === "on") data.home = true;
   else delete data.home;
+  if (formData.get("journal") === "on") data.journal = true;
+  else delete data.journal;
 
   // No uploaded image: read the image of the link (og:image). An uploaded image always wins.
   let note = "";

@@ -20,7 +20,7 @@ import { readWritingItem } from "@/lib/item-data";
 import { paginate, readPage } from "@/lib/paging";
 import { matchesWords, readQuery } from "@/lib/search";
 import { buildSeriesCards, seriesIdsOf } from "@/lib/series-view";
-import { listBlocks, newestFirst, recentWriting } from "@/lib/site-view";
+import { journalWriting, listBlocks, newestFirst, recentWriting } from "@/lib/site-view";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -69,6 +69,8 @@ export default async function WritingPage({ params, searchParams }: Props) {
       })
     : all;
   const recent = recentWriting(all);
+  // The Journal slider stands under the search box, on page 1 and not while searching.
+  const journal = page === 1 && !q ? journalWriting(all) : [];
   const paged = paginate(rows, page, pageSizes.writing);
   if (page > paged.pages) notFound();
 
@@ -93,6 +95,16 @@ export default async function WritingPage({ params, searchParams }: Props) {
       {q && <SearchStatus query={q} count={rows.length} clearHref={writingUrl} />}
       {rows.length > 0 ? (
         <>
+          {journal.length > 0 && (
+            <CardSlider
+              id="journal"
+              items={journal}
+              title="Journal"
+              seconds={style.heroSeconds}
+              autoplay={style.motion !== "off"}
+              spacing="pt-4 pb-10 sm:pt-6 sm:pb-12"
+            />
+          )}
           {page === 1 && !q && (
             <CardSlider
               items={recent}

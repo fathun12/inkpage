@@ -131,3 +131,13 @@ export function homeCountdown(blocks: Block[]): Block | null {
 export function recentWriting(newest: Block[]): Block[] {
   return newest.slice(0, 5);
 }
+
+// Writing links marked "Journal article", newest first. The Journal slider shows these.
+export function journalWriting(blocks: Block[]): Block[] {
+  return newestFirst(
+    blocks.filter(
+      (b) =>
+        (b.type === "link" || b.type === "project") && resolvePage(b.page) === "writing" && b.data.journal === true,
+    ),
+  );
+}

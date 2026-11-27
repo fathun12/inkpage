@@ -127,6 +127,8 @@ export type WritingItem = {
   // Name of the site the link goes to (Medium, skrib.my.id, ...).
   source: string | null;
   home: boolean;
+  // A journal article: also shown in the Journal slider.
+  journal: boolean;
 };
 
 export function readWritingItem(block: Block): WritingItem {
@@ -140,6 +142,7 @@ export function readWritingItem(block: Block): WritingItem {
     uploaded: block.image_url,
     source: block.url ? socialLabel(block.url) : null,
     home: d.home === true,
+    journal: d.journal === true,
   };
 }
 

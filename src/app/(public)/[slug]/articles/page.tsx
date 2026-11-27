@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArticleList } from "@/components/site/ArticleList";
+import { CardSlider } from "@/components/site/CardSlider";
 import { PageIntro } from "@/components/site/PageIntro";
 import { Pager } from "@/components/site/Pager";
 import { SearchBox } from "@/components/site/SearchBox";
@@ -11,13 +12,16 @@ import { pageSizes } from "@/config/paging";
 import { cleanUrl } from "@/config/seo";
 import { routes } from "@/config/site";
 import { readSite } from "@/config/site-content";
+import { readSiteStyle } from "@/config/site-style";
 import { getPublicArticles } from "@/features/articles/queries";
 import { searchArticleIds } from "@/features/articles/search";
+import { getPublicBlocks } from "@/features/blocks/queries";
 import { getProfileByUsername } from "@/features/profile/queries";
 import { getSeriesByIds } from "@/features/series/queries";
 import { paginate, readPage } from "@/lib/paging";
 import { readQuery } from "@/lib/search";
 import { buildSeriesCards, seriesIdsOf } from "@/lib/series-view";
+import { journalWriting } from "@/lib/site-view";
 import { cleanTags } from "@/lib/tags";
 
 type Props = {
@@ -83,6 +87,9 @@ export default async function ArticlesPage({ params, searchParams }: Props) {
 
   const articlesUrl = routes.section(profile.username, "articles");
   const cards = !tag && !q && page === 1 ? buildSeriesCards(await getSeriesByIds(seriesIdsOf(all)), all) : [];
+  // The Journal slider (Writing links marked as journal) stands under the search box, on page 1 only.
+  const style = readSiteStyle(profile.site_style);
+  const journal = !tag && !q && page === 1 ? journalWriting(await getPublicBlocks(profile.id)) : [];
 
   // The address the page numbers and "Clear" start from.
   const params2 = new URLSearchParams();
@@ -101,6 +108,16 @@ export default async function ArticlesPage({ params, searchParams }: Props) {
           value={q}
           placeholder="Search titles, tags, series, or any sentence"
           label="Search articles"
+        />
+      )}
+      {journal.length > 0 && (
+        <CardSlider
+          id="journal"
+          items={journal}
+          title="Journal"
+          seconds={style.heroSeconds}
+          autoplay={style.motion !== "off"}
+          spacing="pt-4 pb-10 sm:pt-6 sm:pb-12"
         />
       )}
       {tag && (

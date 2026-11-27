@@ -58,6 +58,15 @@ function WritingForm({ item, visible, save, sign }: FormProps) {
           </span>
         </label>
       )}
+      <label className="flex flex-col gap-0.5 text-sm">
+        <span className="flex items-center gap-2">
+          <input type="checkbox" name="journal" defaultChecked={item?.journal ?? false} className="accent-accent" />
+          Journal article
+        </span>
+        <span className="pl-6 text-xs text-ink-soft">
+          Also shown in the Journal slider at the top of the Articles and Writing pages.
+        </span>
+      </label>
       <label className="flex items-center gap-2 text-sm">
         <input type="checkbox" name="home" defaultChecked={item?.home ?? false} className="accent-accent" />
         Also show on Home (the sliding cards)
@@ -96,6 +105,7 @@ export function WritingItems({ blocks, actions, sign }: Props) {
             const badges = [
               block.is_visible ? "Live" : "Hidden",
               ...(item.source ? [item.source] : []),
+              ...(item.journal ? ["Journal"] : []),
               ...(item.home ? ["On Home"] : []),
             ];
             return (

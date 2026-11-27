@@ -62,6 +62,7 @@ export type BlockData = {
   links?: ItemLink[]; // Projects item: text links
   showcase?: boolean; // Projects item: also shown as Showcase on Home
   stackMedia?: string; // Projects item: address of the media the Stack layouts show (missing = automatic)
+  journal?: boolean; // Writing item: a journal article, also shown in the Journal slider
   og?: string; // Writing item: image address read from the link (an uploaded image wins over it)
 };
 
