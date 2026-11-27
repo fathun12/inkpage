@@ -411,6 +411,49 @@ export const githubWideViewHints: Record<GithubWideView, string> = {
   edge: "Like Index, but the rows and the lines run edge to edge.",
 };
 
+// The Shop section of Home (product cards). Grid is the original look.
+// Mode (Centered or Full width), the title place, the fonts, the title sizes and the Stack ratio reuse the names above.
+// A product photo is square, so Ratio and Crop only matter in Stack and Stack slide.
+export const shopViews = ["grid", "list", "slider"] as const;
+export type ShopView = (typeof shopViews)[number];
+
+export const shopViewLabels: Record<ShopView, string> = {
+  grid: "Grid",
+  list: "List",
+  slider: "Slider",
+};
+
+export const shopViewHints: Record<ShopView, string> = {
+  grid: "Cards side by side (the original): one column on a phone, up to five on a wide screen.",
+  list: "One product per row: a small photo, the big name, the price and the button. Like a catalogue.",
+  slider: "One row of cards that slides by itself and has arrows.",
+};
+
+export const shopSizeHints: Record<WritingSize, string> = {
+  small: "Five cards per row on a wide screen (smaller cards).",
+  medium: "Four cards per row on a wide screen.",
+  large: "The original size: three cards per row on a wide screen.",
+};
+
+export const shopWideViews = ["stack", "stackslide", "split", "filmstrip", "sheet"] as const;
+export type ShopWideView = (typeof shopWideViews)[number];
+
+export const shopWideViewLabels: Record<ShopWideView, string> = {
+  stack: "Stack",
+  stackslide: "Stack slide",
+  split: "Split",
+  filmstrip: "Filmstrip",
+  sheet: "Contact sheet",
+};
+
+export const shopWideViewHints: Record<ShopWideView, string> = {
+  stack: "One product per row: one photo across the whole screen, then its number, name, price and button.",
+  stackslide: "Like Stack, but one product at a time across the whole screen. It slides by itself and has arrows.",
+  split: "Photo on one half of the screen, text on the other half. The sides swap on each product.",
+  filmstrip: "One row of tall panels that runs to the edges of the screen. It slides by itself and has arrows.",
+  sheet: "Square photos that touch each other. The name and price show on hover (always a label on a phone).",
+};
+
 // How the Countdown section looks.
 export const countdownViews = ["section", "strip"] as const;
 export type CountdownView = (typeof countdownViews)[number];
@@ -507,6 +550,18 @@ export const layoutDefaults: {
   githubTitleSize: DesignTitleSize;
   githubIntroFont: DesignFont;
   githubIntroSize: DesignIntroSize;
+  shopMode: DesignMode;
+  shopView: ShopView;
+  shopWideView: ShopWideView;
+  shopSize: WritingSize;
+  shopMedia: number;
+  shopTitleAlign: DesignTitleAlign;
+  shopTitleFont: DesignFont;
+  shopTitleSize: DesignTitleSize;
+  shopIntroFont: DesignFont;
+  shopIntroSize: DesignIntroSize;
+  shopStackRatio: StackRatio;
+  shopStackCrop: number;
 } = {
   density: "comfortable",
   projectSize: "large",
@@ -588,6 +643,18 @@ export const layoutDefaults: {
   githubTitleSize: "auto",
   githubIntroFont: "default",
   githubIntroSize: "auto",
+  shopMode: "centered",
+  shopView: "grid",
+  shopWideView: "stack",
+  shopSize: "large",
+  shopMedia: 0,
+  shopTitleAlign: "center",
+  shopTitleFont: "default",
+  shopTitleSize: "auto",
+  shopIntroFont: "default",
+  shopIntroSize: "auto",
+  shopStackRatio: "default",
+  shopStackCrop: 50,
 };
 
 // Safe reader: an unknown or missing value falls back to the default.

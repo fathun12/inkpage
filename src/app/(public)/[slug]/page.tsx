@@ -262,6 +262,20 @@ export default async function HomePage({ params }: Props) {
           open={shop.settings.is_open}
           title={shopTitle}
           base={routes.section(profile.username, "shop")}
+          seconds={style.heroSeconds}
+          mode={style.shopMode}
+          view={style.shopView}
+          wideView={style.shopWideView}
+          size={style.shopSize}
+          mediaHeight={style.shopMedia}
+          stackRatio={style.shopStackRatio}
+          stackCrop={style.shopStackCrop}
+          intro={site.shopHomeIntro}
+          titleAlign={style.shopTitleAlign}
+          titleFont={style.shopTitleFont}
+          titleSize={style.shopTitleSize}
+          introFont={style.shopIntroFont}
+          introSize={style.shopIntroSize}
         />
       </SectionBox>
     ),

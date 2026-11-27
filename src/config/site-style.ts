@@ -29,6 +29,8 @@ import {
   bibliaWideViews,
   githubViews,
   githubWideViews,
+  shopViews,
+  shopWideViews,
   layoutDefaults,
   projectSizes,
   projectViews,
@@ -61,6 +63,8 @@ import {
   type BibliaWideView,
   type GithubView,
   type GithubWideView,
+  type ShopView,
+  type ShopWideView,
   type ProjectSize,
   type ProjectView,
   type SectionId,
@@ -115,6 +119,7 @@ export const styleRanges = {
   showcaseMedia: { min: 0, max: 60, step: 2 },
   writingMedia: { min: 0, max: 60, step: 2 },
   articlesMedia: { min: 0, max: 60, step: 2 },
+  shopMedia: { min: 0, max: 60, step: 2 },
   stackCrop: { min: 0, max: 100, step: 5 },
   steamOpacity: { min: 10, max: 100, step: 5 },
   steamPosition: { min: 0, max: 100, step: 5 },
@@ -210,6 +215,18 @@ export type SiteStyle = {
   githubTitleSize: DesignTitleSize;
   githubIntroFont: DesignFont;
   githubIntroSize: DesignIntroSize;
+  shopMode: DesignMode;
+  shopView: ShopView;
+  shopWideView: ShopWideView;
+  shopSize: WritingSize;
+  shopMedia: number;
+  shopTitleAlign: DesignTitleAlign;
+  shopTitleFont: DesignFont;
+  shopTitleSize: DesignTitleSize;
+  shopIntroFont: DesignFont;
+  shopIntroSize: DesignIntroSize;
+  shopStackRatio: StackRatio;
+  shopStackCrop: number;
   sections: SectionSettings;
   order: SectionId[];
   aboutLayout: AboutLayout;
@@ -321,6 +338,18 @@ export const siteStyleDefaults: SiteStyle = {
   githubTitleSize: layoutDefaults.githubTitleSize,
   githubIntroFont: layoutDefaults.githubIntroFont,
   githubIntroSize: layoutDefaults.githubIntroSize,
+  shopMode: layoutDefaults.shopMode,
+  shopView: layoutDefaults.shopView,
+  shopWideView: layoutDefaults.shopWideView,
+  shopSize: layoutDefaults.shopSize,
+  shopMedia: layoutDefaults.shopMedia,
+  shopTitleAlign: layoutDefaults.shopTitleAlign,
+  shopTitleFont: layoutDefaults.shopTitleFont,
+  shopTitleSize: layoutDefaults.shopTitleSize,
+  shopIntroFont: layoutDefaults.shopIntroFont,
+  shopIntroSize: layoutDefaults.shopIntroSize,
+  shopStackRatio: layoutDefaults.shopStackRatio,
+  shopStackCrop: layoutDefaults.shopStackCrop,
   sections: sectionDefaults,
   order: [...sectionIds],
   aboutLayout: aboutDefaults.aboutLayout,
@@ -440,6 +469,18 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     githubTitleSize: readChoice(r.githubTitleSize, designTitleSizes, d.githubTitleSize),
     githubIntroFont: readChoice(r.githubIntroFont, designTextFonts, d.githubIntroFont),
     githubIntroSize: readChoice(r.githubIntroSize, designIntroSizes, d.githubIntroSize),
+    shopMode: readChoice(r.shopMode, designModes, d.shopMode),
+    shopView: readChoice(r.shopView, shopViews, d.shopView),
+    shopWideView: readChoice(r.shopWideView, shopWideViews, d.shopWideView),
+    shopSize: readChoice(r.shopSize, writingSizes, d.shopSize),
+    shopMedia: num(r.shopMedia, styleRanges.shopMedia, d.shopMedia),
+    shopTitleAlign: readChoice(r.shopTitleAlign, designTitleAligns, d.shopTitleAlign),
+    shopTitleFont: readChoice(r.shopTitleFont, designTextFonts, d.shopTitleFont),
+    shopTitleSize: readChoice(r.shopTitleSize, designTitleSizes, d.shopTitleSize),
+    shopIntroFont: readChoice(r.shopIntroFont, designTextFonts, d.shopIntroFont),
+    shopIntroSize: readChoice(r.shopIntroSize, designIntroSizes, d.shopIntroSize),
+    shopStackRatio: readChoice(r.shopStackRatio, stackRatios, d.shopStackRatio),
+    shopStackCrop: num(r.shopStackCrop, styleRanges.stackCrop, d.shopStackCrop),
     designMedia: num(r.designMedia, styleRanges.designMedia, d.designMedia),
     designCount: num(r.designCount, styleRanges.designCount, d.designCount),
     sections: readSections(r.sections),

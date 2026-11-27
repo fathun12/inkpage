@@ -139,6 +139,13 @@ export function HomeForm({ action, sign, site }: WithMedia) {
         >
           <Textarea id="github_home_intro" name="github_home_intro" defaultValue={site.githubHomeIntro ?? ""} rows={3} maxLength={siteLimits.intro} />
         </Field>
+        <Field
+          label="Shop text under the title"
+          htmlFor="shop_home_intro"
+          hint="Optional. Under the Shop label on Home (that label is set in the admin Shop, Settings). Its font, size and place are set in Customize, Sections, Shop. Up to 400 characters."
+        >
+          <Textarea id="shop_home_intro" name="shop_home_intro" defaultValue={site.shopHomeIntro ?? ""} rows={3} maxLength={siteLimits.intro} />
+        </Field>
         <Field label="Showcase" htmlFor="showcase_title" hint="Above the Showcase section.">
           <Input id="showcase_title" name="showcase_title" defaultValue={site.showcaseTitle ?? ""} maxLength={siteLimits.title} />
         </Field>

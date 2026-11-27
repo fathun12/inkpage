@@ -25,7 +25,7 @@ import type { SiteStyle } from "@/config/site-style";
 const pill =
   "ink-border cursor-pointer rounded-full px-3 py-1.5 text-sm has-checked:bg-ink has-checked:text-bg has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink";
 
-function Choice<T extends string>({
+export function Choice<T extends string>({
   label,
   list,
   labels,
@@ -62,7 +62,7 @@ function fontName(id: FontId): string {
   return "label" in choice && typeof choice.label === "string" ? choice.label : id;
 }
 
-function FontSelect({
+export function FontSelect({
   id,
   label,
   value,

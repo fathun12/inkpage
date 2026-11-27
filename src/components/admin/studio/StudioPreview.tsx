@@ -401,7 +401,26 @@ export function StudioPreview({
     ),
     shop: on("shop") && (
       <SectionBox setting={sec.shop}>
-        <HomeShop products={shopItems} open={shopOpen} title={shopTitle} base={shopBase} />
+        <HomeShop
+          products={shopItems}
+          open={shopOpen}
+          title={shopTitle}
+          base={shopBase}
+          seconds={draft.style.heroSeconds}
+          mode={draft.style.shopMode}
+          view={draft.style.shopView}
+          wideView={draft.style.shopWideView}
+          size={draft.style.shopSize}
+          mediaHeight={draft.style.shopMedia}
+          stackRatio={draft.style.shopStackRatio}
+          stackCrop={draft.style.shopStackCrop}
+          intro={site.shopHomeIntro}
+          titleAlign={draft.style.shopTitleAlign}
+          titleFont={draft.style.shopTitleFont}
+          titleSize={draft.style.shopTitleSize}
+          introFont={draft.style.shopIntroFont}
+          introSize={draft.style.shopIntroSize}
+        />
       </SectionBox>
     ),
     links: on("links") && (

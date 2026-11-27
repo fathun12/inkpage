@@ -1,6 +1,7 @@
 "use client";
 
 import { GithubControls } from "@/components/admin/studio/GithubControls";
+import { ShopControls } from "@/components/admin/studio/ShopControls";
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
@@ -1770,6 +1771,18 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
       <input type="hidden" name="site_github_title_size" value={draft.style.githubTitleSize} />
       <input type="hidden" name="site_github_intro_font" value={draft.style.githubIntroFont} />
       <input type="hidden" name="site_github_intro_size" value={draft.style.githubIntroSize} />
+      <input type="hidden" name="site_shop_mode" value={draft.style.shopMode} />
+      <input type="hidden" name="site_shop_view" value={draft.style.shopView} />
+      <input type="hidden" name="site_shop_wide_view" value={draft.style.shopWideView} />
+      <input type="hidden" name="site_shop_size" value={draft.style.shopSize} />
+      <input type="hidden" name="site_shop_media" value={draft.style.shopMedia} />
+      <input type="hidden" name="site_shop_title_align" value={draft.style.shopTitleAlign} />
+      <input type="hidden" name="site_shop_title_font" value={draft.style.shopTitleFont} />
+      <input type="hidden" name="site_shop_title_size" value={draft.style.shopTitleSize} />
+      <input type="hidden" name="site_shop_intro_font" value={draft.style.shopIntroFont} />
+      <input type="hidden" name="site_shop_intro_size" value={draft.style.shopIntroSize} />
+      <input type="hidden" name="site_shop_stack_ratio" value={draft.style.shopStackRatio} />
+      <input type="hidden" name="site_shop_stack_crop" value={draft.style.shopStackCrop} />
       <input type="hidden" name="site_design_stack_ratio" value={draft.style.designStackRatio} />
       <input type="hidden" name="site_design_stack_crop" value={draft.style.designStackCrop} />
       <input type="hidden" name="site_about_layout" value={draft.style.aboutLayout} />
@@ -1958,6 +1971,18 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
                 githubTitleSize: siteStyleDefaults.githubTitleSize,
                 githubIntroFont: siteStyleDefaults.githubIntroFont,
                 githubIntroSize: siteStyleDefaults.githubIntroSize,
+                shopMode: siteStyleDefaults.shopMode,
+                shopView: siteStyleDefaults.shopView,
+                shopWideView: siteStyleDefaults.shopWideView,
+                shopSize: siteStyleDefaults.shopSize,
+                shopMedia: siteStyleDefaults.shopMedia,
+                shopTitleAlign: siteStyleDefaults.shopTitleAlign,
+                shopTitleFont: siteStyleDefaults.shopTitleFont,
+                shopTitleSize: siteStyleDefaults.shopTitleSize,
+                shopIntroFont: siteStyleDefaults.shopIntroFont,
+                shopIntroSize: siteStyleDefaults.shopIntroSize,
+                shopStackRatio: siteStyleDefaults.shopStackRatio,
+                shopStackCrop: siteStyleDefaults.shopStackCrop,
                 designStackRatio: siteStyleDefaults.designStackRatio,
                 designStackCrop: siteStyleDefaults.designStackCrop,
               })
@@ -1977,6 +2002,7 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
                 projects: projectsAll,
                 biblia: bibliaControls,
                 github: <GithubControls style={draft.style} onChange={setStyle} />,
+                shop: <ShopControls style={draft.style} onChange={setStyle} />,
                 countdown: countdownControls,
                 writing: writingControls,
                 articles: articlesControls,
