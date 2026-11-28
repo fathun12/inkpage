@@ -7,11 +7,17 @@ const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
   : null;
 
+// Cloudflare R2 public address (media.mfniam.com), so Vercel may resize those images too.
+const r2Host = process.env.R2_PUBLIC_URL ? new URL(process.env.R2_PUBLIC_URL).hostname : null;
+
 const nextConfig: NextConfig = {
   images: {
-    remotePatterns: supabaseHost
-      ? [{ protocol: "https", hostname: supabaseHost, pathname: "/storage/v1/object/public/media/**" }]
-      : [],
+    remotePatterns: [
+      ...(supabaseHost
+        ? [{ protocol: "https" as const, hostname: supabaseHost, pathname: "/storage/v1/object/public/media/**" }]
+        : []),
+      ...(r2Host ? [{ protocol: "https" as const, hostname: r2Host, pathname: "/**" }] : []),
+    ],
     // Only quality 80 and 90 are allowed. Files have random names and never change, so keep copies for a year.
     qualities: [80, 90],
     minimumCacheTTL: 31536000,

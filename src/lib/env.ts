@@ -50,4 +50,29 @@ export const env = {
   get steamApiKey() {
     return process.env.STEAM_API_KEY || undefined;
   },
+  // Cloudflare R2 for public media, server only. Without all five, uploads stay on Supabase.
+  get r2Ready() {
+    return Boolean(
+      process.env.R2_ACCOUNT_ID &&
+        process.env.R2_ACCESS_KEY_ID &&
+        process.env.R2_SECRET_ACCESS_KEY &&
+        process.env.R2_BUCKET &&
+        process.env.R2_PUBLIC_URL,
+    );
+  },
+  get r2AccountId() {
+    return need("R2_ACCOUNT_ID", process.env.R2_ACCOUNT_ID);
+  },
+  get r2AccessKeyId() {
+    return need("R2_ACCESS_KEY_ID", process.env.R2_ACCESS_KEY_ID);
+  },
+  get r2SecretAccessKey() {
+    return need("R2_SECRET_ACCESS_KEY", process.env.R2_SECRET_ACCESS_KEY);
+  },
+  get r2Bucket() {
+    return need("R2_BUCKET", process.env.R2_BUCKET);
+  },
+  get r2PublicUrl() {
+    return need("R2_PUBLIC_URL", process.env.R2_PUBLIC_URL);
+  },
 };
