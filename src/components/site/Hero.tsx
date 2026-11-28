@@ -17,7 +17,7 @@ type Props = {
   children?: ReactNode;
 };
 
-const stillOnStorage = /\/storage\/v1\/object\/public\/media\/.+\.(webp|jpe?g|png)$/i;
+const stillOnStorage = /(\/storage\/v1\/object\/public\/media\/|^https:\/\/media\.mfniam\.com\/).+\.(webp|jpe?g|png)$/i;
 const phoneWidths = [828, 1200];
 
 // A lighter copy (made by Vercel, quality 90) is used only when the screen really needs few pixels.
