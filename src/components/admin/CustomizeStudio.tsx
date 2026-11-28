@@ -972,6 +972,14 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
   const articlesWide = draft.style.articlesMode === "full";
   const articlesStack =
     articlesWide && (draft.style.articlesWideView === "stack" || draft.style.articlesWideView === "stackslide");
+  const leadSteps = [
+    ["page", "Whole page", "The whole list is replaced at once by the next articles."],
+    ["one", "One by one", "One article leaves and the next one comes in. It looks best with Fade."],
+  ] as const;
+  const leadMotions = [
+    ["slide", "Slide", "The list slides sideways."],
+    ["fade", "Fade", "The list fades into the next one."],
+  ] as const;
   const articlesControls = (
     <>
       <div className="flex flex-col gap-2">
@@ -1045,6 +1053,80 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
             ))}
           </div>
           <p className="text-xs text-ink-soft">{writingSizeHints[draft.style.articlesSize]}</p>
+        </div>
+      )}
+      {articlesWide && draft.style.articlesWideView === "lead" && (
+        <div className="flex flex-col gap-4 border-t border-line pt-4">
+          <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">
+            List under the big article
+          </span>
+          <Slider
+            id="ui_articles_lead_rows"
+            label="Rows shown"
+            value={draft.style.articlesLeadRows}
+            range={styleRanges.articlesLeadRows}
+            format={(v) => (v === 5 ? "All 5" : `${v}`)}
+            hint="How many rows of the list show at once. The rest take turns by themselves."
+            onChange={(articlesLeadRows) => setStyle({ articlesLeadRows })}
+          />
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium text-ink-soft">Change by</span>
+            <div className="flex flex-wrap gap-2">
+              {leadSteps.map(([m, label]) => (
+                <label key={m} className={pill}>
+                  <input
+                    type="radio"
+                    value={m}
+                    checked={draft.style.articlesLeadStep === m}
+                    onChange={() => setStyle({ articlesLeadStep: m })}
+                    className="sr-only"
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+            <p className="text-xs text-ink-soft">
+              {leadSteps.find(([m]) => m === draft.style.articlesLeadStep)?.[2]}
+            </p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium text-ink-soft">Change with</span>
+            <div className="flex flex-wrap gap-2">
+              {leadMotions.map(([m, label]) => (
+                <label key={m} className={pill}>
+                  <input
+                    type="radio"
+                    value={m}
+                    checked={draft.style.articlesLeadMotion === m}
+                    onChange={() => setStyle({ articlesLeadMotion: m })}
+                    className="sr-only"
+                  />
+                  {label}
+                </label>
+              ))}
+            </div>
+            <p className="text-xs text-ink-soft">
+              {leadMotions.find(([m]) => m === draft.style.articlesLeadMotion)?.[2]}
+            </p>
+          </div>
+          <Slider
+            id="ui_articles_lead_top"
+            label="Space above rows"
+            value={draft.style.articlesLeadTop}
+            range={styleRanges.articlesLeadSpace}
+            format={(v) => (v === 0 ? "Normal" : `${v > 0 ? "+" : ""}${v} rem`)}
+            hint="Space above the text of each row. Normal is the original space."
+            onChange={(articlesLeadTop) => setStyle({ articlesLeadTop })}
+          />
+          <Slider
+            id="ui_articles_lead_bottom"
+            label="Space below rows"
+            value={draft.style.articlesLeadBottom}
+            range={styleRanges.articlesLeadSpace}
+            format={(v) => (v === 0 ? "Normal" : `${v > 0 ? "+" : ""}${v} rem`)}
+            hint="Space below the text of each row. Normal is the original space."
+            onChange={(articlesLeadBottom) => setStyle({ articlesLeadBottom })}
+          />
         </div>
       )}
       {articlesStack && (
@@ -1760,6 +1842,11 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
       <input type="hidden" name="site_articles_intro_size" value={draft.style.articlesIntroSize} />
       <input type="hidden" name="site_articles_stack_ratio" value={draft.style.articlesStackRatio} />
       <input type="hidden" name="site_articles_stack_crop" value={draft.style.articlesStackCrop} />
+      <input type="hidden" name="site_articles_lead_rows" value={draft.style.articlesLeadRows} />
+      <input type="hidden" name="site_articles_lead_step" value={draft.style.articlesLeadStep} />
+      <input type="hidden" name="site_articles_lead_motion" value={draft.style.articlesLeadMotion} />
+      <input type="hidden" name="site_articles_lead_top" value={draft.style.articlesLeadTop} />
+      <input type="hidden" name="site_articles_lead_bottom" value={draft.style.articlesLeadBottom} />
       <input type="hidden" name="site_project_mode" value={draft.style.projectMode} />
       <input type="hidden" name="site_project_wide_view" value={draft.style.projectWideView} />
       <input type="hidden" name="site_project_title_align" value={draft.style.projectTitleAlign} />
@@ -1984,6 +2071,11 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
                 articlesIntroSize: siteStyleDefaults.articlesIntroSize,
                 articlesStackRatio: siteStyleDefaults.articlesStackRatio,
                 articlesStackCrop: siteStyleDefaults.articlesStackCrop,
+                articlesLeadRows: siteStyleDefaults.articlesLeadRows,
+                articlesLeadStep: siteStyleDefaults.articlesLeadStep,
+                articlesLeadMotion: siteStyleDefaults.articlesLeadMotion,
+                articlesLeadTop: siteStyleDefaults.articlesLeadTop,
+                articlesLeadBottom: siteStyleDefaults.articlesLeadBottom,
                 projectMode: siteStyleDefaults.projectMode,
                 projectWideView: siteStyleDefaults.projectWideView,
                 projectTitleAlign: siteStyleDefaults.projectTitleAlign,

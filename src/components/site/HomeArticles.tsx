@@ -3,6 +3,8 @@ import Link from "next/link";
 import { Img } from "@/components/ui/Img";
 import {
   stackAspect,
+  type ArticleLeadMotion,
+  type ArticleLeadStep,
   type ArticleView,
   type ArticleWideView,
   type DesignFont,
@@ -19,6 +21,7 @@ import { storageImage } from "@/lib/image-srcset";
 import type { ArticleSummary } from "@/types/article";
 import { ArticleList } from "./ArticleList";
 import { DesignHeading } from "./DesignHeading";
+import { LeadRows } from "./LeadRows";
 import { MediaSlider } from "./MediaSlider";
 import { Reveal } from "./Reveal";
 
@@ -50,7 +53,13 @@ type Props = {
   mediaHeight?: number;
   stackRatio?: StackRatio;
   stackCrop?: number;
-  // Seconds between slides (Stack slide).
+  // The list under the big article (Lead): rows shown at once, how it changes, and the space around each row (rem).
+  leadRows?: number;
+  leadStep?: ArticleLeadStep;
+  leadMotion?: ArticleLeadMotion;
+  leadTop?: number;
+  leadBottom?: number;
+  // Seconds between slides (Stack slide, Lead list).
   seconds?: number;
   intro?: string | null;
   titleAlign?: DesignTitleAlign;
@@ -78,33 +87,39 @@ function stackFrame(height: number, ratio: StackRatio, crop: number): CSSPropert
 }
 
 // Only type: a number, the big title, and the date at the right. Like the contents page of a book.
+// One row of the index. "vars" = the space above and below comes from the Customize settings (the Lead list).
+function indexRow(article: Entry, i: number, username: string, start: number, vars: boolean, reveal: boolean) {
+  const lead = article.subtitle ?? article.excerpt;
+  const link = (
+    <Link
+      href={routes.article(username, article.slug)}
+      className={`group grid grid-cols-[2.25rem_minmax(0,1fr)] gap-x-3 gap-y-1 sm:grid-cols-[3.5rem_minmax(0,1fr)_auto] sm:gap-x-6 ${
+        vars ? "pt-(--row-top) pb-(--row-bot)" : "py-6 sm:py-8"
+      }`}
+    >
+      <span className="pt-2 font-mono text-[11px] tracking-widest text-ink-soft">{two(start + i)}</span>
+      <span className="block min-w-0">
+        <span className="block font-display text-2xl leading-tight decoration-accent decoration-1 underline-offset-4 group-hover:underline sm:text-4xl">
+          {article.title}
+        </span>
+        {lead && <span className="mt-2 line-clamp-2 block max-w-xl text-sm text-ink-soft">{lead}</span>}
+      </span>
+      <span className="col-start-2 pt-1 font-mono text-[11px] uppercase tracking-widest text-ink-soft sm:col-auto sm:pt-2 sm:text-right">
+        {metaOf(article)}
+      </span>
+    </Link>
+  );
+  return (
+    <li key={article.id} className="border-t border-line">
+      {reveal ? <Reveal delay={Math.min(i, 6) * 60}>{link}</Reveal> : link}
+    </li>
+  );
+}
+
 function IndexRows({ entries, username, start = 1 }: { entries: Entry[]; username: string; start?: number }) {
   return (
     <ul className="border-b border-line">
-      {entries.map((article, i) => {
-        const lead = article.subtitle ?? article.excerpt;
-        return (
-          <li key={article.id} className="border-t border-line">
-            <Reveal delay={Math.min(i, 6) * 60}>
-              <Link
-                href={routes.article(username, article.slug)}
-                className="group grid grid-cols-[2.25rem_minmax(0,1fr)] gap-x-3 gap-y-1 py-6 sm:grid-cols-[3.5rem_minmax(0,1fr)_auto] sm:gap-x-6 sm:py-8"
-              >
-                <span className="pt-2 font-mono text-[11px] tracking-widest text-ink-soft">{two(start + i)}</span>
-                <span className="block min-w-0">
-                  <span className="block font-display text-2xl leading-tight decoration-accent decoration-1 underline-offset-4 group-hover:underline sm:text-4xl">
-                    {article.title}
-                  </span>
-                  {lead && <span className="mt-2 line-clamp-2 block max-w-xl text-sm text-ink-soft">{lead}</span>}
-                </span>
-                <span className="col-start-2 pt-1 font-mono text-[11px] uppercase tracking-widest text-ink-soft sm:col-auto sm:pt-2 sm:text-right">
-                  {metaOf(article)}
-                </span>
-              </Link>
-            </Reveal>
-          </li>
-        );
-      })}
+      {entries.map((article, i) => indexRow(article, i, username, start, false, true))}
     </ul>
   );
 }
@@ -222,9 +237,25 @@ function Stack({
 
 // Like the front page of a magazine: the newest article big, its cover touching the left edge of the screen, and
 // the others as a numbered list below it.
-function Lead({ entries, username }: { entries: Entry[]; username: string }) {
+type LeadSettings = {
+  rows: number;
+  step: ArticleLeadStep;
+  motion: ArticleLeadMotion;
+  seconds: number;
+  top: number;
+  bottom: number;
+};
+
+function Lead({ entries, username, settings }: { entries: Entry[]; username: string; settings: LeadSettings }) {
   const [first, ...rest] = entries;
   if (!first) return null;
+  // More articles than rows: the list changes by itself, so its rows do not use the rise-in effect.
+  const changing = rest.length > settings.rows;
+  const items = rest.map((article, i) => indexRow(article, i, username, 2, true, !changing));
+  const vars = {
+    "--row-top": `calc(var(--row-base) + ${settings.top}rem)`,
+    "--row-bot": `calc(var(--row-base) + ${settings.bottom}rem)`,
+  } as CSSProperties;
   const cover = first.cover_url;
   const lead = first.subtitle ?? first.excerpt;
   return (
@@ -252,8 +283,14 @@ function Lead({ entries, username }: { entries: Entry[]; username: string }) {
         </Link>
       </Reveal>
       {rest.length > 0 && (
-        <div className="mt-10 px-5 sm:px-8">
-          <IndexRows entries={rest} username={username} start={2} />
+        <div className="mt-10 px-5 [--row-base:1.5rem] sm:px-8 sm:[--row-base:2rem]" style={vars}>
+          <LeadRows
+            items={items}
+            rows={settings.rows}
+            step={settings.step}
+            motion={settings.motion}
+            seconds={settings.seconds}
+          />
         </div>
       )}
     </div>
@@ -275,6 +312,11 @@ export function HomeArticles({
   stackRatio = "default",
   stackCrop = 50,
   seconds = 6,
+  leadRows = 5,
+  leadStep = "page",
+  leadMotion = "slide",
+  leadTop = 0,
+  leadBottom = 0,
   intro = null,
   titleAlign = "center",
   titleFont = "default",
@@ -348,7 +390,13 @@ export function HomeArticles({
     <section id="articles" aria-label={title} className={`${top ? `${top} ` : ""}site-pb-m`}>
       {heading}
       {more}
-      {wide && wideView === "lead" && <Lead entries={shown} username={username} />}
+      {wide && wideView === "lead" && (
+        <Lead
+          entries={shown}
+          username={username}
+          settings={{ rows: leadRows, step: leadStep, motion: leadMotion, seconds, top: leadTop, bottom: leadBottom }}
+        />
+      )}
       {wide && wideView === "stackslide" && (
         <Stack
           entries={shown}

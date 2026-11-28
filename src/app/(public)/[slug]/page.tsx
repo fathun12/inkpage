@@ -192,6 +192,11 @@ export default async function HomePage({ params }: Props) {
           mediaHeight={style.articlesMedia}
           stackRatio={style.articlesStackRatio}
           stackCrop={style.articlesStackCrop}
+          leadRows={style.articlesLeadRows}
+          leadStep={style.articlesLeadStep}
+          leadMotion={style.articlesLeadMotion}
+          leadTop={style.articlesLeadTop}
+          leadBottom={style.articlesLeadBottom}
           seconds={style.heroSeconds}
           intro={site.articlesHomeIntro}
           titleAlign={style.articlesTitleAlign}

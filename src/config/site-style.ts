@@ -24,6 +24,8 @@ import {
   writingWideViews,
   articleViews,
   articleWideViews,
+  articleLeadSteps,
+  articleLeadMotions,
   countdownWideViews,
   projectWideViews,
   bibliaViews,
@@ -65,6 +67,8 @@ import {
   type WritingWideView,
   type ArticleView,
   type ArticleWideView,
+  type ArticleLeadStep,
+  type ArticleLeadMotion,
   type ProjectWideView,
   type BibliaView,
   type BibliaWideView,
@@ -131,6 +135,8 @@ export const styleRanges = {
   showcaseMedia: { min: 0, max: 60, step: 2 },
   writingMedia: { min: 0, max: 60, step: 2 },
   articlesMedia: { min: 0, max: 60, step: 2 },
+  articlesLeadRows: { min: 1, max: 5, step: 1 },
+  articlesLeadSpace: { min: -1, max: 4, step: 0.5 },
   shopMedia: { min: 0, max: 60, step: 2 },
   stackCrop: { min: 0, max: 100, step: 5 },
   steamOpacity: { min: 10, max: 100, step: 5 },
@@ -208,6 +214,11 @@ export type SiteStyle = {
   articlesIntroSize: DesignIntroSize;
   articlesStackRatio: StackRatio;
   articlesStackCrop: number;
+  articlesLeadRows: number;
+  articlesLeadStep: ArticleLeadStep;
+  articlesLeadMotion: ArticleLeadMotion;
+  articlesLeadTop: number;
+  articlesLeadBottom: number;
   projectMode: DesignMode;
   projectWideView: ProjectWideView;
   projectTitleAlign: DesignTitleAlign;
@@ -355,6 +366,11 @@ export const siteStyleDefaults: SiteStyle = {
   articlesIntroSize: layoutDefaults.articlesIntroSize,
   articlesStackRatio: layoutDefaults.articlesStackRatio,
   articlesStackCrop: layoutDefaults.articlesStackCrop,
+  articlesLeadRows: layoutDefaults.articlesLeadRows,
+  articlesLeadStep: layoutDefaults.articlesLeadStep,
+  articlesLeadMotion: layoutDefaults.articlesLeadMotion,
+  articlesLeadTop: layoutDefaults.articlesLeadTop,
+  articlesLeadBottom: layoutDefaults.articlesLeadBottom,
   projectMode: layoutDefaults.projectMode,
   projectWideView: layoutDefaults.projectWideView,
   projectTitleAlign: layoutDefaults.projectTitleAlign,
@@ -510,6 +526,11 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     articlesIntroSize: readChoice(r.articlesIntroSize, designIntroSizes, d.articlesIntroSize),
     articlesStackRatio: readChoice(r.articlesStackRatio, stackRatios, d.articlesStackRatio),
     articlesStackCrop: num(r.articlesStackCrop, styleRanges.stackCrop, d.articlesStackCrop),
+    articlesLeadRows: num(r.articlesLeadRows, styleRanges.articlesLeadRows, d.articlesLeadRows),
+    articlesLeadStep: readChoice(r.articlesLeadStep, articleLeadSteps, d.articlesLeadStep),
+    articlesLeadMotion: readChoice(r.articlesLeadMotion, articleLeadMotions, d.articlesLeadMotion),
+    articlesLeadTop: num(r.articlesLeadTop, styleRanges.articlesLeadSpace, d.articlesLeadTop),
+    articlesLeadBottom: num(r.articlesLeadBottom, styleRanges.articlesLeadSpace, d.articlesLeadBottom),
     projectMode: readChoice(r.projectMode, designModes, d.projectMode),
     projectWideView: readChoice(r.projectWideView, projectWideViews, d.projectWideView),
     projectTitleAlign: readChoice(r.projectTitleAlign, designTitleAligns, d.projectTitleAlign),

@@ -21,6 +21,8 @@ import {
   writingWideViews,
   articleViews,
   articleWideViews,
+  articleLeadSteps,
+  articleLeadMotions,
   countdownWideViews,
   projectWideViews,
   bibliaViews,
@@ -53,6 +55,15 @@ function whole(label: string, range: { min: number; max: number }) {
     .int(`${label} must be a whole number.`)
     .min(range.min, `${label} is out of range.`)
     .max(range.max, `${label} is out of range.`);
+}
+
+// A number that moves in steps (for example 0.5).
+function steps(label: string, range: { min: number; max: number; step: number }) {
+  return z.coerce
+    .number({ error: `${label} must be a number.` })
+    .min(range.min, `${label} is out of range.`)
+    .max(range.max, `${label} is out of range.`)
+    .multipleOf(range.step, `${label} must move in steps of ${range.step}.`);
 }
 
 const sectionSpaceNumber = z
@@ -189,6 +200,11 @@ export const appearanceSchema = z.object({
   site_articles_intro_size: z.enum(designIntroSizes, { error: "Pick an Articles text size." }),
   site_articles_stack_ratio: z.enum(stackRatios, { error: "Pick an Articles photo ratio." }),
   site_articles_stack_crop: whole("Articles crop position", styleRanges.stackCrop),
+  site_articles_lead_rows: whole("Articles list rows", styleRanges.articlesLeadRows),
+  site_articles_lead_step: z.enum(articleLeadSteps, { error: "Pick how the Articles list changes." }),
+  site_articles_lead_motion: z.enum(articleLeadMotions, { error: "Pick slide or fade for the Articles list." }),
+  site_articles_lead_top: steps("Articles row space above", styleRanges.articlesLeadSpace),
+  site_articles_lead_bottom: steps("Articles row space below", styleRanges.articlesLeadSpace),
   site_project_mode: z.enum(designModes, { error: "Pick a Projects mode." }),
   site_project_wide_view: z.enum(projectWideViews, { error: "Pick a Projects full width layout." }),
   site_project_title_align: z.enum(designTitleAligns, { error: "Pick a Projects title place." }),

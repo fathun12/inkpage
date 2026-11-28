@@ -336,6 +336,11 @@ export function StudioPreview({
           mediaHeight={draft.style.articlesMedia}
           stackRatio={draft.style.articlesStackRatio}
           stackCrop={draft.style.articlesStackCrop}
+          leadRows={draft.style.articlesLeadRows}
+          leadStep={draft.style.articlesLeadStep}
+          leadMotion={draft.style.articlesLeadMotion}
+          leadTop={draft.style.articlesLeadTop}
+          leadBottom={draft.style.articlesLeadBottom}
           seconds={draft.style.heroSeconds}
           intro={site.articlesHomeIntro}
           titleAlign={draft.style.articlesTitleAlign}

@@ -319,6 +319,13 @@ export const articleWideViewHints: Record<ArticleWideView, string> = {
   lead: "Like a magazine front page: the newest article big, its cover running to the edge of the screen, and the others as a numbered list below.",
 };
 
+// The list under the big article of the Lead layout (Articles): how it changes and how.
+export const articleLeadSteps = ["page", "one"] as const;
+export type ArticleLeadStep = (typeof articleLeadSteps)[number];
+
+export const articleLeadMotions = ["slide", "fade"] as const;
+export type ArticleLeadMotion = (typeof articleLeadMotions)[number];
+
 // The Projects section of Home. List, Grid and Slider (Centered) are the original forms.
 // Mode (Centered or Full width), the title place, the fonts, the title sizes and the Stack ratio reuse the names above.
 export const projectWideViews = ["stack", "stackslide", "split", "filmstrip", "sheet"] as const;
@@ -629,6 +636,11 @@ export const layoutDefaults: {
   articlesIntroSize: DesignIntroSize;
   articlesStackRatio: StackRatio;
   articlesStackCrop: number;
+  articlesLeadRows: number;
+  articlesLeadStep: ArticleLeadStep;
+  articlesLeadMotion: ArticleLeadMotion;
+  articlesLeadTop: number;
+  articlesLeadBottom: number;
   projectMode: DesignMode;
   projectWideView: ProjectWideView;
   projectTitleAlign: DesignTitleAlign;
@@ -746,6 +758,11 @@ export const layoutDefaults: {
   articlesIntroSize: "auto",
   articlesStackRatio: "default",
   articlesStackCrop: 50,
+  articlesLeadRows: 5,
+  articlesLeadStep: "page",
+  articlesLeadMotion: "slide",
+  articlesLeadTop: 0,
+  articlesLeadBottom: 0,
   projectMode: "centered",
   projectWideView: "stack",
   projectTitleAlign: "center",
