@@ -60,6 +60,7 @@ export default async function SiteLayout({ children, params }: Props) {
         contactEmail={site.contactEmail}
         whatsapp={site.whatsapp}
         nav={nav}
+        layout={style.footer}
         news={{
           items: site.news,
           seconds: style.heroSeconds,

@@ -11,6 +11,7 @@ import {
   steamLayouts,
   steamModes,
 } from "@/config/about-style";
+import { readFooter } from "@/config/footer-style";
 import { readChoice, readOrder, readSections } from "@/config/layout";
 import { styleRanges } from "@/config/site-style";
 import { routes } from "@/config/site";
@@ -343,6 +344,7 @@ export async function updateAppearanceAction(formData: FormData): Promise<void> 
         ),
         aboutSections: readAboutSections(parseJson(field(formData, "site_about_sections"))),
         aboutOrder: readAboutOrder(parseJson(field(formData, "site_about_order"))),
+        footer: readFooter(parseJson(field(formData, "site_footer"))),
         colorBg: v.site_color_bg,
         colorInk: v.site_color_ink,
         colorAccent: v.site_color_accent,
