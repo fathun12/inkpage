@@ -92,7 +92,7 @@ function Shelf({ books, seconds }: { books: BibliaBook[]; seconds: number }) {
   return (
     <MediaSlider count={books.length} seconds={seconds}>
       {books.map((book) => (
-        <li key={book.slug} className="w-[44%] shrink-0 snap-start pt-1 sm:w-[30%] lg:w-[17%]">
+        <li key={book.slug} className="w-[calc((100%-0.75rem)/2)] shrink-0 snap-start pt-1 sm:w-[30%] lg:w-[17%]">
           <Reveal variant="still">
             <BibliaCard book={book} />
           </Reveal>
@@ -229,12 +229,22 @@ export function HomeBiblia({
     <div className="mx-auto max-w-5xl px-5 pt-4 sm:px-8 site-pb">
       <Shelf books={books} seconds={seconds} />
     </div>
-  ) : view === "list" ? (
-    <div className="mx-auto max-w-5xl px-5 pt-4 sm:px-8 site-pb">
-      <ListRows books={books} />
-    </div>
   ) : (
-    <BibliaGrid books={books} bottom="site-pb" columns={gridColumns[size]} />
+    <>
+      {/* Phone: Grid and List become one row of two covers that slides by itself. Tablet and up: as before. */}
+      <div className="mx-auto max-w-5xl px-5 pt-4 sm:hidden site-pb">
+        <Shelf books={books} seconds={seconds} />
+      </div>
+      <div className="hidden sm:block">
+        {view === "list" ? (
+          <div className="mx-auto max-w-5xl px-5 pt-4 sm:px-8 site-pb">
+            <ListRows books={books} />
+          </div>
+        ) : (
+          <BibliaGrid books={books} bottom="site-pb" columns={gridColumns[size]} />
+        )}
+      </div>
+    </>
   );
 
   if (!wide && !custom) {
