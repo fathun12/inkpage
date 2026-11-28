@@ -5,7 +5,7 @@ import type { FormAction } from "@/types/form";
 type Props = {
   action: FormAction;
   error?: string;
-  // What shows in the dark panel (the hero of the website). Left out = a plain dark panel.
+  // The hero of the website with its intro (greeting, date, big sentence). Left out = a plain dark panel.
   panel?: ReactNode;
 };
 
@@ -13,21 +13,24 @@ const label = "font-mono text-[11px] uppercase tracking-widest text-ink-soft";
 const input =
   "w-full rounded-none border-0 border-b border-line bg-transparent py-3 text-base text-ink outline-none transition-colors placeholder:text-ink-soft focus:border-ink focus:[box-shadow:0_1px_0_0_var(--c-ink)]";
 
+// The intro was made for a full screen. In this narrower panel its padding and its big sentence are made smaller.
+const intro =
+  "[&_.site-intro]:px-8 [&_.site-intro]:pb-16 [&_.site-intro]:pt-10 lg:[&_.site-intro]:px-14 lg:[&_.site-intro]:pb-24 lg:[&_.site-intro]:pt-24 " +
+  "[&_h2]:text-4xl sm:[&_h2]:text-5xl lg:[&_h2]:text-6xl xl:[&_h2]:text-7xl 2xl:[&_h2]:text-8xl";
+
 export function LoginForm({ action, error, panel }: Props) {
   return (
     <main className="grid min-h-screen bg-bg text-ink lg:grid-cols-[1.15fr_1fr]">
+      {/* inert: the panel is decoration, it is skipped by the keyboard and by screen readers. */}
       <section
-        aria-hidden
-        className="relative h-[32svh] overflow-hidden bg-band text-band-ink lg:h-auto lg:min-h-screen"
+        inert
+        className={`login-panel relative h-[28rem] overflow-hidden bg-band text-band-ink [--site-vh:28rem] lg:h-auto lg:min-h-screen lg:[--site-vh:100svh] ${intro}`}
       >
-        {panel}
-        <div
-          className="pointer-events-none absolute inset-0"
-          style={{ backgroundImage: "linear-gradient(to top, rgb(0 0 0 / 0.7), transparent 65%)" }}
-        />
-        <p className="absolute bottom-6 left-6 font-voice text-4xl leading-none sm:text-5xl lg:bottom-12 lg:left-12 lg:text-7xl">
-          Welcome back.
-        </p>
+        {panel ?? (
+          <p className="absolute bottom-6 left-6 font-voice text-4xl leading-none sm:text-5xl lg:bottom-12 lg:left-12 lg:text-7xl">
+            Welcome back.
+          </p>
+        )}
       </section>
 
       <section className="flex items-center px-6 py-14 sm:px-12 lg:px-20">

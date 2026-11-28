@@ -297,6 +297,23 @@
   }
 }
 
+/* Sign in page: the hero in the dark panel zooms in and out very slowly, on every slide.
+   The scroll drift of the hero is switched off there (that page does not scroll). Only in Motion Full. */
+[data-motion="full"] .login-panel .site-hero .site-hero-media {
+  animation: login-zoom 18s ease-in-out infinite alternate;
+  animation-timeline: auto;
+  animation-range: normal;
+  will-change: transform;
+}
+@keyframes login-zoom {
+  from {
+    transform: scale(1);
+  }
+  to {
+    transform: scale(1.14);
+  }
+}
+
 /* Home intro: the lines rise in one after another, then it drifts away while you scroll down. */
 .site-intro-line {
   --m-dist: 32px;
