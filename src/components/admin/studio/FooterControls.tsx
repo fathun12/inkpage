@@ -1,6 +1,12 @@
 import {
   footerAlignLabels,
   footerAligns,
+  footerBandModeHints,
+  footerBandModeLabels,
+  footerBandModes,
+  footerBandSizeLabels,
+  footerBandSizes,
+  footerBandSpace,
   footerBlockLabels,
   footerBrandSpotHints,
   footerBrandSpotLabels,
@@ -10,12 +16,6 @@ import {
   footerModes,
   footerShift,
   footerSlotLabels,
-  footerBandModeHints,
-  footerBandModeLabels,
-  footerBandModes,
-  footerBandSizeLabels,
-  footerBandSizes,
-  footerBandSpace,
   footerSlots,
   type FooterAlign,
   type FooterBand,
@@ -33,6 +33,7 @@ import {
 } from "@/config/topbar-style";
 
 type Props = { value: FooterStyle; onChange: (patch: Partial<FooterStyle>) => void };
+type BandProps = { value: FooterBand; onChange: (patch: Partial<FooterBand>) => void };
 
 const pill =
   "ink-border cursor-pointer rounded-full px-3 py-1.5 text-sm has-checked:bg-ink has-checked:text-bg has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ink";
@@ -84,16 +85,6 @@ export function FooterControls({ value, onChange }: Props) {
   const align = (block: FooterBlock, a: FooterAlign) => onChange({ align: { ...value.align, [block]: a } });
   const slot = (block: FooterBlock, s: FooterSlot) => onChange({ slot: { ...value.slot, [block]: s } });
   const shift = (block: FooterBlock, n: number) => onChange({ shift: { ...value.shift, [block]: n } });
-  const B = value.band;
-  const band = (patch: Partial<FooterBand>) => onChange({ band: { ...value.band, ...patch } });
-  const showBand = (item: TopBarItem, on: boolean) => band({ show: { ...value.band.show, [item]: on } });
-  function moveBand(index: number, dir: -1 | 1) {
-    const next = [...value.band.order];
-    const to = index + dir;
-    if (to < 0 || to >= next.length) return;
-    [next[index], next[to]] = [next[to], next[index]];
-    band({ order: next });
-  }
 
   return (
     <>
@@ -205,62 +196,78 @@ export function FooterControls({ value, onChange }: Props) {
           />
         </div>
       </div>
+    </>
+  );
+}
+
+// Settings of the thin black band under the footer (its own Section in the studio): width, text size,
+// height, which of Clock, Countdown and News show, their order, and how the news changes.
+export function BandControls({ value, onChange }: BandProps) {
+  const showBand = (item: TopBarItem, on: boolean) => onChange({ show: { ...value.show, [item]: on } });
+  function moveBand(index: number, dir: -1 | 1) {
+    const next = [...value.order];
+    const to = index + dir;
+    if (to < 0 || to >= next.length) return;
+    [next[index], next[to]] = [next[to], next[index]];
+    onChange({ order: next });
+  }
+
+  return (
+    <>
+      <p className="text-xs text-ink-soft">
+        The thin black band under the footer: copyright, news, color mode and back to top. The clock, the countdown
+        and the news change one after another in the same place.
+      </p>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-ink-soft">Width</span>
+        <Pills
+          name="band_mode"
+          items={footerBandModes}
+          labels={footerBandModeLabels}
+          value={value.mode}
+          onPick={(m) => onChange({ mode: m })}
+        />
+        <p className="text-xs text-ink-soft">{footerBandModeHints[value.mode]}</p>
+      </div>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-ink-soft">Text size</span>
+        <Pills
+          name="band_size"
+          items={footerBandSizes}
+          labels={footerBandSizeLabels}
+          value={value.size}
+          onPick={(s) => onChange({ size: s })}
+        />
+      </div>
+      <div className="flex flex-col gap-1">
+        <label htmlFor="ui_band_space" className="text-xs text-ink-soft">
+          Height: {value.space === 0 ? "Normal" : `${value.space > 0 ? "+" : ""}${value.space} rem`}
+        </label>
+        <input
+          id="ui_band_space"
+          type="range"
+          min={footerBandSpace.min}
+          max={footerBandSpace.max}
+          step={footerBandSpace.step}
+          value={value.space}
+          onChange={(e) => onChange({ space: Number(e.target.value) })}
+          className="w-full accent-accent"
+        />
+        <p className="text-xs text-ink-soft">Extra space above and below the text. Minus makes the band thinner.</p>
+      </div>
 
       <div className="flex flex-col gap-3 border-t border-line pt-4">
-        <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">Bottom band</span>
-        <p className="text-xs text-ink-soft">
-          The thin black band under the footer: copyright, news, color mode and back to top. The clock, the countdown
-          and the news change one after another in the same place.
-        </p>
-        <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium text-ink-soft">Width</span>
-          <Pills
-            name="band_mode"
-            items={footerBandModes}
-            labels={footerBandModeLabels}
-            value={B.mode}
-            onPick={(m) => band({ mode: m })}
-          />
-          <p className="text-xs text-ink-soft">{footerBandModeHints[B.mode]}</p>
-        </div>
-        <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium text-ink-soft">Text size</span>
-          <Pills
-            name="band_size"
-            items={footerBandSizes}
-            labels={footerBandSizeLabels}
-            value={B.size}
-            onPick={(s) => band({ size: s })}
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <label htmlFor="ui_band_space" className="text-xs text-ink-soft">
-            Height: {B.space === 0 ? "Normal" : `${B.space > 0 ? "+" : ""}${B.space} rem`}
-          </label>
-          <input
-            id="ui_band_space"
-            type="range"
-            min={footerBandSpace.min}
-            max={footerBandSpace.max}
-            step={footerBandSpace.step}
-            value={B.space}
-            onChange={(e) => band({ space: Number(e.target.value) })}
-            className="w-full accent-accent"
-          />
-          <p className="text-xs text-ink-soft">Extra space above and below the text. Minus makes the band thinner.</p>
-        </div>
-
         <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">Parts</span>
         <p className="text-xs text-ink-soft">
           Untick a part to hide it. The parts change one after another, in this order. The clock also needs Show clock
           in Pages. The countdown disappears by itself when its time has come.
         </p>
-        {B.order.map((item, i) => (
+        {value.order.map((item, i) => (
           <div key={item} className="ink-border flex items-center justify-between gap-2 rounded-md p-3">
             <label className="flex items-center gap-2 text-sm">
               <input
                 type="checkbox"
-                checked={B.show[item]}
+                checked={value.show[item]}
                 onChange={(e) => showBand(item, e.target.checked)}
                 className="accent-accent"
               />
@@ -279,7 +286,7 @@ export function FooterControls({ value, onChange }: Props) {
               <button
                 type="button"
                 onClick={() => moveBand(i, 1)}
-                disabled={i === B.order.length - 1}
+                disabled={i === value.order.length - 1}
                 aria-label={`Move ${topBarItemLabels[item]} later`}
                 className={small}
               >
@@ -288,21 +295,23 @@ export function FooterControls({ value, onChange }: Props) {
             </span>
           </div>
         ))}
+      </div>
 
+      <div className="flex flex-col gap-3 border-t border-line pt-4">
         <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">News motion</span>
         <div className="flex flex-col gap-2">
           <Pills
             name="band_motion"
             items={topBarMotions}
             labels={topBarMotionLabels}
-            value={B.motion}
-            onPick={(m) => band({ motion: m })}
+            value={value.motion}
+            onPick={(m) => onChange({ motion: m })}
           />
-          <p className="text-xs text-ink-soft">{topBarMotionHints[B.motion]}</p>
+          <p className="text-xs text-ink-soft">{topBarMotionHints[value.motion]}</p>
         </div>
         <div className="flex flex-col gap-1">
           <label htmlFor="ui_band_ms" className="text-xs text-ink-soft">
-            Speed of the change: {B.ms} ms
+            Speed of the change: {value.ms} ms
           </label>
           <input
             id="ui_band_ms"
@@ -310,15 +319,15 @@ export function FooterControls({ value, onChange }: Props) {
             min={topBarRanges.ms.min}
             max={topBarRanges.ms.max}
             step={topBarRanges.ms.step}
-            value={B.ms}
-            onChange={(e) => band({ ms: Number(e.target.value) })}
+            value={value.ms}
+            onChange={(e) => onChange({ ms: Number(e.target.value) })}
             className="w-full accent-accent"
           />
           <p className="text-xs text-ink-soft">A smaller number is faster.</p>
         </div>
         <div className="flex flex-col gap-1">
           <label htmlFor="ui_band_seconds" className="text-xs text-ink-soft">
-            Time per line: {B.seconds === 0 ? "Same as the Hero" : `${B.seconds} s`}
+            Time per line: {value.seconds === 0 ? "Same as the Hero" : `${value.seconds} s`}
           </label>
           <input
             id="ui_band_seconds"
@@ -326,8 +335,8 @@ export function FooterControls({ value, onChange }: Props) {
             min={topBarRanges.seconds.min}
             max={topBarRanges.seconds.max}
             step={topBarRanges.seconds.step}
-            value={B.seconds}
-            onChange={(e) => band({ seconds: Number(e.target.value) })}
+            value={value.seconds}
+            onChange={(e) => onChange({ seconds: Number(e.target.value) })}
             className="w-full accent-accent"
           />
         </div>

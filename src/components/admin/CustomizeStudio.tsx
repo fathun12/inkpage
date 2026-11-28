@@ -9,7 +9,7 @@ import { ShopControls } from "@/components/admin/studio/ShopControls";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { AboutControls } from "@/components/admin/studio/AboutControls";
-import { FooterControls } from "@/components/admin/studio/FooterControls";
+import { BandControls, FooterControls } from "@/components/admin/studio/FooterControls";
 import { TopBarControls } from "@/components/admin/studio/TopBarControls";
 import { SectionControls } from "@/components/admin/studio/SectionControls";
 import type { AboutSectionId } from "@/config/about-style";
@@ -2405,8 +2405,24 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
             <Section title="Top bar" open onReset={() => setStyle({ topBar: siteStyleDefaults.topBar })}>
               <TopBarControls value={draft.style.topBar} onChange={(patch) => setStyle({ topBar: { ...draft.style.topBar, ...patch } })} />
             </Section>
-            <Section title="Footer" open onReset={() => setStyle({ footer: siteStyleDefaults.footer })}>
+            <Section
+              title="Footer"
+              open
+              onReset={() => setStyle({ footer: { ...siteStyleDefaults.footer, band: draft.style.footer.band } })}
+            >
               <FooterControls value={draft.style.footer} onChange={(patch) => setStyle({ footer: { ...draft.style.footer, ...patch } })} />
+            </Section>
+            <Section
+              title="Bottom band"
+              open
+              onReset={() => setStyle({ footer: { ...draft.style.footer, band: siteStyleDefaults.footer.band } })}
+            >
+              <BandControls
+                value={draft.style.footer.band}
+                onChange={(patch) =>
+                  setStyle({ footer: { ...draft.style.footer, band: { ...draft.style.footer.band, ...patch } } })
+                }
+              />
             </Section>
           </div>
           <p className="px-5 py-4 text-xs text-ink-soft">
