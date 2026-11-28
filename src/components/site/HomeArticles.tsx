@@ -99,8 +99,8 @@ function indexRow(article: Entry, i: number, username: string, start: number, va
     >
       <span className="pt-2 font-mono text-[11px] tracking-widest text-ink-soft">{two(start + i)}</span>
       <span className="block min-w-0">
-        <span className="block font-display text-2xl leading-tight decoration-accent decoration-1 underline-offset-4 group-hover:underline sm:text-4xl">
-          {article.title}
+        <span className="block font-display text-2xl leading-tight sm:text-4xl">
+          <span className="site-sweep-thin">{article.title}</span>
         </span>
         {lead && <span className="mt-2 line-clamp-2 block max-w-xl text-sm text-ink-soft">{lead}</span>}
       </span>
@@ -207,8 +207,8 @@ function Stack({
           <Reveal delay={100}>
             <div className="mt-6 grid gap-5 px-5 sm:px-8 md:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] md:gap-12">
               {cover ? (
-                <span className="block font-display text-3xl leading-tight decoration-accent decoration-1 underline-offset-4 group-hover:underline sm:text-5xl">
-                  {article.title}
+                <span className="block font-display text-3xl leading-tight sm:text-5xl">
+                  <span className="site-sweep-thin">{article.title}</span>
                 </span>
               ) : (
                 <span />
@@ -274,8 +274,8 @@ function Lead({ entries, username, settings }: { entries: Entry[]; username: str
           </span>
           <span className="flex flex-col justify-end px-5 py-8 sm:px-8 md:py-12">
             <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">{metaOf(first)}</span>
-            <span className="mt-3 block font-display text-4xl leading-[1.05] decoration-accent decoration-1 underline-offset-4 group-hover:underline sm:text-5xl lg:text-6xl">
-              {first.title}
+            <span className="mt-3 block font-display text-4xl leading-[1.05] sm:text-5xl lg:text-6xl">
+              <span className="site-sweep-thin">{first.title}</span>
             </span>
             {lead && <span className="mt-4 block max-w-md text-ink-soft">{lead}</span>}
             <span className="mt-6 font-mono text-xs uppercase tracking-widest">Read &rarr;</span>
