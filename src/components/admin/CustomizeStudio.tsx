@@ -1930,7 +1930,7 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
         <span className="font-display text-lg font-medium">Customize</span>
         {dirty && <span className="font-mono text-xs text-accent">● Unsaved changes</span>}
         <div className="ml-auto flex items-center gap-3">
-          <div className="hidden gap-1 lg:flex" role="group" aria-label="Preview size">
+          <div className="hidden gap-1 sm:flex" role="group" aria-label="Preview size">
             {(["phone", "desktop"] as const).map((d) => (
               <button
                 key={d}
