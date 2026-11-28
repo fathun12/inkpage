@@ -32,7 +32,11 @@ export default async function AboutPage({ params }: Props) {
   const site = readSite(profile.site);
   if (!hasAbout(site)) notFound();
 
-  const [blocks, steam] = await Promise.all([getPublicBlocks(profile.id), fetchSteam(site.steamId)]);
+  const [blocks, steam, steam2] = await Promise.all([
+    getPublicBlocks(profile.id),
+    fetchSteam(site.steamId),
+    site.steamId2 ? fetchSteam(site.steamId2) : Promise.resolve(null),
+  ]);
   const person = personLd(profile, site, socialsOf(blocks));
   const url = cleanUrl(profile.username, "/about");
 
@@ -48,6 +52,7 @@ export default async function AboutPage({ params }: Props) {
         body={site.about.body}
         photo={site.about.photo}
         steam={steam}
+        steam2={steam2}
         steamMedia={site.steamMedia}
         steamCredit={creditOf(site.credits, site.steamMedia)}
         style={readSiteStyle(profile.site_style)}

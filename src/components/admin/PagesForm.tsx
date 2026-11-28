@@ -342,6 +342,13 @@ export function AboutForm({ action, sign, site }: WithMedia) {
           <Input id="steam_id" name="steam_id" placeholder="7656119XXXXXXXXXX" defaultValue={site.steamId ?? ""} maxLength={120} />
         </Field>
         <Field
+          label="Steam ID (second account)"
+          htmlFor="steam_id_2"
+          hint="Optional. A second Steam profile, shown under the first one with the same look. Same rules: 17 digits that start with 7656119, profile and Game details Public. Empty = no second block."
+        >
+          <Input id="steam_id_2" name="steam_id_2" placeholder="7656119XXXXXXXXXX" defaultValue={site.steamId2 ?? ""} maxLength={120} />
+        </Field>
+        <Field
           label="Background media"
           htmlFor="site-steam"
           hint={`Optional. An image, GIF or video behind the Steam section. It shows when the Background of Steam is set to Media (Customize, About page, Steam). One item. ${mediaHint}`}

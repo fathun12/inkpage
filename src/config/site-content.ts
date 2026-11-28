@@ -114,6 +114,8 @@ export type SiteSettings = {
   githubTitle: string | null;
   // Steam profile (SteamID64, 17 digits). Empty = no Steam section on the About page.
   steamId: string | null;
+  // A second Steam profile, shown under the first one (empty = no second block).
+  steamId2: string | null;
   // The media behind the Steam section of the About page (empty = none).
   steamMedia: string | null;
   // YouTube or Spotify link of the music player (empty = no player).
@@ -292,6 +294,7 @@ export function readSite(raw: unknown): SiteSettings {
     githubUser: githubName(r.githubUser),
     githubTitle: text(r.githubTitle, siteLimits.title),
     steamId: steamIdNumber(r.steamId),
+    steamId2: steamIdNumber(r.steamId2),
     steamMedia: link(r.steamMedia),
     musicUrl: link(r.musicUrl),
     visitTitle: text(r.visitTitle, siteLimits.title),

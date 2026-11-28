@@ -14,6 +14,7 @@ type Props = {
   body: string | null;
   photo: string | null;
   steam: SteamData | null;
+  steam2?: SteamData | null;
   steamMedia: string | null;
   steamCredit: string | null;
   style: Pick<
@@ -32,7 +33,16 @@ type Props = {
 
 // The About page: the title, then the sections in the order and with the settings of Customize.
 // The public page and the Customize preview both use this one component.
-export function AboutContent({ title, name, bio, body, photo, steam, steamMedia, steamCredit, style }: Props) {
+export function AboutContent({ title, name, bio, body, photo, steam, steam2 = null, steamMedia, steamCredit, style }: Props) {
+  const steamLook = {
+    mode: style.steamMode,
+    layout: style.steamLayout,
+    background: style.steamBackground,
+    opacity: style.steamOpacity,
+    position: style.steamPosition,
+    media: steamMedia,
+    credit: steamCredit,
+  };
   const parts: Record<AboutSectionId, ReactNode> = {
     profile: (
       <AboutSection
@@ -44,20 +54,13 @@ export function AboutContent({ title, name, bio, body, photo, steam, steamMedia,
         shape={style.aboutPhoto}
       />
     ),
-    steam: steam ? (
-      <AboutSteam
-        data={steam}
-        look={{
-          mode: style.steamMode,
-          layout: style.steamLayout,
-          background: style.steamBackground,
-          opacity: style.steamOpacity,
-          position: style.steamPosition,
-          media: steamMedia,
-          credit: steamCredit,
-        }}
-      />
-    ) : null,
+    steam:
+      steam || steam2 ? (
+        <>
+          {steam && <AboutSteam data={steam} look={steamLook} />}
+          {steam2 && <AboutSteam data={steam2} look={steamLook} title="Steam · Second account" />}
+        </>
+      ) : null,
   };
   return (
     <>

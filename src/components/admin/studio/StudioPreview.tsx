@@ -53,6 +53,7 @@ type Props = {
   designs: ComponentProps<typeof HomeDesigns>["data"] | null;
   github: ComponentProps<typeof HomeGithub>["data"] | null;
   steam: SteamData | null;
+  steam2?: SteamData | null;
   shopItems: ComponentProps<typeof HomeShop>["products"];
   shopOpen: boolean;
   shopTitle: string;
@@ -147,6 +148,7 @@ export function StudioPreview({
   designs,
   github,
   steam,
+  steam2 = null,
   shopItems,
   shopOpen,
   shopTitle,
@@ -564,6 +566,7 @@ export function StudioPreview({
               body={site.about.body}
               photo={site.about.photo}
               steam={steam}
+              steam2={steam2}
               steamMedia={site.steamMedia}
               steamCredit={creditOf(site.credits, site.steamMedia)}
               style={draft.style}

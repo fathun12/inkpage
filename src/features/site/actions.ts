@@ -76,6 +76,7 @@ const textSchema = z.object({
   designs_intro: text("The design projects text", siteLimits.intro),
   github_title: text("The GitHub label", siteLimits.title),
   steam_id: text("The Steam ID", 120),
+  steam_id_2: text("The second Steam ID", 120),
   visit_title: text("The Visit website label", siteLimits.title),
   visit_home_intro: text("The Visit website text on Home", siteLimits.intro),
   projects_title: text("The Projects title", siteLimits.title),
@@ -198,6 +199,7 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
     designs_intro: field(formData, "designs_intro"),
     github_title: field(formData, "github_title"),
     steam_id: field(formData, "steam_id"),
+    steam_id_2: field(formData, "steam_id_2"),
     visit_title: field(formData, "visit_title"),
     visit_home_intro: field(formData, "visit_home_intro"),
     projects_title: field(formData, "projects_title"),
@@ -330,6 +332,15 @@ export async function saveSiteAction(formData: FormData): Promise<void> {
       );
     }
     next.steamId = steam ? steam : null;
+    const steam2 = v.steam_id_2
+      ?.replace(/^https?:\/\/(www\.)?steamcommunity\.com\/profiles\//i, "")
+      .replace(/[/?#].*$/, "");
+    if (steam2 && !steamIdNumber(steam2)) {
+      return abort(
+        "The second Steam ID must be 17 digits that start with 7656119. Example: 76561198324590157. A custom address (/id/name) does not work here.",
+      );
+    }
+    next.steamId2 = steam2 ? steam2 : null;
   }
   if (tab === "footer") {
     next.footerNote = v.footer_note ?? null;

@@ -41,11 +41,12 @@ export default async function PreviewPage() {
   const site = readSite(profile.site);
   const base = routes.profile(profile.username);
 
-  const [biblia, designs, github, steam, shop, articles] = await Promise.all([
+  const [biblia, designs, github, steam, steam2, shop, articles] = await Promise.all([
     fetchBiblia(site.bibliaUrl, 6),
     fetchDesigns(site.designsUrl, 6),
     fetchGithub(site.githubUser),
     fetchSteam(site.steamId),
+    site.steamId2 ? fetchSteam(site.steamId2) : Promise.resolve(null),
     getPublicShop(profile.id),
     getPublicArticles(profile.id),
   ]);
@@ -93,6 +94,7 @@ export default async function PreviewPage() {
       designs={designs}
       github={github}
       steam={steam}
+      steam2={steam2}
       shopItems={shopItems}
       shopOpen={shop.settings.is_open}
       shopTitle={shopTitle}

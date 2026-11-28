@@ -96,7 +96,15 @@ function GameList({
 // The Steam section of the About page. It only appears when Steam answered.
 // The background (page, Tertiary, Secondary or your media) always runs edge to edge. Mode decides if the text
 // stays inside the page margins (Centered) or goes edge to edge (Full width).
-export function AboutSteam({ data, look }: { data: SteamData; look: SteamLook }) {
+export function AboutSteam({
+  data,
+  look,
+  title = "Steam",
+}: {
+  data: SteamData;
+  look: SteamLook;
+  title?: string;
+}) {
   const media = look.background === "media" && look.media ? look.media : null;
   const tone = tones[look.background === "page" ? "page" : look.background === "tertiary" ? "tertiary" : "band"];
   const painted = look.background !== "page";
@@ -151,7 +159,7 @@ export function AboutSteam({ data, look }: { data: SteamData; look: SteamLook })
   const mediaStyle: CSSProperties = { opacity: look.opacity / 100, objectPosition: `50% ${look.position}%` };
 
   return (
-    <section aria-label="Steam" className={cn("relative overflow-hidden", tone.box)}>
+    <section aria-label={title} className={cn("relative overflow-hidden", tone.box)}>
       {media && (
         <div aria-hidden className="absolute inset-0">
           {mediaKind(media) === "video" ? (
@@ -164,7 +172,7 @@ export function AboutSteam({ data, look }: { data: SteamData; look: SteamLook })
       <div className={cn("relative px-5 pb-24 sm:px-8", !full && "mx-auto max-w-5xl", painted && "pt-14")}>
         <div className={cn("border-t pt-8", tone.rule)} style={tone.ruleStyle}>
           <Reveal>
-            <h2 className={cn("font-mono text-xs font-normal uppercase tracking-widest", tone.soft)}>Steam</h2>
+            <h2 className={cn("font-mono text-xs font-normal uppercase tracking-widest", tone.soft)}>{title}</h2>
           </Reveal>
           {stack ? (
             <div className="mt-8 flex flex-col gap-10">
