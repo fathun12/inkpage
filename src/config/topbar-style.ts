@@ -1,6 +1,16 @@
 // Settings of the thin bar at the very top (news, clock, countdown). Plain data. Stored in profiles.site_style.
 import { readChoice } from "@/config/layout";
 
+export const topBarModes = ["centered", "full"] as const;
+export type TopBarMode = (typeof topBarModes)[number];
+
+export const topBarModeLabels: Record<TopBarMode, string> = { centered: "Centered", full: "Full width" };
+
+export const topBarModeHints: Record<TopBarMode, string> = {
+  centered: "Inside the page margins (the original).",
+  full: "Edge to edge: the bar uses the whole width of the screen.",
+};
+
 export const topBarItems = ["clock", "news", "countdown"] as const;
 export type TopBarItem = (typeof topBarItems)[number];
 
@@ -32,6 +42,7 @@ export const topBarRanges = {
 } as const;
 
 export type TopBarStyle = {
+  mode: TopBarMode;
   order: TopBarItem[];
   show: Record<TopBarItem, boolean>;
   motion: TopBarMotion;
@@ -40,6 +51,7 @@ export type TopBarStyle = {
 };
 
 export const topBarDefaults: TopBarStyle = {
+  mode: "centered",
   order: [...topBarItems],
   show: { clock: true, news: true, countdown: true },
   motion: "slide",
@@ -68,6 +80,7 @@ export function readTopBar(raw: unknown): TopBarStyle {
   for (const i of topBarItems) seen.add(i);
   const d = topBarDefaults;
   return {
+    mode: readChoice(r.mode, topBarModes, d.mode),
     order: [...seen],
     show: {
       clock: typeof s.clock === "boolean" ? s.clock : d.show.clock,

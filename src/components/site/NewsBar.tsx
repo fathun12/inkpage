@@ -183,6 +183,7 @@ export function NewsBar({ items, seconds, autoplay, showClock = false, countdown
   const live = L.show.countdown && countdown && isLive(countdown, now) ? countdown : null;
   const news = L.show.news ? items.map((item, i) => <NewsLine key={`${item.text}-${i}`} item={item} />) : [];
   const secs = L.seconds > 0 ? L.seconds : seconds;
+  const wrap = L.mode === "full" ? "w-full" : "mx-auto max-w-6xl";
 
   const phone: ReactNode[] = L.order.flatMap((id): ReactNode[] => {
     if (id === "clock") return clockOn ? [<Clock key="clock" />] : [];
@@ -193,7 +194,7 @@ export function NewsBar({ items, seconds, autoplay, showClock = false, countdown
 
   return (
     <div role="region" aria-label="News" className="site-bar-in relative z-40 border-b border-band-line bg-band text-xs text-band-ink">
-      <div className="mx-auto hidden h-9 max-w-6xl items-center gap-3 px-3 sm:flex">
+      <div className={`${wrap} hidden h-9 items-center gap-3 px-3 sm:flex`}>
         {L.order.map((id, i) => {
           if (id === "clock") return clockOn ? <Clock key="clock" /> : null;
           if (id === "news") {

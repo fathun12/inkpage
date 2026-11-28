@@ -1,5 +1,8 @@
 import {
   topBarItemLabels,
+  topBarModeHints,
+  topBarModeLabels,
+  topBarModes,
   topBarMotionHints,
   topBarMotionLabels,
   topBarMotions,
@@ -29,7 +32,27 @@ export function TopBarControls({ value, onChange }: Props) {
 
   return (
     <>
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium text-ink-soft">Width</span>
+        <div className="flex flex-wrap gap-2">
+          {topBarModes.map((m) => (
+            <label key={m} className={pill}>
+              <input
+                type="radio"
+                name="ui_topbar_mode"
+                value={m}
+                checked={value.mode === m}
+                onChange={() => onChange({ mode: m })}
+                className="sr-only"
+              />
+              {topBarModeLabels[m]}
+            </label>
+          ))}
+        </div>
+        <p className="text-xs text-ink-soft">{topBarModeHints[value.mode]}</p>
+      </div>
+
+      <div className="flex flex-col gap-3 border-t border-line pt-4">
         <span className="font-mono text-[11px] uppercase tracking-widest text-ink-soft">Parts</span>
         <p className="text-xs text-ink-soft">
           Untick a part to hide it. The order is from left to right. The clock also needs Show clock in Pages. The
