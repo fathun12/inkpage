@@ -9,6 +9,7 @@ import { ShopControls } from "@/components/admin/studio/ShopControls";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { AboutControls } from "@/components/admin/studio/AboutControls";
+import { FooterControls } from "@/components/admin/studio/FooterControls";
 import { SectionControls } from "@/components/admin/studio/SectionControls";
 import type { AboutSectionId } from "@/config/about-style";
 import { Field } from "@/components/ui/Field";
@@ -142,6 +143,7 @@ const phoneWidth = 480;
 const studioPages = [
   { id: "home", label: "Home" },
   { id: "about", label: "About" },
+  { id: "footer", label: "Bars & footer" },
 ] as const;
 type StudioPage = (typeof studioPages)[number]["id"];
 
@@ -1913,6 +1915,7 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
       <input type="hidden" name="site_steam_position" value={draft.style.steamPosition} />
       <input type="hidden" name="site_about_sections" value={JSON.stringify(draft.style.aboutSections)} />
       <input type="hidden" name="site_about_order" value={JSON.stringify(draft.style.aboutOrder)} />
+      <input type="hidden" name="site_footer" value={JSON.stringify(draft.style.footer)} />
       {draft.style.heroGray && <input type="hidden" name="site_hero_gray" value="on" />}
 
       <header className="flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-line px-5 py-3">
@@ -2395,6 +2398,11 @@ export function CustomizeStudio({ action, username, fonts, style, notice }: Prop
                 })
               }
             />
+          </div>
+          <div className={cn(page !== "footer" && "hidden")}>
+            <Section title="Footer" open onReset={() => setStyle({ footer: siteStyleDefaults.footer })}>
+              <FooterControls value={draft.style.footer} onChange={(patch) => setStyle({ footer: { ...draft.style.footer, ...patch } })} />
+            </Section>
           </div>
           <p className="px-5 py-4 text-xs text-ink-soft">
             Media, text and pages are set in <Link href={routes.pages} className="underline underline-offset-4">Pages</Link>.

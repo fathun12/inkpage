@@ -105,6 +105,7 @@ import {
   type SteamLayout,
   type SteamMode,
 } from "@/config/about-style";
+import { footerDefaults, readFooter, type FooterStyle } from "@/config/footer-style";
 
 export const motionModes = ["full", "subtle", "off"] as const;
 export type MotionMode = (typeof motionModes)[number];
@@ -285,6 +286,7 @@ export type SiteStyle = {
   steamPosition: number;
   aboutSections: AboutSections;
   aboutOrder: AboutSectionId[];
+  footer: FooterStyle;
   colorBg: string;
   colorInk: string;
   colorAccent: string;
@@ -437,6 +439,7 @@ export const siteStyleDefaults: SiteStyle = {
   steamPosition: aboutDefaults.steamPosition,
   aboutSections: aboutSectionDefaults,
   aboutOrder: [...aboutSectionIds],
+  footer: footerDefaults,
   colorBg: "#ffffff",
   colorInk: "#000000",
   colorAccent: "#b5532f",
@@ -599,6 +602,7 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     steamPosition: num(r.steamPosition, styleRanges.steamPosition, d.steamPosition),
     aboutSections: readAboutSections(r.aboutSections),
     aboutOrder: readAboutOrder(r.aboutOrder),
+    footer: readFooter(r.footer),
     colorBg: color(r.colorBg, d.colorBg),
     colorInk: color(r.colorInk, d.colorInk),
     colorAccent: color(r.colorAccent, d.colorAccent),

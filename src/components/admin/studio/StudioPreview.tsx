@@ -159,9 +159,9 @@ export function StudioPreview({
   // Counts up to play the entrance of the top of Home again.
   const [replay, setReplay] = useState(0);
   // The page the studio is editing: Home or the About page.
-  const [page, setPage] = useState<"home" | "about">("home");
+  const [page, setPage] = useState<"home" | "about" | "footer">("home");
   useEffect(() => {
-    window.scrollTo(0, 0);
+    window.scrollTo(0, page === "footer" ? document.body.scrollHeight : 0);
   }, [page]);
 
   const hoverBox = useRef<HTMLDivElement>(null);
@@ -202,7 +202,7 @@ export function StudioPreview({
       if (typeof data !== "object" || data === null) return;
       const msg = data as { type?: unknown; draft?: unknown; page?: unknown };
       if (msg.type === previewMessages.draft && typeof msg.draft === "object" && msg.draft !== null) {
-        if (msg.page === "home" || msg.page === "about") setPage(msg.page);
+        if (msg.page === "home" || msg.page === "about" || msg.page === "footer") setPage(msg.page);
         const raw = msg.draft as { fontHeading?: unknown; fontBody?: unknown; style?: unknown };
         if (typeof raw.style !== "object" || raw.style === null) return;
         setDraft((d) => ({
@@ -553,7 +553,9 @@ export function StudioPreview({
         />
         <SiteHeader brand={profile.username} home={base} items={nav} overlay={page === "home"} />
         <main>
-          {page === "about" ? (
+          {page === "footer" ? (
+            <div aria-hidden className="h-[30svh]" />
+          ) : page === "about" ? (
             <AboutContent
               title={site.about.title ?? "About"}
               name={profile.displayName}
@@ -607,6 +609,7 @@ export function StudioPreview({
           whatsapp={site.whatsapp}
           nav={nav}
           modeControl={{ value: mode, onChange: setMode }}
+          layout={draft.style.footer}
           news={{
             items: site.news,
             seconds: draft.style.heroSeconds,
