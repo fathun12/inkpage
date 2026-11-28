@@ -550,6 +550,7 @@ export function StudioPreview({
           autoplay={autoplay}
           showClock={site.showClock}
           countdown={newsCountdown}
+          layout={draft.style.topBar}
         />
         <SiteHeader brand={profile.username} home={base} items={nav} overlay={page === "home"} />
         <main>

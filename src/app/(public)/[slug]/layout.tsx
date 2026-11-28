@@ -44,6 +44,7 @@ export default async function SiteLayout({ children, params }: Props) {
         autoplay={style.motion !== "off"}
         showClock={site.showClock}
         countdown={countdown}
+        layout={style.topBar}
       />
       <SiteHeader
         brand={profile.username}

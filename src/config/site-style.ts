@@ -106,6 +106,7 @@ import {
   type SteamMode,
 } from "@/config/about-style";
 import { footerDefaults, readFooter, type FooterStyle } from "@/config/footer-style";
+import { readTopBar, topBarDefaults, type TopBarStyle } from "@/config/topbar-style";
 
 export const motionModes = ["full", "subtle", "off"] as const;
 export type MotionMode = (typeof motionModes)[number];
@@ -287,6 +288,7 @@ export type SiteStyle = {
   aboutSections: AboutSections;
   aboutOrder: AboutSectionId[];
   footer: FooterStyle;
+  topBar: TopBarStyle;
   colorBg: string;
   colorInk: string;
   colorAccent: string;
@@ -440,6 +442,7 @@ export const siteStyleDefaults: SiteStyle = {
   aboutSections: aboutSectionDefaults,
   aboutOrder: [...aboutSectionIds],
   footer: footerDefaults,
+  topBar: topBarDefaults,
   colorBg: "#ffffff",
   colorInk: "#000000",
   colorAccent: "#b5532f",
@@ -603,6 +606,7 @@ export function readSiteStyle(raw: unknown): SiteStyle {
     aboutSections: readAboutSections(r.aboutSections),
     aboutOrder: readAboutOrder(r.aboutOrder),
     footer: readFooter(r.footer),
+    topBar: readTopBar(r.topBar),
     colorBg: color(r.colorBg, d.colorBg),
     colorInk: color(r.colorInk, d.colorInk),
     colorAccent: color(r.colorAccent, d.colorAccent),
