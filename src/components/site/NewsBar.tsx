@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useSyncExternalStore, type ReactNode } from "react";
 import type { NewsItem } from "@/config/site-content";
+import { footerBandDefaults, type FooterBand, type FooterBandSize } from "@/config/footer-style";
 import { topBarDefaults, type TopBarMotion, type TopBarStyle } from "@/config/topbar-style";
 
 export type NewsCountdown = { title: string; target: string };
@@ -13,6 +14,8 @@ export type NewsProps = {
   countdown?: NewsCountdown | null;
   // Only the top bar uses this (Customize, Bars & footer). Left out = the original look.
   layout?: TopBarStyle;
+  // Only the news in the black band of the footer uses this. Left out = the original look.
+  band?: FooterBand;
 };
 
 // One shared second counter. It is 0 on the server and on the first browser render, so both HTML versions match.
@@ -225,21 +228,39 @@ export function NewsBar({ items, seconds, autoplay, showClock = false, countdown
   );
 }
 
-// The same news inside the black band of the footer. It is narrow, so the clock and the countdown
-// are slides of the same slider as the news.
-export function NewsTicker({ items, seconds, autoplay, showClock = false, countdown = null }: NewsProps) {
-  const now = useNow();
-  const live = countdown && isLive(countdown, now) ? countdown : null;
+const bandBox: Record<FooterBandSize, string> = {
+  small: "h-5 text-[11px]",
+  normal: "h-6 text-xs",
+  large: "h-7 text-sm",
+  huge: "h-8 text-base",
+};
 
-  const slides: ReactNode[] = [];
-  if (showClock) slides.push(<Clock key="clock" />);
-  if (live) slides.push(<CountdownText key="countdown" countdown={live} now={now} />);
-  items.forEach((item, i) => slides.push(<NewsLine key={`${item.text}-${i}`} item={item} />));
+// The same news inside the black band of the footer. It is narrow, so the clock and the countdown
+// are slides of the same slider as the news. Which parts show, their order and the motion come from `band`.
+export function NewsTicker({ items, seconds, autoplay, showClock = false, countdown = null, band }: NewsProps) {
+  const B = band ?? footerBandDefaults;
+  const now = useNow();
+  const clockOn = showClock && B.show.clock;
+  const live = B.show.countdown && countdown && isLive(countdown, now) ? countdown : null;
+  const news = B.show.news ? items.map((item, i) => <NewsLine key={`${item.text}-${i}`} item={item} />) : [];
+
+  const slides: ReactNode[] = B.order.flatMap((id): ReactNode[] => {
+    if (id === "clock") return clockOn ? [<Clock key="clock" />] : [];
+    if (id === "countdown") return live ? [<CountdownText key="countdown" countdown={live} now={now} />] : [];
+    return news;
+  });
   if (slides.length === 0) return null;
 
   return (
-    <div className="flex h-6 min-w-0 flex-1 items-center gap-2 text-xs">
-      <Slides slides={slides} seconds={seconds} autoplay={autoplay} small />
+    <div className={`flex min-w-0 flex-1 items-center gap-2 ${bandBox[B.size]}`}>
+      <Slides
+        slides={slides}
+        seconds={B.seconds > 0 ? B.seconds : seconds}
+        autoplay={autoplay}
+        small
+        motion={B.motion}
+        ms={B.ms}
+      />
     </div>
   );
 }

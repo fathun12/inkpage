@@ -4,6 +4,7 @@ import {
   footerDefaults,
   footerSlots,
   type FooterAlign,
+  type FooterBandSize,
   type FooterBlock,
   type FooterSlot,
   type FooterStyle,
@@ -47,6 +48,12 @@ const slotStart: Record<FooterSlot, string> = {
   middle: "sm:col-start-2",
   right: "sm:col-start-3",
 };
+const bandText: Record<FooterBandSize, string> = {
+  small: "text-[11px]",
+  normal: "text-xs",
+  large: "text-sm",
+  huge: "text-base",
+};
 
 export function SiteFooter({
   brand,
@@ -65,6 +72,8 @@ export function SiteFooter({
   const hasNav = nav.length > 0;
   const full = layout.mode === "full";
   const wrap = full ? "w-full" : "mx-auto max-w-5xl";
+  const band = layout.band;
+  const bandWrap = band.mode === "follow" ? wrap : band.mode === "full" ? "w-full" : "mx-auto max-w-5xl";
 
   const blocks: Record<FooterBlock, ReactNode | null> = {
     note: hasNote ? (
@@ -167,8 +176,11 @@ export function SiteFooter({
 
       {/* Full-width band, thin: copyright, news, color mode, back to top. */}
       <div className="bg-band px-5 text-band-ink sm:px-8">
-        <div className={`${wrap} flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-2.5`}>
-          <p className="text-xs opacity-70">
+        <div
+          className={`${bandWrap} flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-2.5`}
+          style={band.space === 0 ? undefined : { paddingBlock: `${0.625 + band.space}rem` }}
+        >
+          <p className={`${bandText[band.size]} opacity-70`}>
             © {new Date().getFullYear()}{" "}
             <a
               href={siteConfig.credit.author.url}
@@ -181,7 +193,7 @@ export function SiteFooter({
           </p>
           {news && (
             <div className="order-last flex min-w-0 basis-full justify-center sm:order-none sm:flex-1">
-              <NewsTicker {...news} />
+              <NewsTicker {...news} band={band} />
             </div>
           )}
           <div className="flex items-center gap-3">
