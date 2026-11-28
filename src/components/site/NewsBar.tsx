@@ -95,6 +95,7 @@ function Slides({
   small = false,
   motion = "slide",
   ms = 700,
+  gap = "gap-3",
 }: {
   slides: ReactNode[];
   seconds: number;
@@ -102,6 +103,7 @@ function Slides({
   small?: boolean;
   motion?: TopBarMotion;
   ms?: number;
+  gap?: string;
 }) {
   const [index, setIndex] = useState(0);
   const count = slides.length;
@@ -121,14 +123,21 @@ function Slides({
   const slideBox = "flex h-full w-full flex-none items-center justify-center px-2";
 
   return (
-    <>
-      {count > 1 ? (
-        <button type="button" onClick={() => go(-1)} aria-label="Previous news" className={arrow}>
-          ‹
-        </button>
-      ) : (
-        <span className={spacer} />
-      )}
+    <div className={`flex h-full min-w-0 flex-1 items-center ${gap}`}>
+      <span className="flex flex-none items-center gap-2">
+        {count > 1 ? (
+          <button type="button" onClick={() => go(-1)} aria-label="Previous news" className={arrow}>
+            ‹
+          </button>
+        ) : (
+          <span className={spacer} />
+        )}
+        {count > 1 && (
+          <span aria-hidden className="invisible font-mono">
+            {at + 1}/{count}
+          </span>
+        )}
+      </span>
       <div className="relative h-full min-w-0 flex-1 overflow-hidden">
         {motion === "fade" ? (
           slides.map((slide, i) => (
@@ -159,7 +168,7 @@ function Slides({
         )}
       </div>
       {count > 1 ? (
-        <span className="flex items-center gap-2">
+        <span className="flex flex-none items-center gap-2">
           <span className="font-mono opacity-60">
             {at + 1}/{count}
           </span>
@@ -170,7 +179,7 @@ function Slides({
       ) : (
         <span className={spacer} />
       )}
-    </>
+    </div>
   );
 }
 
@@ -192,35 +201,52 @@ export function NewsBar({ items, seconds, autoplay, showClock = false, countdown
   });
   if (phone.length === 0) return null;
 
-  return (
-    <div role="region" aria-label="News" className="site-bar-in relative z-40 border-b border-band-line bg-band text-xs text-band-ink">
-      <div className={`${wrap} hidden h-9 items-center gap-3 px-3 sm:flex`}>
-        {L.order.map((id, i) => {
-          if (id === "clock") return clockOn ? <Clock key="clock" /> : null;
-          if (id === "news") {
-            return news.length > 0 ? (
-              <Slides
-                key="news"
-                slides={news}
-                seconds={secs}
-                autoplay={autoplay}
-                small={live !== null}
-                motion={L.motion}
-                ms={L.ms}
-              />
-            ) : (
-              <span key="news" className="flex-1" />
-            );
-          }
+  // Wide screens: the news is the middle column. Whatever comes before it in the order goes to the left column,
+  // whatever comes after it to the right column. The two side columns are always equally wide, so the news
+  // stays exactly in the middle of the bar. With no clock and no countdown there are no side columns.
+  const cut = L.order.indexOf("news");
+  const leftIds = cut < 0 ? L.order : L.order.slice(0, cut);
+  const rightIds = cut < 0 ? [] : L.order.slice(cut + 1);
+  const shows = (id: string) => (id === "clock" ? clockOn : id === "countdown" ? live !== null : false);
+  const columns = leftIds.some(shows) || rightIds.some(shows)
+    ? "grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)_minmax(0,1fr)]"
+    : "grid-cols-1";
+  const side = (ids: string[], edge: "left" | "right") => (
+    <div className={`flex min-w-0 items-center gap-3 ${edge === "left" ? "justify-start" : "justify-end"}`}>
+      {ids.map((id) => {
+        if (id === "clock") return clockOn ? <Clock key="clock" /> : null;
+        if (id === "countdown") {
           return live ? (
             <div
               key="countdown"
-              className={`flex h-4 max-w-[16rem] flex-none items-center border-band-line ${i === 0 ? "border-r pr-3" : "border-l pl-3"}`}
+              className={`flex h-4 min-w-0 max-w-[16rem] items-center border-band-line ${edge === "left" ? "border-r pr-3" : "border-l pl-3"}`}
             >
               <CountdownText countdown={live} now={now} />
             </div>
           ) : null;
-        })}
+        }
+        return null;
+      })}
+    </div>
+  );
+
+  return (
+    <div role="region" aria-label="News" className="site-bar-in relative z-40 border-b border-band-line bg-band text-xs text-band-ink">
+      <div className={`${wrap} hidden h-9 items-center gap-3 px-3 sm:grid ${columns}`}>
+        {columns !== "grid-cols-1" && side(leftIds, "left")}
+        <div className="h-9 min-w-0">
+          {news.length > 0 && (
+            <Slides
+              slides={news}
+              seconds={secs}
+              autoplay={autoplay}
+              small={live !== null}
+              motion={L.motion}
+              ms={L.ms}
+            />
+          )}
+        </div>
+        {columns !== "grid-cols-1" && side(rightIds, "right")}
       </div>
       <div className="mx-auto flex h-9 max-w-6xl items-center gap-3 px-3 sm:hidden">
         <Slides slides={phone} seconds={secs} autoplay={autoplay} small motion={L.motion} ms={L.ms} />
@@ -261,6 +287,7 @@ export function NewsTicker({ items, seconds, autoplay, showClock = false, countd
         small
         motion={B.motion}
         ms={B.ms}
+        gap="gap-2"
       />
     </div>
   );

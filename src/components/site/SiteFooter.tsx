@@ -177,10 +177,10 @@ export function SiteFooter({
       {/* Full-width band, thin: copyright, news, color mode, back to top. */}
       <div className="bg-band px-5 text-band-ink sm:px-8">
         <div
-          className={`${bandWrap} flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-2.5`}
+          className={`${bandWrap} flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-2.5 lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.6fr)_minmax(0,1fr)]`}
           style={band.space === 0 ? undefined : { paddingBlock: `${0.625 + band.space}rem` }}
         >
-          <p className={`${bandText[band.size]} opacity-70`}>
+          <p className={`${bandText[band.size]} opacity-70 lg:col-start-1 lg:row-start-1`}>
             © {new Date().getFullYear()}{" "}
             <a
               href={siteConfig.credit.author.url}
@@ -192,11 +192,11 @@ export function SiteFooter({
             </a>
           </p>
           {news && (
-            <div className="order-last flex min-w-0 basis-full justify-center sm:order-none sm:flex-1">
+            <div className="order-last flex min-w-0 basis-full justify-center lg:order-none lg:col-start-2 lg:row-start-1 lg:basis-auto">
               <NewsTicker {...news} band={band} />
             </div>
           )}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 lg:col-start-3 lg:row-start-1 lg:justify-self-end">
             <ThemeSwitch control={modeControl} />
             <a
               href="#"
