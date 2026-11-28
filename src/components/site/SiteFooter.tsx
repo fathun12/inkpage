@@ -1,6 +1,13 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { footerDefaults, type FooterAlign, type FooterBlock, type FooterStyle } from "@/config/footer-style";
+import {
+  footerDefaults,
+  footerSlots,
+  type FooterAlign,
+  type FooterBlock,
+  type FooterSlot,
+  type FooterStyle,
+} from "@/config/footer-style";
 import { siteConfig } from "@/config/site";
 import type { SocialItem } from "@/types/block";
 import { NewsTicker, type NewsProps } from "./NewsBar";
@@ -35,6 +42,11 @@ const boxAlign: Record<FooterAlign, string> = {
   right: "items-end text-right",
 };
 const textAlign: Record<FooterAlign, string> = { left: "text-left", center: "text-center", right: "text-right" };
+const slotStart: Record<FooterSlot, string> = {
+  left: "sm:col-start-1",
+  middle: "sm:col-start-2",
+  right: "sm:col-start-3",
+};
 
 export function SiteFooter({
   brand,
@@ -102,7 +114,13 @@ export function SiteFooter({
       </div>
     ),
   };
-  const shown = layout.order.filter((id) => blocks[id] !== null);
+  // Each column (Left, Middle, Right) holds the blocks that picked it, in the order of the list.
+  const columns = footerSlots
+    .map((slot) => ({
+      slot,
+      ids: layout.order.filter((id) => blocks[id] !== null && layout.slot[id] === slot),
+    }))
+    .filter((c) => c.ids.length > 0);
 
   const above = layout.brandSpot === "above";
   // The name, very large. Below the columns it is cut off by the band. Decorative.
@@ -127,14 +145,19 @@ export function SiteFooter({
           {above && bigName}
           <div
             className={
-              full
-                ? "flex flex-col gap-12 sm:flex-row sm:justify-between"
-                : "grid gap-12 sm:grid-cols-[repeat(auto-fit,minmax(12rem,1fr))]"
+              full ? "flex flex-col gap-12 sm:flex-row sm:justify-between" : "grid gap-12 sm:grid-cols-3"
             }
           >
-            {shown.map((id, i) => (
-              <div key={id} className={full ? "sm:min-w-48" : undefined}>
-                <Reveal delay={i * 100}>{blocks[id]}</Reveal>
+            {columns.map((column, ci) => (
+              <div
+                key={column.slot}
+                className={`flex flex-col gap-10 ${full ? "sm:min-w-48" : slotStart[column.slot]}`}
+              >
+                {column.ids.map((id, i) => (
+                  <div key={id} style={{ marginTop: `${layout.shift[id]}rem` }}>
+                    <Reveal delay={(ci + i) * 100}>{blocks[id]}</Reveal>
+                  </div>
+                ))}
               </div>
             ))}
           </div>
